@@ -53,7 +53,21 @@ Global technology ecosystem: social network, professional platform, exchange, de
 
 ---
 
-## 3. Documents
+## 3. Ecosystem: 4 platforms + other directions
+
+OMNIXIUS is one ecosystem. The **four platforms** are the core; **other directions** (education, startups, media, your other projects) plug into them so everything stays one product with one account.
+
+- **CONNECT** — social, experts, learning, media, community.
+- **TRADE & FINANCE** — payments, investments, rewards, subscriptions.
+- **REPOSITORIUM** — storage, compute, files, backups.
+- **BLOCKCHAIN (IXI)** — tokens, governance, launchpad, staking.
+
+See **ECOSYSTEM.md** for the full map and how to add new directions.
+
+---
+
+## 4. Documents
 
 - **ARCHITECTURE.md** — this file (vision and architecture).
+- **ECOSYSTEM.md** — map of 4 platforms + other directions; single place to plug in new projects.
 - **ROADMAP.md** — phases and priorities.

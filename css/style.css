@@ -366,3 +366,27 @@ body {
 .stack-preview .btn {
   margin-top: 1rem;
 }
+
+/* Ecosystem table */
+.table-wrap {
+  overflow-x: auto;
+  margin-top: 1rem;
+}
+.ecosystem-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+.ecosystem-table th,
+.ecosystem-table td {
+  padding: 0.6rem 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+.ecosystem-table th {
+  color: var(--accent);
+  font-weight: 600;
+}
+.ecosystem-table tbody tr:hover {
+  background: var(--accent-dim);
+}

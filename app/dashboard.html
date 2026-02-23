@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,8 +14,11 @@
       <nav class="nav">
         <a href="marketplace.html">Marketplace</a>
         <a href="mail.html">Mail</a>
+        <a href="orders.html">Orders</a>
         <a href="dashboard.html">Profile</a>
+        <a href="../index.html">Site</a>
         <a href="#" id="logout">Sign out</a>
+        <span class="lang-switcher"><a href="#" data-lang="en">EN</a> | <a href="#" data-lang="ru">RU</a> | <a href="#" data-lang="fr">FR</a></span>
       </nav>
     </div>
   </header>
@@ -23,11 +26,12 @@
     <div class="container">
       <h1>Profile</h1>
       <div id="profile"></div>
-      <h2 style="margin-top:2rem;">My orders</h2>
-      <div id="orders"></div>
+      <h2 id="orders" style="margin-top:2rem;">My orders</h2>
+      <div id="ordersList"></div>
     </div>
   </main>
   <script src="config.js"></script>
+  <script src="js/i18n.js"></script>
   <script src="js/api.js"></script>
   <script>
     if (!api.getToken()) { location.href = 'login.html'; return; }
@@ -43,7 +47,7 @@
         <p><a href="profile-edit.html" class="btn btn-primary" style="display:inline-block; margin-top:0.5rem;">Edit</a></p>
       `;
       const list = [...(orders.asBuyer || []), ...(orders.asSeller || [])].slice(0, 20);
-      document.getElementById('orders').innerHTML = list.length
+      document.getElementById('ordersList').innerHTML = list.length
         ? '<ul class="mail-list">' + list.map(o => `<li><span>${o.title} — ${o.status}</span><span>${new Date(o.created_at * 1000).toLocaleDateString()}</span></li>`).join('') + '</ul>'
         : '<p style="color:var(--text-muted);">No orders yet.</p>';
     })().catch(() => { api.auth.logout(); location.href = 'login.html'; });

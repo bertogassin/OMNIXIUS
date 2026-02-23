@@ -61,3 +61,28 @@
 .thread-send button { padding: 0.6rem 1.2rem; }
 
 .profile-avatar { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-bottom: 1rem; }
+
+.orders-hint { color: var(--text-muted); margin-bottom: 1.5rem; }
+.orders-section { margin-bottom: 2.5rem; }
+.orders-section h2 { font-size: 1.1rem; margin-bottom: 1rem; color: var(--text-muted); }
+.orders-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
+.order-card {
+  display: flex; gap: 1rem; padding: 1rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px;
+}
+.order-card-img { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; }
+.order-card-body { flex: 1; min-width: 0; }
+.order-card-title { font-size: 1rem; margin-bottom: 0.25rem; }
+.order-card-meta, .order-card-price { font-size: 0.85rem; color: var(--text-muted); }
+.order-card-price { color: var(--accent); font-weight: 600; margin-top: 0.25rem; }
+.order-status { display: inline-block; margin-top: 0.5rem; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.8rem; }
+.order-status-pending { background: rgba(255,193,7,0.2); color: #ffc107; }
+.order-status-confirmed { background: rgba(0,212,170,0.2); color: var(--accent); }
+.order-status-completed { background: rgba(0,212,170,0.25); color: var(--accent); }
+.order-status-cancelled { background: rgba(244,67,54,0.2); color: #f44336; }
+.orders-empty { color: var(--text-muted); }
+
+.api-url-hint { background: rgba(255,193,7,0.1); border: 1px solid rgba(255,193,7,0.3); border-radius: 8px; padding: 1rem; margin-bottom: 1rem; font-size: 0.9rem; }
+.api-url-hint a { color: var(--accent); }
+.lang-switcher { margin-left: auto; font-size: 0.9rem; color: var(--text-muted); }
+.lang-switcher a { color: inherit; margin: 0 0.2rem; }
+.lang-switcher a.active { color: var(--accent); }

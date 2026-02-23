@@ -7,6 +7,8 @@ import (
 	"database/sql"
 	"encoding/base64"
 	"encoding/hex"
+	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 	"os"
@@ -59,6 +61,7 @@ func main() {
 	auth.Use(authRequired())
 	auth.GET("/users/me", handleUserMe)
 	auth.PATCH("/users/me", handleUserUpdate)
+	auth.DELETE("/users/me", handleUserDelete)
 	auth.GET("/users/me/orders", handleUserOrders)
 	auth.POST("/users/me/avatar", handleUserAvatar)
 
@@ -93,16 +96,45 @@ func requestLogger() gin.HandlerFunc {
 		clientIP := c.ClientIP()
 		c.Next()
 		status := c.Writer.Status()
-		latency := time.Since(start)
-		log.Printf("[%s] %d %s %s %s", method, status, path, clientIP, latency)
+		latencyMs := time.Since(start).Milliseconds()
+		level := "info"
+		if status >= 500 {
+			level = "error"
+		} else if status >= 400 {
+			level = "warn"
+		}
+		entry := map[string]interface{}{
+			"level": level, "method": method, "path": path,
+			"status": status, "ip": clientIP, "latency_ms": latencyMs,
+		}
+		if b, err := json.Marshal(entry); err == nil {
+			log.Println(string(b))
+		} else {
+			log.Printf("[%s] %d %s %s", method, status, path, clientIP)
+		}
 	}
 }
 
 func corsMiddleware() gin.HandlerFunc {
+	origins := strings.Split(cfg.AllowedOrigins, ",")
+	for i, o := range origins {
+		origins[i] = strings.TrimSpace(o)
+	}
 	return func(c *gin.Context) {
-		c.Header("Access-Control-Allow-Origin", "*")
+		origin := c.GetHeader("Origin")
+		if cfg.AllowedOrigins == "" {
+			c.Header("Access-Control-Allow-Origin", "*")
+		} else if origin != "" {
+			for _, o := range origins {
+				if o != "" && (origin == o || o == "*") {
+					c.Header("Access-Control-Allow-Origin", origin)
+					break
+				}
+			}
+		}
 		c.Header("Access-Control-Allow-Methods", "GET,POST,PATCH,DELETE,OPTIONS")
 		c.Header("Access-Control-Allow-Headers", "Content-Type, Authorization")
+		c.Header("Access-Control-Allow-Credentials", "true")
 		if c.Request.Method == "OPTIONS" {
 			c.AbortWithStatus(204)
 			return
@@ -183,7 +215,6 @@ func handleRegister(c *gin.Context) {
 		c.JSON(400, gin.H{"error": "Invalid email or password (min 8 chars)"})
 		return
 	}
-	body.Email = strings.TrimSpace(strings.ToLower(body.Email))
 	if len(body.Email) > 255 {
 		c.JSON(400, gin.H{"error": "Email too long"})
 		return
@@ -191,25 +222,19 @@ func handleRegister(c *gin.Context) {
 	if len(body.Name) > 200 {
 		body.Name = body.Name[:200]
 	}
-	var id int64
-	err := db.DB.QueryRow("SELECT id FROM users WHERE email = ?", body.Email).Scan(&id)
-	if err == nil {
-		c.JSON(409, gin.H{"error": "Email already registered"})
-		return
-	}
-	hash := hashPasswordArgon2(body.Password)
-	tok := make([]byte, 32)
-	rand.Read(tok)
-	verifyToken := hex.EncodeToString(tok)
-	res, err := db.DB.Exec("INSERT INTO users (email, password_hash, name, role, email_verify_token) VALUES (?, ?, ?, 'user', ?)",
-		body.Email, hash, nullStr(body.Name), verifyToken)
+	user, token, err := AuthRegister(body.Email, body.Password, body.Name)
 	if err != nil {
-		c.JSON(500, gin.H{"error": "Registration failed"})
+		switch {
+		case errors.Is(err, ErrEmailExists):
+			c.JSON(409, gin.H{"error": "Email already registered"})
+		case errors.Is(err, ErrRegistrationFailed):
+			c.JSON(500, gin.H{"error": "Registration failed"})
+		default:
+			c.JSON(500, gin.H{"error": "Registration failed"})
+		}
 		return
 	}
-	id, _ = res.LastInsertId()
-	token, _ := pqc.SignToken(cfg.PQCPrivateKey, id, time.Now().Add(7*24*time.Hour))
-	c.JSON(201, gin.H{"user": gin.H{"id": id, "email": body.Email, "role": "user", "name": body.Name}, "token": token})
+	c.JSON(201, gin.H{"user": user, "token": token})
 }
 
 func handleLogin(c *gin.Context) {
@@ -227,20 +252,15 @@ func handleLogin(c *gin.Context) {
 		c.JSON(400, gin.H{"error": "Email and password required"})
 		return
 	}
-	body.Email = strings.TrimSpace(strings.ToLower(body.Email))
-	var id int64
-	var hash string
-	var role, name string
-	var avatar sql.NullString
-	var verified int
-	err := db.DB.QueryRow("SELECT id, password_hash, role, name, avatar_path, email_verified FROM users WHERE email = ?", body.Email).
-		Scan(&id, &hash, &role, &name, &avatar, &verified)
-	if err != nil || !checkPassword(hash, body.Password) {
-		c.JSON(401, gin.H{"error": "Invalid email or password"})
+	user, token, err := AuthLogin(body.Email, body.Password)
+	if err != nil {
+		if errors.Is(err, ErrInvalidCredentials) {
+			c.JSON(401, gin.H{"error": "Invalid email or password"})
+			return
+		}
+		c.JSON(500, gin.H{"error": "Login failed"})
 		return
 	}
-	user := gin.H{"id": id, "email": body.Email, "role": role, "name": name, "avatar_path": avatar.String, "email_verified": verified == 1}
-	token, _ := pqc.SignToken(cfg.PQCPrivateKey, id, time.Now().Add(7*24*time.Hour))
 	c.JSON(200, gin.H{"user": user, "token": token})
 }
 
@@ -350,6 +370,22 @@ func handleUserUpdate(c *gin.Context) {
 	}
 	db.DB.Exec("UPDATE users SET name = ?, updated_at = unixepoch() WHERE id = ?", nullStr(body.Name), getUserID(c))
 	handleUserMe(c)
+}
+
+func handleUserDelete(c *gin.Context) {
+	uid := getUserID(c)
+	// Orders reference users; delete them first so we can delete the user.
+	db.DB.Exec("DELETE FROM orders WHERE buyer_id = ? OR seller_id = ?", uid, uid)
+	res, err := db.DB.Exec("DELETE FROM users WHERE id = ?", uid)
+	if err != nil {
+		c.JSON(500, gin.H{"error": "Account deletion failed"})
+		return
+	}
+	if mustRows(res) == 0 {
+		c.JSON(404, gin.H{"error": "User not found"})
+		return
+	}
+	c.JSON(200, gin.H{"ok": true})
 }
 
 func handleUserOrders(c *gin.Context) {
@@ -477,33 +513,16 @@ func handleProductsCategories(c *gin.Context) {
 }
 
 func handleProductGet(c *gin.Context) {
-	id := c.Param("id")
-	var p productRow
-	err := db.DB.QueryRow(`SELECT p.id, p.user_id, p.title, p.description, p.price, p.category, p.location, p.image_path, p.created_at, u.name, u.email FROM products p JOIN users u ON u.id = p.user_id WHERE p.id = ?`, id).
-		Scan(&p.ID, &p.UserID, &p.Title, &p.Description, &p.Price, &p.Category, &p.Location, &p.ImagePath, &p.CreatedAt, &p.SellerName, &p.SellerEmail)
+	h, err := ProductGet(c.Param("id"))
 	if err != nil {
-		c.JSON(404, gin.H{"error": "Product not found"})
+		if errors.Is(err, ErrProductNotFound) {
+			c.JSON(404, gin.H{"error": "Product not found"})
+			return
+		}
+		c.JSON(500, gin.H{"error": "Failed to load product"})
 		return
 	}
-	c.JSON(200, p.toH())
-}
-
-type productRow struct {
-	ID          int64
-	UserID      int64
-	Title       string
-	Description string
-	Price       float64
-	Category    string
-	Location    string
-	ImagePath   sql.NullString
-	CreatedAt   int64
-	SellerName  sql.NullString
-	SellerEmail string
-}
-
-func (p productRow) toH() gin.H {
-	return gin.H{"id": p.ID, "user_id": p.UserID, "title": p.Title, "description": p.Description, "price": p.Price, "category": p.Category, "location": p.Location, "image_path": p.ImagePath.String, "created_at": p.CreatedAt, "seller_id": p.UserID, "seller_name": p.SellerName.String, "seller_email": p.SellerEmail}
+	c.JSON(200, h)
 }
 
 func handleProductCreate(c *gin.Context) {
@@ -542,17 +561,12 @@ func handleProductCreate(c *gin.Context) {
 			imagePath = rel
 		}
 	}
-	res, err := db.DB.Exec("INSERT INTO products (user_id, title, description, price, category, location, image_path) VALUES (?, ?, ?, ?, ?, ?, ?)",
-		getUserID(c), title, desc, price, category, nullStr(location), nullStr(imagePath))
+	h, err := ProductCreate(getUserID(c), title, desc, category, location, imagePath, price)
 	if err != nil {
 		c.JSON(500, gin.H{"error": "Create failed"})
 		return
 	}
-	newID, _ := res.LastInsertId()
-	row := db.DB.QueryRow("SELECT id, user_id, title, description, price, category, location, image_path, created_at FROM products WHERE id = ?", newID)
-	var pr productRow
-	row.Scan(&pr.ID, &pr.UserID, &pr.Title, &pr.Description, &pr.Price, &pr.Category, &pr.Location, &pr.ImagePath, &pr.CreatedAt)
-	c.JSON(201, pr.toH())
+	c.JSON(201, h)
 }
 
 func handleProductUpdate(c *gin.Context) {
@@ -611,21 +625,7 @@ func handleProductDelete(c *gin.Context) {
 }
 
 func handleOrdersMy(c *gin.Context) {
-	id := getUserID(c)
-	rows, _ := db.DB.Query(`SELECT o.id, o.product_id, o.buyer_id, o.seller_id, o.status, o.created_at, p.title, p.price, p.image_path FROM orders o JOIN products p ON p.id = o.product_id WHERE o.buyer_id = ? OR o.seller_id = ? ORDER BY o.created_at DESC`, id, id)
-	var list []gin.H
-	if rows != nil {
-		defer rows.Close()
-		for rows.Next() {
-			var oid, pid, buyer, seller, created int64
-			var status, title string
-			var price float64
-			var img sql.NullString
-			rows.Scan(&oid, &pid, &buyer, &seller, &status, &created, &title, &price, &img)
-			list = append(list, gin.H{"id": oid, "product_id": pid, "buyer_id": buyer, "seller_id": seller, "status": status, "created_at": created, "title": title, "price": price, "image_path": img.String})
-		}
-	}
-	c.JSON(200, list)
+	c.JSON(200, OrdersMy(getUserID(c)))
 }
 
 func handleOrderCreate(c *gin.Context) {
@@ -636,23 +636,19 @@ func handleOrderCreate(c *gin.Context) {
 		c.JSON(400, gin.H{"error": "product_id required"})
 		return
 	}
-	var sellerID int64
-	if db.DB.QueryRow("SELECT user_id FROM products WHERE id = ?", body.ProductID).Scan(&sellerID) != nil {
-		c.JSON(404, gin.H{"error": "Product not found"})
-		return
-	}
-	uid := getUserID(c)
-	if sellerID == uid {
-		c.JSON(400, gin.H{"error": "Cannot order own product"})
-		return
-	}
-	res, err := db.DB.Exec("INSERT INTO orders (product_id, buyer_id, seller_id, status) VALUES (?, ?, ?, 'pending')", body.ProductID, uid, sellerID)
+	h, err := OrderCreate(getUserID(c), body.ProductID)
 	if err != nil {
-		c.JSON(500, gin.H{"error": "Failed"})
+		switch {
+		case errors.Is(err, ErrOrderProductNotFound):
+			c.JSON(404, gin.H{"error": "Product not found"})
+		case errors.Is(err, ErrOrderOwnProduct):
+			c.JSON(400, gin.H{"error": "Cannot order own product"})
+		default:
+			c.JSON(500, gin.H{"error": "Failed"})
+		}
 		return
 	}
-	oid, _ := res.LastInsertId()
-	c.JSON(201, gin.H{"id": oid, "product_id": body.ProductID, "buyer_id": uid, "seller_id": sellerID, "status": "pending"})
+	c.JSON(201, h)
 }
 
 func handleOrderUpdate(c *gin.Context) {
@@ -680,27 +676,7 @@ func handleOrderUpdate(c *gin.Context) {
 }
 
 func handleConversationsList(c *gin.Context) {
-	uid := getUserID(c)
-	rows, _ := db.DB.Query(`SELECT c.id, c.product_id, c.updated_at FROM conversations c JOIN conversation_participants cp ON cp.conversation_id = c.id WHERE cp.user_id = ? ORDER BY c.updated_at DESC`, uid)
-	var list []gin.H
-	if rows != nil {
-		defer rows.Close()
-		for rows.Next() {
-			var cid, pid, updated int64
-			var pidNull sql.NullInt64
-			rows.Scan(&cid, &pidNull, &updated)
-			if pidNull.Valid {
-				pid = pidNull.Int64
-			}
-			var otherID int64
-			var otherName, otherEmail sql.NullString
-			db.DB.QueryRow("SELECT u.id, u.name, u.email FROM users u JOIN conversation_participants cp ON cp.user_id = u.id WHERE cp.conversation_id = ? AND u.id != ?", cid, uid).Scan(&otherID, &otherName, &otherEmail)
-			var lastMsg sql.NullString
-			db.DB.QueryRow("SELECT body FROM messages WHERE conversation_id = ? ORDER BY created_at DESC LIMIT 1", cid).Scan(&lastMsg)
-			list = append(list, gin.H{"id": cid, "product_id": pid, "updated_at": updated, "last_message": lastMsg.String, "other": gin.H{"id": otherID, "name": otherName.String, "email": otherEmail.String}})
-		}
-	}
-	c.JSON(200, list)
+	c.JSON(200, ConversationsList(getUserID(c)))
 }
 
 func handleConversationCreate(c *gin.Context) {
@@ -713,48 +689,42 @@ func handleConversationCreate(c *gin.Context) {
 		c.JSON(400, gin.H{"error": "Valid user_id required"})
 		return
 	}
-	var otherExists int64
-	if db.DB.QueryRow("SELECT id FROM users WHERE id = ?", body.UserID).Scan(&otherExists) != nil {
-		c.JSON(404, gin.H{"error": "User not found"})
-		return
-	}
-	uid := getUserID(c)
-	var convID int64
-	err := db.DB.QueryRow(`SELECT c.id FROM conversations c JOIN conversation_participants cp1 ON cp1.conversation_id = c.id AND cp1.user_id = ? JOIN conversation_participants cp2 ON cp2.conversation_id = c.id AND cp2.user_id = ? WHERE (c.product_id IS NULL AND ? = 0) OR c.product_id = ?`,
-		uid, body.UserID, body.ProductID, body.ProductID).Scan(&convID)
+	convID, err := ConversationCreate(getUserID(c), body.UserID, body.ProductID)
 	if err != nil {
-		res, _ := db.DB.Exec("INSERT INTO conversations (product_id) VALUES (?)", nullInt64(body.ProductID))
-		convID, _ = res.LastInsertId()
-		db.DB.Exec("INSERT INTO conversation_participants (conversation_id, user_id) VALUES (?, ?), (?, ?)", convID, uid, convID, body.UserID)
+		if errors.Is(err, ErrConvUserNotFound) {
+			c.JSON(404, gin.H{"error": "User not found"})
+			return
+		}
+		c.JSON(500, gin.H{"error": "Failed"})
+		return
 	}
 	c.JSON(200, gin.H{"id": convID, "product_id": body.ProductID})
 }
 
 func handleMessagesList(c *gin.Context) {
-	cid := c.Param("id")
-	uid := getUserID(c)
-	var ok int
-	if db.DB.QueryRow("SELECT 1 FROM conversation_participants WHERE conversation_id = ? AND user_id = ?", cid, uid).Scan(&ok) != nil {
-		c.JSON(403, gin.H{"error": "Forbidden"})
+	cid, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(400, gin.H{"error": "Invalid conversation id"})
 		return
 	}
-	rows, _ := db.DB.Query("SELECT m.id, m.sender_id, m.body, m.read_at, m.created_at, u.name FROM messages m JOIN users u ON u.id = m.sender_id WHERE m.conversation_id = ? ORDER BY m.created_at ASC", cid)
-	var list []gin.H
-	if rows != nil {
-		defer rows.Close()
-		for rows.Next() {
-			var id, senderID, created int64
-			var body, name string
-			var readAt sql.NullInt64
-			rows.Scan(&id, &senderID, &body, &readAt, &created, &name)
-			list = append(list, gin.H{"id": id, "sender_id": senderID, "body": body, "read_at": readAt.Int64, "created_at": created, "sender_name": name})
+	list, err := MessagesList(cid, getUserID(c))
+	if err != nil {
+		if errors.Is(err, ErrConvForbidden) {
+			c.JSON(403, gin.H{"error": "Forbidden"})
+			return
 		}
+		c.JSON(500, gin.H{"error": "Failed"})
+		return
 	}
 	c.JSON(200, list)
 }
 
 func handleMessageSend(c *gin.Context) {
-	cid := c.Param("id")
+	cid, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(400, gin.H{"error": "Invalid conversation id"})
+		return
+	}
 	var body struct {
 		Body string `json:"body"`
 	}
@@ -766,40 +736,37 @@ func handleMessageSend(c *gin.Context) {
 	if len(bodyTrim) > 10000 {
 		bodyTrim = bodyTrim[:10000]
 	}
-	uid := getUserID(c)
-	var ok int
-	if db.DB.QueryRow("SELECT 1 FROM conversation_participants WHERE conversation_id = ? AND user_id = ?", cid, uid).Scan(&ok) != nil {
-		c.JSON(403, gin.H{"error": "Forbidden"})
-		return
-	}
-	res, err := db.DB.Exec("INSERT INTO messages (conversation_id, sender_id, body) VALUES (?, ?, ?)", cid, uid, bodyTrim)
+	h, err := MessageSend(cid, getUserID(c), bodyTrim)
 	if err != nil {
+		if errors.Is(err, ErrConvForbidden) {
+			c.JSON(403, gin.H{"error": "Forbidden"})
+			return
+		}
 		c.JSON(500, gin.H{"error": "Failed"})
 		return
 	}
-	db.DB.Exec("UPDATE conversations SET updated_at = unixepoch() WHERE id = ?", cid)
-	mid, _ := res.LastInsertId()
-	c.JSON(201, gin.H{"id": mid, "conversation_id": cid, "sender_id": uid, "body": bodyTrim, "created_at": time.Now().Unix()})
+	c.JSON(201, h)
 }
 
 func handleMessageRead(c *gin.Context) {
-	mid := c.Param("id")
-	uid := getUserID(c)
-	var senderID, convID int64
-	if db.DB.QueryRow("SELECT sender_id, conversation_id FROM messages WHERE id = ?", mid).Scan(&senderID, &convID) != nil {
-		c.JSON(404, gin.H{"error": "Message not found"})
+	mid, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(400, gin.H{"error": "Invalid message id"})
 		return
 	}
-	if senderID == uid {
-		c.JSON(200, gin.H{"ok": true})
+	err = MessageMarkRead(mid, getUserID(c))
+	if err != nil {
+		if errors.Is(err, ErrMessageNotFound) {
+			c.JSON(404, gin.H{"error": "Message not found"})
+			return
+		}
+		if errors.Is(err, ErrConvForbidden) {
+			c.JSON(403, gin.H{"error": "Forbidden"})
+			return
+		}
+		c.JSON(500, gin.H{"error": "Failed"})
 		return
 	}
-	var ok int
-	if db.DB.QueryRow("SELECT 1 FROM conversation_participants WHERE conversation_id = ? AND user_id = ?", convID, uid).Scan(&ok) != nil {
-		c.JSON(403, gin.H{"error": "Forbidden"})
-		return
-	}
-	db.DB.Exec("UPDATE messages SET read_at = unixepoch() WHERE id = ? AND read_at IS NULL", mid)
 	c.JSON(200, gin.H{"ok": true})
 }
 

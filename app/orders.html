@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Orders — OMNIXIUS</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <header class="header">
+    <div class="container">
+      <a href="../index.html" class="logo">OMNIXIUS</a>
+      <nav class="nav">
+        <a href="marketplace.html">Marketplace</a>
+        <a href="mail.html">Mail</a>
+        <a href="orders.html">Orders</a>
+        <a href="dashboard.html">Profile</a>
+        <a href="../index.html">Site</a>
+        <a href="#" id="logout">Sign out</a>
+        <span class="lang-switcher"><a href="#" data-lang="en">EN</a> | <a href="#" data-lang="ru">RU</a> | <a href="#" data-lang="fr">FR</a></span>
+      </nav>
+    </div>
+  </header>
+  <main class="app-page">
+    <div class="container">
+      <h1 data-i18n="ordersTitle">My orders</h1>
+      <p class="orders-hint" data-i18n="ordersHint">Purchases and sales in one place.</p>
+      <section class="orders-section" id="asBuyerSection">
+        <h2 data-i18n="ordersAsBuyer">As buyer</h2>
+        <div id="asBuyerList"></div>
+      </section>
+      <section class="orders-section" id="asSellerSection">
+        <h2 data-i18n="ordersAsSeller">As seller</h2>
+        <div id="asSellerList"></div>
+      </section>
+    </div>
+  </main>
+  <script src="config.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    if (!api.getToken()) { location.href = 'login.html'; return; }
+    document.getElementById('logout').onclick = () => { api.auth.logout(); location.href = '../index.html'; };
+
+    function renderOrderCard(o, role) {
+      const img = o.image_path ? (window.API_URL + '/uploads/' + o.image_path) : '';
+      const date = o.created_at ? new Date(o.created_at * 1000).toLocaleDateString(undefined, { dateStyle: 'medium' }) : '';
+      const other = o.seller_name || o.buyer_name || '';
+      const statusClass = (o.status || '').toLowerCase();
+      return `
+        <article class="order-card">
+          ${img ? `<img src="${img}" alt="" class="order-card-img">` : ''}
+          <div class="order-card-body">
+            <h3 class="order-card-title">${escapeHtml(o.title || '')}</h3>
+            <p class="order-card-meta">${escapeHtml(other)} · ${date}</p>
+            <p class="order-card-price">${typeof o.price === 'number' ? o.price.toFixed(2) : o.price}</p>
+            <span class="order-status order-status-${statusClass}">${escapeHtml(o.status || '')}</span>
+          </div>
+        </article>
+      `;
+    }
+    function escapeHtml(s) {
+      const div = document.createElement('div');
+      div.textContent = s;
+      return div.innerHTML;
+    }
+
+    (async () => {
+      const data = await api.users.myOrders();
+      const asBuyer = data.asBuyer || [];
+      const asSeller = data.asSeller || [];
+      document.getElementById('asBuyerList').innerHTML = asBuyer.length
+        ? '<div class="orders-grid">' + asBuyer.map(o => renderOrderCard(o, 'buyer')).join('') + '</div>'
+        : '<p class="orders-empty" data-i18n="noOrders">No orders yet.</p>';
+      document.getElementById('asSellerList').innerHTML = asSeller.length
+        ? '<div class="orders-grid">' + asSeller.map(o => renderOrderCard(o, 'seller')).join('') + '</div>'
+        : '<p class="orders-empty" data-i18n="noOrders">No orders yet.</p>';
+      if (typeof i18n !== 'undefined') i18n.apply();
+    })().catch(() => { api.auth.logout(); location.href = 'login.html'; });
+  </script>
+</body>
+</html>

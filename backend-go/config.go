@@ -11,6 +11,7 @@ import (
 
 type Config struct {
 	Port             string
+	AllowedOrigins   string // comma-separated; empty = "*" (dev)
 	MaxLoginAttempts int
 	UploadDir        string
 	MaxFileSize      int64
@@ -36,6 +37,7 @@ func LoadConfig() Config {
 	}
 	cfg := Config{
 		Port:             port,
+		AllowedOrigins:   os.Getenv("ALLOWED_ORIGINS"), // e.g. "https://bertogassin.github.io,https://omnixius.com"
 		MaxLoginAttempts: 5,
 		UploadDir:        "uploads",
 		MaxFileSize:      5 * 1024 * 1024,
@@ -51,12 +53,12 @@ func LoadConfig() Config {
 		cfg.PQCPrivateKey = b
 	}
 	if len(cfg.PQCPublicKey) == 0 || len(cfg.PQCPrivateKey) == 0 {
-		pub, priv, err := pqc.GenerateKey()
+		priv, pub, err := pqc.GenerateKey()
 		if err != nil {
 			log.Fatal("pqc.GenerateKey: ", err)
 		}
-		cfg.PQCPublicKey = pub
 		cfg.PQCPrivateKey = priv
+		cfg.PQCPublicKey = pub
 		log.Print("PQC: DILITHIUM_PUBLIC_KEY/DILITHIUM_PRIVATE_KEY not set; ephemeral keys generated (tokens invalid after restart). Set env in production.")
 	}
 	return cfg

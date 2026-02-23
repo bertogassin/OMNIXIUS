@@ -16,8 +16,9 @@ API: `http://localhost:3000`
 ## Env
 
 - `PORT` — default 3000
-- `JWT_SECRET` — change in production
 - `DB_PATH` — default `db/omnixius.db`
+- `ALLOWED_ORIGINS` — comma-separated origins for CORS; empty = `*` (dev)
+- `DILITHIUM_PUBLIC_KEY` / `DILITHIUM_PRIVATE_KEY` — base64 PQC keys (optional; ephemeral if unset)
 
 ## Endpoints
 
@@ -25,4 +26,8 @@ Same as before: `/api/auth/*`, `/api/users/*`, `/api/products/*`, `/api/orders/*
 
 ## DB
 
-SQLite. Schema in `db/schema.sql` (embedded). DB file created on first run.
+SQLite. Schema in `db/schema.sql` (embedded). Versioned migrations in `db/migrations/` (e.g. `003_add_feature.sql`); applied on startup. DB file created on first run.
+
+## CI
+
+GitHub Actions (`.github/workflows/ci.yml`): on push/PR to `main`/`master`, runs `go test ./...` and `go build` in `backend-go`.

@@ -13,45 +13,71 @@
       <a href="../index.html" class="logo">OMNIXIUS</a>
       <nav class="nav">
         <a href="marketplace.html">Marketplace</a>
+        <a href="mail.html">Mail</a>
+        <a href="orders.html">Orders</a>
+        <a href="dashboard.html">Profile</a>
+        <a href="../index.html">Site</a>
         <a href="login.html">Sign in</a>
         <a href="register.html">Register</a>
+        <span class="lang-switcher">
+          <a href="#" data-lang="en">EN</a> | <a href="#" data-lang="ru">RU</a> | <a href="#" data-lang="fr">FR</a>
+        </span>
       </nav>
     </div>
   </header>
   <main class="app-page">
     <div class="container">
-      <h1 style="text-align:center; margin-bottom:1rem;">Register</h1>
+      <div id="apiUrlHint" class="api-url-hint" style="display:none;"></div>
+      <h1 style="text-align:center; margin-bottom:1rem;" data-i18n="registerTitle">Register</h1>
       <form class="app-form" id="form">
         <p class="error" id="err" style="display:none;"></p>
-        <label>Email</label>
+        <label data-i18n="email">Email</label>
         <input type="email" name="email" required autocomplete="email">
-        <label>Password (min 8 characters)</label>
+        <label data-i18n="passwordMin">Password (min 8 characters)</label>
         <input type="password" name="password" required minlength="8" autocomplete="new-password">
-        <label>Name</label>
+        <label data-i18n="name">Name</label>
         <input type="text" name="name" autocomplete="name">
-        <button type="submit" class="btn btn-primary">Register</button>
+        <button type="submit" class="btn btn-primary" data-i18n="register">Register</button>
       </form>
-      <p class="link"><a href="login.html">Already have an account? Sign in</a></p>
+      <p class="link"><a href="login.html" data-i18n="haveAccount">Already have an account? Sign in</a></p>
     </div>
   </main>
   <script src="config.js"></script>
+  <script src="js/i18n.js"></script>
   <script src="js/api.js"></script>
   <script>
+    (function () {
+      var hint = document.getElementById('apiUrlHint');
+      if (!window.API_URL && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+        hint.innerHTML = '<span data-i18n="apiUrlHint">Backend URL not set. You cannot sign in or register until you set it.</span> <a href="#" id="setApiUrl">' + (window.i18n ? window.i18n.t('setApiUrl') : 'Set API URL') + '</a>';
+        hint.style.display = 'block';
+        document.getElementById('setApiUrl').onclick = function (e) {
+          e.preventDefault();
+          var url = prompt('Backend API URL (e.g. https://your-api.example.com):', localStorage.getItem('omnixius_api_url') || '');
+          if (url) { localStorage.setItem('omnixius_api_url', url.replace(/\/$/, '')); location.reload(); }
+        };
+      }
+    })();
     if (api.getToken()) { location.href = 'dashboard.html'; }
     document.getElementById('form').onsubmit = async (e) => {
       e.preventDefault();
-      const err = document.getElementById('err');
+      var err = document.getElementById('err');
       err.style.display = 'none';
-      const email = e.target.email.value.trim();
-      const password = e.target.password.value;
-      const name = e.target.name.value.trim() || null;
+      var email = e.target.email.value.trim();
+      var password = e.target.password.value;
+      var name = e.target.name.value.trim() || null;
       try {
-        const data = await api.auth.register(email, password, name);
+        var data = await api.auth.register(email, password, name);
+        if (!data || !data.token) { err.textContent = window.i18n ? i18n.t('registerFailed') : 'Registration failed. Try again.'; err.style.display = 'block'; return; }
         api.setToken(data.token);
         api.user = data.user;
         location.href = 'dashboard.html';
       } catch (x) {
-        err.textContent = x.data?.error || 'Registration failed';
+        if (x && x.message && (x.message.includes('fetch') || x.message.includes('Failed'))) {
+          err.textContent = window.i18n ? i18n.t('cannotConnect') : 'Cannot reach server. Set API URL?';
+        } else {
+          err.textContent = (x && x.data && x.data.error) || (window.i18n ? i18n.t('registerFailed') : 'Registration failed');
+        }
         err.style.display = 'block';
       }
     };

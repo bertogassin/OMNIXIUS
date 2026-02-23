@@ -1,0 +1,1 @@
+-- Placeholder for future migrations. Next: use 003_description.sql for schema changes.

@@ -1,13 +1,15 @@
-# OMNIXIUS platform: registration, marketplace, mail
+# OMNIXIUS platform: Mail, Marketplace, Shop, and the full ecosystem
 
 **Stack: Go only** for backend (see ARCHITECTURE.md — SPARK, RUST, C++, SWIFT, GO).
 
-## What’s included
+## What’s live now
 
-1. **Registration & accounts** — Email/password, confirm email, login/logout, password reset. Roles: user, seller, admin. Profile: name, avatar, order history. JWT auth.
-2. **Marketplace** — Create/edit/delete listings (title, description, price, photo, category, location). Search and filters. Product page, “Contact seller” (opens internal mail). Orders.
-3. **Internal mail** — Conversations and messages, optional product link, read status.
-4. **Integration** — Single login for marketplace, mail, profile, orders. “Contact seller” creates a conversation with optional product link.
+1. **Mail** — Internal mail: conversations and messages between users.
+2. **Marketplace** — Listings: browse, search, filters, categories. Create/edit/delete listings (title, description, price, photo, category, location).
+3. **Shop** — Buy and sell: orders, “Contact seller” (opens Mail), order status. Single login for marketplace, mail, profile, orders.
+4. **Profile** — Registration, login, password reset, name, avatar, my orders (buyer/seller). PQC (Dilithium3) auth tokens. Account deletion: DELETE `/api/users/me` (see PRIVACY.md).
+
+The full ecosystem (Connect, Trade & Finance, Repositorium, Blockchain, and more) is in vision and roadmap; new directions are added over time. See **ECOSYSTEM.md**.
 
 ## How to run
 
@@ -31,5 +33,5 @@
 
 ## Security & scale
 
-- Passwords: bcrypt. JWT, rate limit, validation, parameterized queries. File uploads: type and size checked.
+- Passwords: Argon2id (legacy bcrypt at login). PQC tokens, rate limit, validation, parameterized queries. File uploads: type and size checked. Privacy: PRIVACY.md; DELETE `/api/users/me` for account deletion.
 - Ready to scale: swap SQLite for PostgreSQL, add payments, geo, microservices.

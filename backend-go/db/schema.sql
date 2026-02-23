@@ -59,3 +59,7 @@ CREATE TABLE IF NOT EXISTS messages (
   created_at INTEGER DEFAULT (unixepoch())
 );
 CREATE INDEX IF NOT EXISTS idx_messages_conversation ON messages(conversation_id);
+
+-- Versioned migrations: one row, version = last applied migration number (001 = initial).
+CREATE TABLE IF NOT EXISTS schema_version (id INTEGER PRIMARY KEY CHECK (id = 1), version INTEGER NOT NULL DEFAULT 0);
+INSERT OR IGNORE INTO schema_version (id, version) VALUES (1, 1);
