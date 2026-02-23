@@ -28,18 +28,28 @@
   <main class="app-page">
     <div class="container">
       <div id="apiUrlHint" class="api-url-hint" style="display:none;"></div>
-      <h1 style="text-align:center; margin-bottom:1rem;" data-i18n="registerTitle">Register</h1>
-      <form class="app-form" id="form">
-        <p class="error" id="err" style="display:none;"></p>
-        <label data-i18n="email">Email</label>
-        <input type="email" name="email" required autocomplete="email">
-        <label data-i18n="passwordMin">Password (min 8 characters)</label>
-        <input type="password" name="password" required minlength="8" autocomplete="new-password">
-        <label data-i18n="name">Name</label>
-        <input type="text" name="name" autocomplete="name">
-        <button type="submit" class="btn btn-primary" data-i18n="register">Register</button>
-      </form>
-      <p class="link"><a href="login.html" data-i18n="haveAccount">Already have an account? Sign in</a></p>
+      <div class="auth-card">
+        <h1 class="auth-title" data-i18n="registerTitle">Register</h1>
+        <p class="auth-subtitle" data-i18n="registerSubtitle">Create your OMNIXIUS account.</p>
+        <form class="app-form" id="form">
+          <p class="error" id="err" style="display:none;"></p>
+          <label data-i18n="email">Email</label>
+          <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+          <label data-i18n="passwordMin">Password (min 8 characters)</label>
+          <input type="password" name="password" required minlength="8" autocomplete="new-password" id="pwd">
+          <label data-i18n="confirmPassword">Confirm password</label>
+          <input type="password" name="password2" required minlength="8" autocomplete="new-password" id="pwd2">
+          <p class="form-hint" id="pwdMismatch" style="display:none;" data-i18n="passwordMismatch">Passwords do not match</p>
+          <label data-i18n="name">Name</label>
+          <input type="text" name="name" autocomplete="name" placeholder="Your name" maxlength="200">
+          <label class="checkbox-label">
+            <input type="checkbox" name="agree" id="agree" required>
+            <span><span data-i18n="agreeTermsPrefix">I agree to the</span> <a href="../contact.html" target="_blank" rel="noopener"><span data-i18n="termsAndPrivacy">Terms and Privacy</span></a></span>
+          </label>
+          <button type="submit" class="btn btn-primary btn-block" id="submitBtn" data-i18n="createAccount">Create account</button>
+        </form>
+        <p class="auth-link"><a href="login.html" data-i18n="haveAccount">Already have an account? Sign in</a></p>
+      </div>
     </div>
   </main>
   <script src="config.js"></script>
@@ -59,20 +69,48 @@
       }
     })();
     if (api.getToken()) { location.href = 'dashboard.html'; }
-    document.getElementById('form').onsubmit = async (e) => {
+
+    var form = document.getElementById('form');
+    var pwd = document.getElementById('pwd');
+    var pwd2 = document.getElementById('pwd2');
+    var pwdMismatch = document.getElementById('pwdMismatch');
+    pwd2.addEventListener('input', function () {
+      pwdMismatch.style.display = (pwd.value && pwd2.value && pwd.value !== pwd2.value) ? 'block' : 'none';
+    });
+    pwd.addEventListener('input', function () {
+      pwdMismatch.style.display = (pwd.value && pwd2.value && pwd.value !== pwd2.value) ? 'block' : 'none';
+    });
+
+    form.onsubmit = async (e) => {
       e.preventDefault();
       var err = document.getElementById('err');
+      var btn = document.getElementById('submitBtn');
       err.style.display = 'none';
-      var email = e.target.email.value.trim();
-      var password = e.target.password.value;
-      var name = e.target.name.value.trim() || null;
+      if (pwd.value !== pwd2.value) {
+        err.textContent = window.i18n ? i18n.t('passwordMismatch') : 'Passwords do not match';
+        err.style.display = 'block';
+        return;
+      }
+      var email = form.email.value.trim();
+      var password = form.password.value;
+      var name = form.name.value.trim() || null;
+      btn.disabled = true;
+      btn.textContent = window.i18n ? i18n.t('registering') : 'Creating account…';
       try {
         var data = await api.auth.register(email, password, name);
-        if (!data || !data.token) { err.textContent = window.i18n ? i18n.t('registerFailed') : 'Registration failed. Try again.'; err.style.display = 'block'; return; }
-        api.setToken(data.token);
+        if (!data || !data.token) {
+          err.textContent = window.i18n ? i18n.t('registerFailed') : 'Registration failed. Try again.';
+          err.style.display = 'block';
+          btn.disabled = false;
+          btn.textContent = window.i18n ? i18n.t('createAccount') : 'Create account';
+          return;
+        }
+        api.setToken(data.token, true);
         api.user = data.user;
         location.href = 'dashboard.html';
       } catch (x) {
+        btn.disabled = false;
+        btn.textContent = window.i18n ? i18n.t('createAccount') : 'Create account';
         if (x && x.message && (x.message.includes('fetch') || x.message.includes('Failed'))) {
           err.textContent = window.i18n ? i18n.t('cannotConnect') : 'Cannot reach server. Set API URL?';
         } else {

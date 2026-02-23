@@ -1,13 +1,27 @@
 (function () {
   const API_URL = window.API_URL || '';
+  const TOKEN_KEY = 'omnixius_token';
+  const USER_KEY = 'omnixius_user';
+  const PERSIST_KEY = 'omnixius_remember';
 
-  function getToken() {
-    return localStorage.getItem('omnixius_token');
+  function getStorage(persistent) {
+    return persistent ? localStorage : sessionStorage;
   }
 
-  function setToken(token) {
-    if (token) localStorage.setItem('omnixius_token', token);
-    else localStorage.removeItem('omnixius_token');
+  function getToken() {
+    return sessionStorage.getItem(TOKEN_KEY) || localStorage.getItem(TOKEN_KEY);
+  }
+
+  function setToken(token, persistent) {
+    sessionStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(TOKEN_KEY);
+    if (token) {
+      var storage = persistent !== false ? localStorage : sessionStorage;
+      storage.setItem(TOKEN_KEY, token);
+      try { storage.setItem(PERSIST_KEY, persistent !== false ? '1' : '0'); } catch (_) {}
+    } else {
+      try { localStorage.removeItem(PERSIST_KEY); sessionStorage.removeItem(PERSIST_KEY); } catch (_) {}
+    }
   }
 
   function getAuthHeaders() {
@@ -23,13 +37,17 @@
     setToken,
     get user() {
       try {
-        return JSON.parse(localStorage.getItem('omnixius_user') || 'null');
+        var raw = sessionStorage.getItem(USER_KEY) || localStorage.getItem(USER_KEY);
+        return raw ? JSON.parse(raw) : null;
       } catch (_) {
         return null;
       }
     },
     set user(u) {
-      localStorage.setItem('omnixius_user', u ? JSON.stringify(u) : '');
+      var storage = sessionStorage.getItem(TOKEN_KEY) ? sessionStorage : localStorage;
+      sessionStorage.removeItem(USER_KEY);
+      localStorage.removeItem(USER_KEY);
+      if (u) storage.setItem(USER_KEY, JSON.stringify(u));
     },
     async request(path, options = {}) {
       const url = API_URL + path;

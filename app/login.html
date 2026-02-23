@@ -28,17 +28,23 @@
   <main class="app-page">
     <div class="container">
       <div id="apiUrlHint" class="api-url-hint" style="display:none;"></div>
-      <h1 style="text-align:center; margin-bottom:1rem;" data-i18n="loginTitle">Sign in</h1>
-      <form class="app-form" id="form">
-        <p class="error" id="err" style="display:none;"></p>
-        <label data-i18n="email">Email</label>
-        <input type="email" name="email" required autocomplete="email">
-        <label data-i18n="password">Password</label>
-        <input type="password" name="password" required autocomplete="current-password">
-        <button type="submit" class="btn btn-primary" data-i18n="signIn">Sign in</button>
-      </form>
-      <p class="link"><a href="forgot-password.html" data-i18n="forgotPassword">Forgot password?</a></p>
-      <p class="link"><a href="register.html" data-i18n="noAccount">No account? Register</a></p>
+      <div class="auth-card">
+        <h1 class="auth-title" data-i18n="loginTitle">Sign in</h1>
+        <form class="app-form" id="form">
+          <p class="error" id="err" style="display:none;"></p>
+          <label data-i18n="email">Email</label>
+          <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+          <label data-i18n="password">Password</label>
+          <input type="password" name="password" required autocomplete="current-password">
+          <label class="checkbox-label">
+            <input type="checkbox" name="remember" id="remember" checked>
+            <span data-i18n="rememberMe">Keep me signed in</span>
+          </label>
+          <button type="submit" class="btn btn-primary btn-block" id="submitBtn" data-i18n="signIn">Sign in</button>
+        </form>
+        <p class="auth-link"><a href="forgot-password.html" data-i18n="forgotPassword">Forgot password?</a></p>
+        <p class="auth-link"><a href="register.html" data-i18n="noAccount">No account? Register</a></p>
+      </div>
     </div>
   </main>
   <script src="config.js"></script>
@@ -61,16 +67,20 @@
     document.getElementById('form').onsubmit = async (e) => {
       e.preventDefault();
       var err = document.getElementById('err');
+      var btn = document.getElementById('submitBtn');
       err.style.display = 'none';
       var email = e.target.email.value.trim();
       var password = e.target.password.value;
+      var remember = !!e.target.remember && e.target.remember.checked;
+      btn.disabled = true;
       try {
         var data = await api.auth.login(email, password);
-        if (!data || !data.token) { err.textContent = window.i18n ? i18n.t('signInFailed') : 'Sign in failed'; err.style.display = 'block'; return; }
-        api.setToken(data.token);
+        if (!data || !data.token) { err.textContent = window.i18n ? i18n.t('signInFailed') : 'Sign in failed'; err.style.display = 'block'; btn.disabled = false; return; }
+        api.setToken(data.token, remember);
         api.user = data.user;
         location.href = 'dashboard.html';
       } catch (x) {
+        btn.disabled = false;
         if (x && x.message && (x.message.includes('fetch') || x.message.includes('Failed'))) {
           err.textContent = window.i18n ? i18n.t('cannotConnect') : 'Cannot reach server. Set API URL?';
         } else {

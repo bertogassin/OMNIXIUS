@@ -23,10 +23,30 @@
   color: var(--text);
   font-family: inherit;
 }
-.app-form .btn { width: 100%; margin-top: 0.5rem; }
+.app-form .btn { margin-top: 0.5rem; }
+.app-form .btn-block { width: 100%; }
 .app-form .error { color: #e74c3c; margin-bottom: 0.5rem; font-size: 0.9rem; }
 .app-form .link { margin-top: 1rem; text-align: center; }
 .app-form .link a { color: var(--accent); }
+.app-form .form-hint { color: #e74c3c; font-size: 0.85rem; margin-top: -0.5rem; margin-bottom: 0.5rem; }
+
+.auth-card {
+  max-width: 420px; margin: 2rem auto; padding: 2rem;
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px;
+}
+.auth-title { text-align: center; margin-bottom: 0.5rem; font-size: 1.5rem; }
+.auth-subtitle { text-align: center; color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem; }
+.auth-link { text-align: center; margin-top: 1rem; }
+.auth-link a { color: var(--accent); }
+
+.checkbox-label {
+  display: flex; align-items: center; gap: 0.5rem; margin: 1rem 0; cursor: pointer;
+  font-size: 0.95rem; color: var(--text-muted);
+}
+.checkbox-label input[type="checkbox"] { width: auto; margin: 0; cursor: pointer; accent-color: var(--accent); flex-shrink: 0; }
+.checkbox-label span { user-select: none; }
+.checkbox-label a { color: var(--accent); text-decoration: none; }
+.checkbox-label a:hover { text-decoration: underline; }
 
 .app-page { padding-top: 5rem; padding-bottom: 3rem; min-height: 80vh; }
 .app-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.5rem; }
