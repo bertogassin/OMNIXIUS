@@ -23,6 +23,14 @@
   color: var(--text);
   font-family: inherit;
 }
+.input-with-toggle { position: relative; display: flex; margin-bottom: 1rem; }
+.input-with-toggle input { flex: 1; margin-bottom: 0; border-top-right-radius: 0; border-bottom-right-radius: 0; }
+.input-with-toggle .pwd-toggle {
+  background: var(--bg-card); border: 1px solid var(--border); border-left: none;
+  border-radius: 0 6px 6px 0; padding: 0.6rem 0.75rem; cursor: pointer;
+  color: var(--text-muted); font-size: 1.1rem; line-height: 1;
+}
+.input-with-toggle .pwd-toggle:hover { color: var(--accent); }
 .app-form .btn { margin-top: 0.5rem; }
 .app-form .btn-block { width: 100%; }
 .app-form .error { color: #e74c3c; margin-bottom: 0.5rem; font-size: 0.9rem; }
@@ -82,6 +90,18 @@
 
 .profile-avatar { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-bottom: 1rem; }
 
+.dashboard-welcome { margin-bottom: 1.5rem; }
+.welcome-title { font-size: 1.5rem; font-weight: 600; }
+.quick-links { margin-bottom: 2rem; }
+.quick-links-grid { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+.quick-link {
+  display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.25rem;
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px;
+  color: var(--text); text-decoration: none; font-weight: 500; transition: border-color 0.2s;
+}
+.quick-link:hover { border-color: var(--accent); color: var(--accent); }
+.quick-link-icon { font-size: 1.2rem; opacity: 0.9; }
+
 .orders-hint { color: var(--text-muted); margin-bottom: 1.5rem; }
 .orders-section { margin-bottom: 2.5rem; }
 .orders-section h2 { font-size: 1.1rem; margin-bottom: 1rem; color: var(--text-muted); }
@@ -100,6 +120,11 @@
 .order-status-completed { background: rgba(0,212,170,0.25); color: var(--accent); }
 .order-status-cancelled { background: rgba(244,67,54,0.2); color: #f44336; }
 .orders-empty { color: var(--text-muted); }
+
+.loading-state { color: var(--text-muted); text-align: center; padding: 2rem; }
+.empty-state { text-align: center; padding: 2.5rem 1rem; }
+.empty-state-title { font-size: 1.1rem; margin-bottom: 0.5rem; color: var(--text-muted); }
+.empty-state-text { color: var(--text-muted); font-size: 0.95rem; }
 
 .api-url-hint { background: rgba(255,193,7,0.1); border: 1px solid rgba(255,193,7,0.3); border-radius: 8px; padding: 1rem; margin-bottom: 1rem; font-size: 0.9rem; }
 .api-url-hint a { color: var(--accent); }

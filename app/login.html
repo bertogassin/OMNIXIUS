@@ -35,7 +35,10 @@
           <label data-i18n="email">Email</label>
           <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
           <label data-i18n="password">Password</label>
-          <input type="password" name="password" required autocomplete="current-password">
+          <div class="input-with-toggle">
+            <input type="password" name="password" required autocomplete="current-password" id="pwd">
+            <button type="button" class="pwd-toggle" aria-label="Show password" title="Show password" id="pwdToggle">👁</button>
+          </div>
           <label class="checkbox-label">
             <input type="checkbox" name="remember" id="remember" checked>
             <span data-i18n="rememberMe">Keep me signed in</span>
@@ -64,6 +67,11 @@
       }
     })();
     if (api.getToken()) { location.href = 'dashboard.html'; return; }
+    (function () {
+      var pwd = document.getElementById('pwd');
+      var btn = document.getElementById('pwdToggle');
+      if (pwd && btn) btn.onclick = function () { var isPass = pwd.type === 'password'; pwd.type = isPass ? 'text' : 'password'; btn.setAttribute('aria-label', isPass ? 'Hide password' : 'Show password'); btn.textContent = isPass ? '🙈' : '👁'; };
+    })();
     document.getElementById('form').onsubmit = async (e) => {
       e.preventDefault();
       var err = document.getElementById('err');

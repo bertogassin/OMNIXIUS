@@ -53,22 +53,18 @@
     document.getElementById('navLogout').onclick = () => { api.auth.logout(); location.reload(); };
 
     async function load(params = {}) {
-      const data = await api.products.list(params);
-      const cats = await api.products.categories();
-      const sel = document.querySelector('select[name=category]');
-      sel.innerHTML = '<option value="">All categories</option>' + cats.map(c => `<option value="${c}">${c}</option>`).join('');
-      document.getElementById('list').innerHTML = data.length
-        ? data.map(p => `
-          <a href="product.html?id=${p.id}" class="app-card">
-            <img src="${p.image_path ? (window.API_URL + '/uploads/' + p.image_path) : 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22260%22 height=%22180%22><rect fill=%22%23222%22 width=%22260%22 height=%22180%22/><text x=%2250%25%22 y=%2250%25%22 fill=%22666%22 text-anchor=%22middle%22 dy=%22.3em%22>Нет фото</text></svg>'}" alt="">
-            <div class="body">
-              <h3>${escapeHtml(p.title)}</h3>
-              <p class="price">${p.price} ₽</p>
-              <p class="meta">${escapeHtml(p.category)} · ${escapeHtml(p.location || '')}</p>
-            </div>
-          </a>
-        `).join('')
-        : '<p style="color:var(--text-muted);">No results.</p>';
+      var listEl = document.getElementById('list');
+      listEl.innerHTML = '<p class="loading-state">Loading…</p>';
+      try {
+        const [data, cats] = await Promise.all([api.products.list(params), api.products.categories()]);
+        var sel = document.querySelector('select[name=category]');
+        if (sel && !sel.dataset.filled) { sel.innerHTML = '<option value="">All categories</option>' + (cats || []).map(c => '<option value="' + escapeHtml(c) + '">' + escapeHtml(c) + '</option>').join(''); sel.dataset.filled = '1'; }
+        listEl.innerHTML = data.length
+          ? data.map(p => '<a href="product.html?id=' + p.id + '" class="app-card"><img src="' + (p.image_path ? (window.API_URL + '/uploads/' + p.image_path) : 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22260%22 height=%22180%22><rect fill=%22%23222%22 width=%22260%22 height=%22180%22/><text x=%2250%25%22 y=%2250%25%22 fill=%23666%22 text-anchor=%22middle%22 dy=%22.3em%22>No photo</text></svg>') + '" alt=""><div class="body"><h3>' + escapeHtml(p.title) + '</h3><p class="price">' + p.price + '</p><p class="meta">' + escapeHtml(p.category) + (p.location ? ' · ' + escapeHtml(p.location) : '') + '</p></div></a>').join('')
+          : '<div class="empty-state"><p class="empty-state-title">No results</p><p class="empty-state-text">Try different filters or add your own listing.</p></div>';
+      } catch (e) {
+        listEl.innerHTML = '<p class="error">Failed to load. Try again.</p>';
+      }
     }
     function escapeHtml(s) { return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
     document.getElementById('filters').onsubmit = (e) => { e.preventDefault(); load(Object.fromEntries(new FormData(e.target))); };

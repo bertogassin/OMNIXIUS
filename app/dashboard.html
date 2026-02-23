@@ -24,10 +24,12 @@
   </header>
   <main class="app-page">
     <div class="container">
+      <div id="welcome" class="dashboard-welcome"></div>
+      <div id="quickLinks" class="quick-links"></div>
       <h1>Profile</h1>
-      <div id="profile"></div>
+      <div id="profile"><p class="loading-state">Loading…</p></div>
       <h2 id="orders" style="margin-top:2rem;">My orders</h2>
-      <div id="ordersList"></div>
+      <div id="ordersList"><p class="loading-state">Loading…</p></div>
     </div>
   </main>
   <script src="config.js"></script>
@@ -40,17 +42,15 @@
     (async () => {
       const u = await api.users.me();
       const orders = await api.users.myOrders();
-      document.getElementById('profile').innerHTML = `
-        <p><img class="profile-avatar" src="${u.avatar_path ? (window.API_URL + '/uploads/' + u.avatar_path) : 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 80 80%22><rect fill=%22%23333%22 width=%2280%22 height=%2280%22/><text x=%2250%25%22 y=%2255%25%22 fill=%22%23888%22 text-anchor=%22middle%22 dy=%22.3em%22 font-size=%2224%22>?</text></svg>'}" alt=""></p>
-        <p><strong>${u.name || '—'}</strong> · ${u.email}</p>
-        <p style="color:var(--text-muted);">Role: ${u.role}</p>
-        <p><a href="profile-edit.html" class="btn btn-primary" style="display:inline-block; margin-top:0.5rem;">Edit</a></p>
-      `;
-      const list = [...(orders.asBuyer || []), ...(orders.asSeller || [])].slice(0, 20);
+      var name = u.name || u.email || 'User';
+      document.getElementById('welcome').innerHTML = '<h1 class="welcome-title">Hello, ' + (name.length > 25 ? name.slice(0, 22) + '…' : name) + '</h1>';
+      document.getElementById('quickLinks').innerHTML = '<div class="quick-links-grid"><a href="marketplace.html" class="quick-link"><span class="quick-link-icon">◆</span><span>Marketplace</span></a><a href="mail.html" class="quick-link"><span class="quick-link-icon">✉</span><span>Mail</span></a><a href="orders.html" class="quick-link"><span class="quick-link-icon">◇</span><span>Orders</span></a></div>';
+      document.getElementById('profile').innerHTML = '<p><img class="profile-avatar" src="' + (u.avatar_path ? (window.API_URL + '/uploads/' + u.avatar_path) : 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 80 80%22><rect fill=%22%23333%22 width=%2280%22 height=%2280%22/><text x=%2250%25%22 y=%2255%25%22 fill=%22%23888%22 text-anchor=%22middle%22 dy=%22.3em%22 font-size=%2224%22>?</text></svg>') + '" alt=""></p><p><strong>' + (u.name || '—') + '</strong> · ' + u.email + '</p><p style="color:var(--text-muted);">Role: ' + u.role + '</p><p><a href="profile-edit.html" class="btn btn-primary" style="display:inline-block; margin-top:0.5rem;">Edit</a></p>';
+      var list = (orders.asBuyer || []).concat(orders.asSeller || []).slice(0, 20);
       document.getElementById('ordersList').innerHTML = list.length
-        ? '<ul class="mail-list">' + list.map(o => `<li><span>${o.title} — ${o.status}</span><span>${new Date(o.created_at * 1000).toLocaleDateString()}</span></li>`).join('') + '</ul>'
-        : '<p style="color:var(--text-muted);">No orders yet.</p>';
-    })().catch(() => { api.auth.logout(); location.href = 'login.html'; });
+        ? '<ul class="mail-list">' + list.map(function(o) { return '<li><span>' + o.title + ' — ' + o.status + '</span><span>' + new Date(o.created_at * 1000).toLocaleDateString() + '</span></li>'; }).join('') + '</ul>'
+        : '<p style="color:var(--text-muted);">No orders yet. <a href="marketplace.html">Go to Marketplace</a></p>';
+    })().catch(function() { api.auth.logout(); location.href = 'login.html'; });
   </script>
 </body>
 </html>

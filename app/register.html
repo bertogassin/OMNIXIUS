@@ -36,9 +36,15 @@
           <label data-i18n="email">Email</label>
           <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
           <label data-i18n="passwordMin">Password (min 8 characters)</label>
-          <input type="password" name="password" required minlength="8" autocomplete="new-password" id="pwd">
+          <div class="input-with-toggle">
+            <input type="password" name="password" required minlength="8" autocomplete="new-password" id="pwd">
+            <button type="button" class="pwd-toggle" aria-label="Show password" id="pwdToggle1">👁</button>
+          </div>
           <label data-i18n="confirmPassword">Confirm password</label>
-          <input type="password" name="password2" required minlength="8" autocomplete="new-password" id="pwd2">
+          <div class="input-with-toggle">
+            <input type="password" name="password2" required minlength="8" autocomplete="new-password" id="pwd2">
+            <button type="button" class="pwd-toggle" aria-label="Show password" id="pwdToggle2">👁</button>
+          </div>
           <p class="form-hint" id="pwdMismatch" style="display:none;" data-i18n="passwordMismatch">Passwords do not match</p>
           <label data-i18n="name">Name</label>
           <input type="text" name="name" autocomplete="name" placeholder="Your name" maxlength="200">
@@ -70,6 +76,15 @@
     })();
     if (api.getToken()) { location.href = 'dashboard.html'; }
 
+    (function () {
+      function bindToggle(inpId, btnId) {
+        var pwd = document.getElementById(inpId);
+        var btn = document.getElementById(btnId);
+        if (pwd && btn) btn.onclick = function () { var isPass = pwd.type === 'password'; pwd.type = isPass ? 'text' : 'password'; btn.setAttribute('aria-label', isPass ? 'Hide password' : 'Show password'); btn.textContent = isPass ? '🙈' : '👁'; };
+      }
+      bindToggle('pwd', 'pwdToggle1');
+      bindToggle('pwd2', 'pwdToggle2');
+    })();
     var form = document.getElementById('form');
     var pwd = document.getElementById('pwd');
     var pwd2 = document.getElementById('pwd2');

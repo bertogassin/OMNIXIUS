@@ -28,7 +28,7 @@
       <p class="orders-hint" data-i18n="ordersHint">Purchases and sales in one place.</p>
       <section class="orders-section" id="asBuyerSection">
         <h2 data-i18n="ordersAsBuyer">As buyer</h2>
-        <div id="asBuyerList"></div>
+        <div id="asBuyerList"><p class="loading-state">Loading…</p></div>
       </section>
       <section class="orders-section" id="asSellerSection">
         <h2 data-i18n="ordersAsSeller">As seller</h2>
@@ -67,16 +67,21 @@
     }
 
     (async () => {
-      const data = await api.users.myOrders();
-      const asBuyer = data.asBuyer || [];
-      const asSeller = data.asSeller || [];
-      document.getElementById('asBuyerList').innerHTML = asBuyer.length
-        ? '<div class="orders-grid">' + asBuyer.map(o => renderOrderCard(o, 'buyer')).join('') + '</div>'
-        : '<p class="orders-empty" data-i18n="noOrders">No orders yet.</p>';
-      document.getElementById('asSellerList').innerHTML = asSeller.length
-        ? '<div class="orders-grid">' + asSeller.map(o => renderOrderCard(o, 'seller')).join('') + '</div>'
-        : '<p class="orders-empty" data-i18n="noOrders">No orders yet.</p>';
-      if (typeof i18n !== 'undefined') i18n.apply();
+      try {
+        const data = await api.users.myOrders();
+        const asBuyer = data.asBuyer || [];
+        const asSeller = data.asSeller || [];
+        document.getElementById('asBuyerList').innerHTML = asBuyer.length
+          ? '<div class="orders-grid">' + asBuyer.map(o => renderOrderCard(o, 'buyer')).join('') + '</div>'
+          : '<div class="empty-state"><p class="empty-state-title" data-i18n="noOrders">No orders yet.</p><p class="empty-state-text">Buy or sell on the Marketplace to see orders here.</p></div>';
+        document.getElementById('asSellerList').innerHTML = asSeller.length
+          ? '<div class="orders-grid">' + asSeller.map(o => renderOrderCard(o, 'seller')).join('') + '</div>'
+          : '<p class="orders-empty" data-i18n="noOrders">No orders yet.</p>';
+        if (typeof i18n !== 'undefined') i18n.apply();
+      } catch (e) {
+        document.getElementById('asBuyerList').innerHTML = '<p class="error">Failed to load orders.</p>';
+        document.getElementById('asSellerList').innerHTML = '';
+      }
     })().catch(() => { api.auth.logout(); location.href = 'login.html'; });
   </script>
 </body>
