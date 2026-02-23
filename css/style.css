@@ -1,0 +1,337 @@
+/* OMNIXIUS — основная тема */
+:root {
+  --bg: #0c0c0f;
+  --bg-card: #14141a;
+  --text: #e8e6e3;
+  --text-muted: #8a8a8a;
+  --accent: #00d4aa;
+  --accent-dim: rgba(0, 212, 170, 0.15);
+  --border: #2a2a32;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+/* Header */
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  padding: 1rem 0;
+  background: rgba(12, 12, 15, 0.9);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+}
+
+.header .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  font-weight: 700;
+  font-size: 1.25rem;
+  letter-spacing: 0.05em;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.nav {
+  display: flex;
+  gap: 2rem;
+}
+
+.nav a {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-weight: 400;
+  transition: color 0.2s;
+}
+
+.nav a:hover {
+  color: var(--accent);
+}
+
+.menu-toggle {
+  display: none;
+  width: 28px;
+  height: 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  position: relative;
+}
+
+.menu-toggle::before,
+.menu-toggle::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--text);
+}
+
+.menu-toggle::before { top: 0; }
+.menu-toggle::after { bottom: 0; }
+
+.menu-toggle span {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 100%;
+  height: 2px;
+  background: var(--text);
+  display: block;
+}
+
+/* Hero */
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6rem 0 4rem;
+  overflow: hidden;
+}
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 80% 50% at 50% 0%, var(--accent-dim) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.hero .container {
+  text-align: center;
+  position: relative;
+}
+
+.hero h1 {
+  font-size: clamp(2.5rem, 8vw, 4.5rem);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  margin-bottom: 0.75rem;
+}
+
+.hero-tagline {
+  font-size: 1.25rem;
+  color: var(--text-muted);
+  margin-bottom: 2rem;
+}
+
+.btn {
+  display: inline-block;
+  padding: 0.9rem 2rem;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 8px;
+  transition: background 0.2s, transform 0.15s;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+.btn-primary:hover {
+  background: #00b894;
+  transform: translateY(-2px);
+}
+
+/* Sections */
+.section {
+  padding: 5rem 0;
+  border-top: 1px solid var(--border);
+}
+
+.section h2 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: var(--text);
+}
+
+.about-text {
+  max-width: 600px;
+  color: var(--text-muted);
+  font-size: 1.1rem;
+}
+
+/* Cards */
+.services .cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 2rem;
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.card:hover {
+  border-color: var(--accent);
+  transform: translateY(-4px);
+}
+
+.card-icon {
+  display: block;
+  color: var(--accent);
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.card h3 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.card p {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+/* Contact */
+.contact p {
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+
+.contact-email {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--accent);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.contact-email:hover {
+  color: #00b894;
+}
+
+/* Footer */
+.footer {
+  padding: 2rem 0;
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+
+.footer .logo {
+  display: inline-block;
+  margin-bottom: 0.5rem;
+}
+
+.footer p {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  .nav {
+    display: none;
+  }
+
+  .menu-toggle {
+    display: block;
+  }
+
+  .menu-toggle::before {
+    top: 4px;
+  }
+
+  .menu-toggle::after {
+    bottom: 4px;
+  }
+
+  .menu-toggle span {
+    display: block;
+  }
+
+  .nav.open {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--bg-card);
+    padding: 1rem;
+    gap: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+}
+
+/* Доп. страницы */
+.hero-section {
+  padding-top: 8rem;
+}
+
+.hero-section h1 {
+  font-size: 2rem;
+  margin-bottom: 0.75rem;
+}
+
+.contact-block {
+  margin-bottom: 2rem;
+}
+
+.contact-block h2 {
+  font-size: 1rem;
+  font-weight: 400;
+  color: var(--text-muted);
+  margin-bottom: 0.25rem;
+}
+
+.error-section {
+  min-height: 70vh;
+  display: flex;
+  align-items: center;
+  padding-top: 8rem;
+}
+
+.error-code {
+  font-size: 4rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 0.5rem;
+}
+
+.error-section h1 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}

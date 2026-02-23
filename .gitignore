@@ -1,0 +1,4 @@
+# Не загружать в GitHub
+.DS_Store
+Thumbs.db
+*.log
