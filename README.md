@@ -1,6 +1,13 @@
 # OMNIXIUS
 
-Сайт OMNIXIUS — лендинг на HTML/CSS/JS.
+Сайт и приложение (маркетплейс, почта, заказы) — всё выкладывается **только через GitHub**.
+
+**Production:** https://bertogassin.github.io/OMNIXIUS/  
+**Приложение (вход, маркетплейс, заказы):** https://bertogassin.github.io/OMNIXIUS/app/marketplace.html  
+
+Другого деплоя не нужно: пушишь в репозиторий → GitHub Pages обновляет сайт сам.
+
+---
 
 ## Как выложить через GitHub (GitHub Pages)
 
