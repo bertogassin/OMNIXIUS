@@ -1,52 +1,59 @@
-# OMNIXIUS — Архитектура и видение
+# OMNIXIUS — Architecture & Vision
 
-Глобальная технологическая экосистема: социальная сеть, профессиональная платформа, биржа, децентрализованное облако, блокчейн IXI, AI-аналитика и инвестиционные инструменты.
+Global technology ecosystem: social network, professional platform, exchange, decentralized cloud, IXI blockchain, AI analytics, and investment tools.
 
-**Цель:** самодостаточная экосистема — общение, заработок, инвестиции, обучение и управление активами в одном приложении, без зависимости от централизованных корпораций.
+**Goal:** Self-sufficient ecosystem — communication, earning, investment, learning, and asset management in one application, without dependence on centralized corporations.
 
 ---
 
-## 1. Четыре платформы
+## 1. Four platforms
 
 ### OMNIXIUS CONNECT
-- Социальная сеть + платформа экспертов.
-- Профили, заказы по геолокации, AI-подбор специалистов, рейтинги и отзывы.
-- Чат, аудио- и видеозвонки, запись консультаций, смарт-контракты.
-- Маркетплейс товаров и услуг (крипто, FIAT, карты, PayPal), подписки.
-- Безопасность: смарт-контракты, AI-модерация.
+- Social network + expert platform.
+- Profiles, geo-based orders, AI matching, ratings and reviews.
+- Chat, audio/video calls, consultation recording, smart contracts.
+- Marketplace for goods and services (crypto, FIAT, cards, PayPal), subscriptions.
+- Security: smart contracts, AI moderation.
 
 ### OMNIXIUS TRADE & FINANCE
-- Биржа: криптовалюты, золото, нефть, акции, индексы, стартапы.
-- Фонд выкупа для экономики блокчейна IXI.
-- Копитрейдинг, долгосрочные портфели, автоинвестирование с AI.
-- Кошельки, Apple Pay, Google Pay, PayPal, карты.
+- Exchange: crypto, gold, oil, stocks, indices, startups.
+- Buyback fund for IXI blockchain economy.
+- Copy trading, long-term portfolios, auto-investing with AI.
+- Wallets, Apple Pay, Google Pay, PayPal, cards.
 
 ### OMNIXIUS REPOSITORIUM
-- Децентрализованное облако: домашние серверы, награды за хранение и обработку.
-- IPFS + AI-шифрование, блокчейн-контроль доступа.
-- Аренда вычислительных мощностей, реферальные программы.
+- Decentralized cloud: home servers, rewards for storage and compute.
+- IPFS + AI encryption, blockchain access control.
+- Compute rental, referral programs.
 
 ### OMNIXIUS BLOCKCHAIN (IXI)
-**IXI — блокчейн (базовая платформа), не токен.**
+**IXI is the blockchain (base platform), not a token.**
 - Zero-Knowledge Proofs (ZKP).
-- Гибрид Proof-of-Stake + Proof-of-Storage.
-- AI-мониторинг транзакций.
-- Эмиссия на 30 лет, фонд выкупа.
+- Hybrid Proof-of-Stake + Proof-of-Storage.
+- AI transaction monitoring.
+- 30-year emission, buyback fund.
 
 ---
 
-## 2. Технологический стек
+## 2. Technology stack (only)
 
-| Слой | Технологии |
-|------|------------|
-| Архитектура | Microservices, Serverless, Multi-Cloud (AWS, GCP, Azure), Edge (Cloudflare Workers) |
-| Frontend | Swift (iOS), Kotlin (Android), Next.js, WebAssembly; TailwindCSS, Framer Motion, GSAP |
-| Backend | Golang, Rust, C++; GraphQL, gRPC; CockroachDB, ScyllaDB, Redis |
-| Blockchain & AI | Rust (Substrate), Move, Solidity; AI-безопасность |
+**Allowed languages and runtimes: SPARK, RUST, C++, SWIFT, GO. No other languages in the codebase.**
+
+| Layer | Technologies |
+|-------|--------------|
+| Backend / API / Services | **Go**, **Rust**, **C++** |
+| Data / Analytics | **Apache Spark** (or SPARK as designated) |
+| Mobile (Apple) | **Swift** (iOS) |
+| Blockchain / low-level | **Rust**, **C++** |
+
+- No JavaScript/TypeScript, Kotlin, Python, etc. in core services.
+- Frontend: all user-facing content is multilingual; **English is the fallback language**. UI and APIs support all languages; Russian is not prioritized over others.
+
+**Quantum resistance:** All crypto must be quantum-resistant or on a clear migration path. Auth tokens: Dilithium3 (PQC). Passwords: Argon2id. TLS in production with PQC hybrid where available. Blockchain IXI: PQC signatures and KEM in consensus. See QUANTUM_READINESS.md.
 
 ---
 
-## 3. Документы
+## 3. Documents
 
-- **ARCHITECTURE.md** — этот файл (видение и архитектура).
-- **ROADMAP.md** — этапы и приоритеты разработки.
+- **ARCHITECTURE.md** — this file (vision and architecture).
+- **ROADMAP.md** — phases and priorities.

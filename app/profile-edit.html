@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile settings — OMNIXIUS</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <header class="header">
+    <div class="container">
+      <a href="../index.html" class="logo">OMNIXIUS</a>
+      <nav class="nav">
+        <a href="marketplace.html">Marketplace</a>
+        <a href="mail.html">Mail</a>
+        <a href="dashboard.html">Profile</a>
+        <a href="#" id="logout">Sign out</a>
+      </nav>
+    </div>
+  </header>
+  <main class="app-page">
+    <div class="container">
+      <h1>Settings</h1>
+      <form class="app-form" id="form">
+        <p class="error" id="err" style="display:none;"></p>
+        <label>Name</label>
+        <input type="text" name="name" id="name">
+        <label>Profile photo</label>
+        <input type="file" name="avatar" accept="image/jpeg,image/png,image/webp">
+        <button type="submit" class="btn btn-primary">Save</button>
+      </form>
+    </div>
+  </main>
+  <script src="config.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    if (!api.getToken()) { location.href = 'login.html'; return; }
+    document.getElementById('logout').onclick = () => { api.auth.logout(); location.href = '../index.html'; };
+    (async () => {
+      const u = await api.users.me();
+      document.getElementById('name').value = u.name || '';
+    })();
+    document.getElementById('form').onsubmit = async (e) => {
+      e.preventDefault();
+      const err = document.getElementById('err');
+      err.style.display = 'none';
+      const name = e.target.name.value.trim() || null;
+      const file = e.target.avatar.files[0];
+      try {
+        await api.users.updateMe({ name });
+        if (file) {
+          const fd = new FormData();
+          fd.append('avatar', file);
+          const r = await fetch(window.API_URL + '/api/users/me/avatar', {
+            method: 'POST',
+            headers: { Authorization: 'Bearer ' + api.getToken() },
+            body: fd,
+          });
+          if (!r.ok) throw await r.json();
+        }
+        location.href = 'dashboard.html';
+      } catch (x) {
+        err.textContent = x.data?.error || x.error || 'Error';
+        err.style.display = 'block';
+      }
+    };
+  </script>
+</body>
+</html>

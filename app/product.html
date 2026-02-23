@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product — OMNIXIUS</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <header class="header">
+    <div class="container">
+      <a href="../index.html" class="logo">OMNIXIUS</a>
+      <nav class="nav">
+        <a href="marketplace.html">Marketplace</a>
+        <a href="mail.html">Mail</a>
+        <a href="dashboard.html">Profile</a>
+        <a href="login.html" id="navLogin">Sign in</a>
+        <a href="#" id="navLogout" style="display:none;">Sign out</a>
+      </nav>
+    </div>
+  </header>
+  <main class="app-page">
+    <div class="container" id="root"></div>
+  </main>
+  <script src="config.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    const id = new URLSearchParams(location.search).get('id');
+    if (!id) { document.getElementById('root').innerHTML = '<p>Product ID missing.</p>'; throw 0; }
+    const token = api.getToken();
+    if (token) {
+      document.getElementById('navLogin').style.display = 'none';
+      document.getElementById('navLogout').style.display = 'inline';
+    }
+    document.getElementById('navLogout').onclick = () => { api.auth.logout(); location.reload(); };
+
+    (async () => {
+      const p = await api.products.get(id);
+      const root = document.getElementById('root');
+      root.innerHTML = `
+        <p style="margin-bottom:1rem;"><a href="marketplace.html">← Marketplace</a></p>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:2rem; align-items:start;">
+          <img src="${p.image_path ? (window.API_URL + '/uploads/' + p.image_path) : 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22300%22><rect fill=%22%23222%22 width=%22400%22 height=%22300%22/></svg>'}" alt="" style="max-width:100%; border-radius:12px;">
+          <div>
+            <h1>${escapeHtml(p.title)}</h1>
+            <p class="price" style="font-size:1.5rem;">${p.price} ₽</p>
+            <p style="color:var(--text-muted);">${escapeHtml(p.category)} · ${escapeHtml(p.location || '')}</p>
+            <p style="margin-top:1rem;">${escapeHtml(p.description || '')}</p>
+            <p style="margin-top:1rem;">Продавец: <strong>${escapeHtml(p.seller_name || p.seller_email)}</strong></p>
+            ${token ? `<p style="margin-top:1rem;"><a href="conversation.html?userId=${p.seller_id}&productId=${p.id}" class="btn btn-primary">Contact seller</a></p>` : '<p style="margin-top:1rem;"><a href="login.html">Sign in</a> to contact the seller.</p>'}
+          </div>
+        </div>
+      `;
+    })();
+    function escapeHtml(s) { return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  </script>
+</body>
+</html>

@@ -2,3 +2,11 @@
 .DS_Store
 Thumbs.db
 *.log
+
+# Backend
+backend/node_modules
+backend/uploads
+backend/db/*.db
+backend-go/uploads
+backend-go/db/*.db
+backend-go/omnixius-api.exe

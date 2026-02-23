@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Marketplace — OMNIXIUS</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <header class="header">
+    <div class="container">
+      <a href="../index.html" class="logo">OMNIXIUS</a>
+      <nav class="nav">
+        <a href="marketplace.html">Marketplace</a>
+        <a href="mail.html">Mail</a>
+        <a href="dashboard.html">Profile</a>
+        <a href="login.html" id="navLogin">Sign in</a>
+        <a href="#" id="navLogout" style="display:none;">Sign out</a>
+      </nav>
+    </div>
+  </header>
+  <main class="app-page">
+    <div class="container">
+      <h1>Marketplace</h1>
+      <form id="filters" style="margin-bottom:1.5rem; display:flex; flex-wrap:wrap; gap:0.5rem; align-items:center;">
+        <input type="text" name="q" placeholder="Search" style="padding:0.5rem; width:180px;">
+        <input type="text" name="location" placeholder="City" style="padding:0.5rem; width:140px;">
+        <select name="category" style="padding:0.5rem;">
+          <option value="">All categories</option>
+        </select>
+        <input type="number" name="minPrice" placeholder="Price from" style="padding:0.5rem; width:100px;">
+        <input type="number" name="maxPrice" placeholder="to" style="padding:0.5rem; width:100px;">
+        <button type="submit" class="btn btn-primary">Search</button>
+      </form>
+      <p id="authHint" style="color:var(--text-muted); margin-bottom:1rem;"></p>
+      <div class="app-grid" id="list"></div>
+    </div>
+  </main>
+  <script src="config.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    const token = api.getToken();
+    if (token) {
+      document.getElementById('navLogin').style.display = 'none';
+      document.getElementById('navLogout').style.display = 'inline';
+      document.getElementById('authHint').innerHTML = '<a href="product-create.html" class="btn btn-primary" style="display:inline-block;">Add listing</a>';
+    }
+    document.getElementById('navLogout').onclick = () => { api.auth.logout(); location.reload(); };
+
+    async function load(params = {}) {
+      const data = await api.products.list(params);
+      const cats = await api.products.categories();
+      const sel = document.querySelector('select[name=category]');
+      sel.innerHTML = '<option value="">All categories</option>' + cats.map(c => `<option value="${c}">${c}</option>`).join('');
+      document.getElementById('list').innerHTML = data.length
+        ? data.map(p => `
+          <a href="product.html?id=${p.id}" class="app-card">
+            <img src="${p.image_path ? (window.API_URL + '/uploads/' + p.image_path) : 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22260%22 height=%22180%22><rect fill=%22%23222%22 width=%22260%22 height=%22180%22/><text x=%2250%25%22 y=%2250%25%22 fill=%22666%22 text-anchor=%22middle%22 dy=%22.3em%22>Нет фото</text></svg>'}" alt="">
+            <div class="body">
+              <h3>${escapeHtml(p.title)}</h3>
+              <p class="price">${p.price} ₽</p>
+              <p class="meta">${escapeHtml(p.category)} · ${escapeHtml(p.location || '')}</p>
+            </div>
+          </a>
+        `).join('')
+        : '<p style="color:var(--text-muted);">No results.</p>';
+    }
+    function escapeHtml(s) { return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+    document.getElementById('filters').onsubmit = (e) => { e.preventDefault(); load(Object.fromEntries(new FormData(e.target))); };
+    load();
+  </script>
+</body>
+</html>

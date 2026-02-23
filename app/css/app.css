@@ -1,0 +1,63 @@
+/* App: формы и списки */
+:root {
+  --bg: #0c0c0f;
+  --bg-card: #14141a;
+  --text: #e8e6e3;
+  --text-muted: #8a8a8a;
+  --accent: #00d4aa;
+  --border: #2a2a32;
+}
+
+.app-form {
+  max-width: 400px;
+  margin: 2rem auto;
+}
+.app-form label { display: block; margin-bottom: 0.25rem; color: var(--text-muted); }
+.app-form input, .app-form textarea {
+  width: 100%;
+  padding: 0.6rem;
+  margin-bottom: 1rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-family: inherit;
+}
+.app-form .btn { width: 100%; margin-top: 0.5rem; }
+.app-form .error { color: #e74c3c; margin-bottom: 0.5rem; font-size: 0.9rem; }
+.app-form .link { margin-top: 1rem; text-align: center; }
+.app-form .link a { color: var(--accent); }
+
+.app-page { padding-top: 5rem; padding-bottom: 3rem; min-height: 80vh; }
+.app-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.5rem; }
+.app-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.app-card:hover { border-color: var(--accent); }
+.app-card img { width: 100%; height: 180px; object-fit: cover; }
+.app-card .body { padding: 1rem; }
+.app-card h3 { font-size: 1rem; margin-bottom: 0.25rem; }
+.app-card .price { color: var(--accent); font-weight: 600; }
+.app-card .meta { font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem; }
+
+.mail-list { list-style: none; }
+.mail-list li {
+  padding: 1rem;
+  border-bottom: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.mail-list li.unread { background: rgba(0,212,170,0.05); }
+.mail-list a { color: inherit; text-decoration: none; }
+.thread { max-width: 640px; margin: 0 auto; }
+.thread .msg { padding: 0.75rem; border-bottom: 1px solid var(--border); }
+.thread .msg.mine { background: rgba(0,212,170,0.08); }
+.thread .msg .meta { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.25rem; }
+.thread-send { display: flex; gap: 0.5rem; margin-top: 1rem; }
+.thread-send input { flex: 1; padding: 0.6rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; color: var(--text); }
+.thread-send button { padding: 0.6rem 1.2rem; }
+
+.profile-avatar { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-bottom: 1rem; }

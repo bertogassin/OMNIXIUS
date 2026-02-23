@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add listing — OMNIXIUS</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <header class="header">
+    <div class="container">
+      <a href="../index.html" class="logo">OMNIXIUS</a>
+      <nav class="nav">
+        <a href="marketplace.html">Marketplace</a>
+        <a href="mail.html">Mail</a>
+        <a href="dashboard.html">Profile</a>
+        <a href="#" id="logout">Sign out</a>
+      </nav>
+    </div>
+  </header>
+  <main class="app-page">
+    <div class="container">
+      <h1>New listing</h1>
+      <form class="app-form" id="form" style="max-width:500px;">
+        <p class="error" id="err" style="display:none;"></p>
+        <label>Title *</label>
+        <input type="text" name="title" required minlength="2">
+        <label>Description</label>
+        <textarea name="description" rows="4"></textarea>
+        <label>Price *</label>
+        <input type="number" name="price" required min="0" step="0.01">
+        <label>Category *</label>
+        <input type="text" name="category" required list="cats">
+        <datalist id="cats"></datalist>
+        <label>City / location</label>
+        <input type="text" name="location">
+        <label>Photo</label>
+        <input type="file" name="image" accept="image/jpeg,image/png,image/webp">
+        <button type="submit" class="btn btn-primary">Publish</button>
+      </form>
+    </div>
+  </main>
+  <script src="config.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    if (!api.getToken()) { location.href = 'login.html'; return; }
+    document.getElementById('logout').onclick = () => { api.auth.logout(); location.href = '../index.html'; };
+    api.products.categories().then(cats => {
+      document.getElementById('cats').innerHTML = cats.map(c => `<option value="${c}">`).join('');
+    });
+    document.getElementById('form').onsubmit = async (e) => {
+      e.preventDefault();
+      const err = document.getElementById('err');
+      err.style.display = 'none';
+      const fd = new FormData(e.target);
+      try {
+        const r = await api.products.create(fd);
+        location.href = 'product.html?id=' + r.id;
+      } catch (x) {
+        err.textContent = x.data?.error || 'Error';
+        err.style.display = 'block';
+      }
+    };
+  </script>
+</body>
+</html>

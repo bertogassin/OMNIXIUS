@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conversation — OMNIXIUS</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <header class="header">
+    <div class="container">
+      <a href="../index.html" class="logo">OMNIXIUS</a>
+      <nav class="nav">
+        <a href="marketplace.html">Marketplace</a>
+        <a href="mail.html">Mail</a>
+        <a href="dashboard.html">Profile</a>
+        <a href="#" id="logout">Sign out</a>
+      </nav>
+    </div>
+  </header>
+  <main class="app-page">
+    <div class="container">
+      <p style="margin-bottom:1rem;"><a href="mail.html">← Mail</a></p>
+      <div id="root"></div>
+      <div class="thread-send" id="sendForm" style="display:none;">
+        <input type="text" id="msgInput" placeholder="Message">
+        <button type="button" class="btn btn-primary" id="sendBtn">Send</button>
+      </div>
+    </div>
+  </main>
+  <script src="config.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    if (!api.getToken()) { location.href = 'login.html'; return; }
+    document.getElementById('logout').onclick = () => { api.auth.logout(); location.href = '../index.html'; };
+
+    const params = new URLSearchParams(location.search);
+    const convId = params.get('id');
+    const userId = params.get('userId');
+    const productId = params.get('productId');
+
+    let conversationId = convId;
+
+    async function loadOrCreate() {
+      if (conversationId) {
+        const messages = await api.messages.list(conversationId);
+        render(messages);
+        document.getElementById('sendForm').style.display = 'flex';
+        return;
+      }
+      if (userId) {
+        const conv = await api.conversations.create(userId, productId || undefined);
+        conversationId = conv.id;
+        history.replaceState(null, '', 'conversation.html?id=' + conv.id);
+        document.getElementById('root').innerHTML = '<p style="color:var(--text-muted);">Conversation created. Send a message.</p>';
+        document.getElementById('sendForm').style.display = 'flex';
+        return;
+      }
+      document.getElementById('root').innerHTML = '<p>Specify conversation id or userId.</p>';
+    }
+
+    function render(messages) {
+      const me = api.user?.id;
+      document.getElementById('root').innerHTML = `
+        <div class="thread">
+          ${messages.map(m => `
+            <div class="msg ${m.sender_id === me ? 'mine' : ''}">
+              <div class="meta">${escapeHtml(m.sender_name)} · ${formatDate(m.created_at)}</div>
+              <div>${escapeHtml(m.body)}</div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    document.getElementById('sendBtn').onclick = async () => {
+      const input = document.getElementById('msgInput');
+      const body = input.value.trim();
+      if (!body || !conversationId) return;
+      await api.messages.send(conversationId, body);
+      input.value = '';
+      const messages = await api.messages.list(conversationId);
+      render(messages);
+    };
+
+    loadOrCreate();
+
+    function escapeHtml(s) { return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+    function formatDate(t) { return t ? new Date(t * 1000).toLocaleString() : ''; }
+  </script>
+</body>
+</html>

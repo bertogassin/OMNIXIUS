@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mail — OMNIXIUS</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <header class="header">
+    <div class="container">
+      <a href="../index.html" class="logo">OMNIXIUS</a>
+      <nav class="nav">
+        <a href="marketplace.html">Marketplace</a>
+        <a href="mail.html">Mail</a>
+        <a href="dashboard.html">Profile</a>
+        <a href="#" id="logout">Sign out</a>
+      </nav>
+    </div>
+  </header>
+  <main class="app-page">
+    <div class="container">
+      <h1>Internal mail</h1>
+      <p style="color:var(--text-muted); margin-bottom:1rem;">Inbox and sent conversations.</p>
+      <ul class="mail-list" id="list"></ul>
+    </div>
+  </main>
+  <script src="config.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    if (!api.getToken()) { location.href = 'login.html'; return; }
+    document.getElementById('logout').onclick = () => { api.auth.logout(); location.href = '../index.html'; };
+    (async () => {
+      const list = await api.conversations.list();
+      document.getElementById('list').innerHTML = list.length
+        ? list.map(c => `
+          <li class="${c.unread ? 'unread' : ''}">
+            <a href="conversation.html?id=${c.id}">
+              <strong>${escapeHtml(c.other?.name || c.other?.email || 'User')}</strong>
+              ${c.product ? ` · ${escapeHtml(c.product.title)}` : ''}
+              <br><span style="font-size:0.9rem; color:var(--text-muted);">${(c.last_message || '').slice(0, 60)}...</span>
+            </a>
+            <span style="font-size:0.85rem; color:var(--text-muted);">${formatDate(c.updated_at)}</span>
+          </li>
+        `).join('')
+        : '<li style="color:var(--text-muted);">No conversations.</li>';
+    })();
+    function escapeHtml(s) { return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+    function formatDate(t) { return t ? new Date(t * 1000).toLocaleString() : ''; }
+  </script>
+</body>
+</html>

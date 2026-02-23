@@ -1,24 +1,24 @@
-# OMNIXIUS — Дорожная карта
+# OMNIXIUS — Roadmap
 
-Краткие этапы и приоритеты.
-
----
-
-## Фаза 1 — Основа
-- Сайт и документация (архитектура, видение).
-- Выбор стека и инфраструктуры (multi-cloud, edge).
-- Прототип блокчейна IXI (консенсус, ZKP, экономика).
-
-## Фаза 2 — Платформы
-- OMNIXIUS CONNECT: профили, геолокация, чат, маркетплейс (MVP).
-- OMNIXIUS TRADE & FINANCE: кошельки, биржа (крипто/FIAT), копитрейдинг (MVP).
-- OMNIXIUS REPOSITORIUM: узлы хранения, награды, аренда мощностей (MVP).
-
-## Фаза 3 — Интеграция и масштаб
-- Связка всех платформ через блокчейн IXI и единый аккаунт.
-- AI-модерация, AI-аналитика, автоинвестирование.
-- Мобильные приложения (iOS/Android), глобальное масштабирование.
+Phases and priorities. Stack: **SPARK, RUST, C++, SWIFT, GO only.**
 
 ---
 
-Приоритеты уточняются по ходу разработки. IXI — блокчейн-платформа экосистемы, не отдельный токен.
+## Phase 1 — Foundation
+- Site and documentation (architecture, vision).
+- Infrastructure (multi-cloud, edge).
+- IXI blockchain prototype (consensus, ZKP, economy). **Rust / C++.**
+
+## Phase 2 — Platforms
+- OMNIXIUS CONNECT: profiles, geo, chat, marketplace (MVP). **Go** API, **Swift** iOS.
+- OMNIXIUS TRADE & FINANCE: wallets, exchange (crypto/FIAT), copy trading (MVP). **Go / Rust.**
+- OMNIXIUS REPOSITORIUM: storage nodes, rewards, compute rental (MVP). **Rust / C++**, **Spark** for analytics where applicable.
+
+## Phase 3 — Integration & scale
+- All platforms connected via IXI blockchain and single account.
+- AI moderation, AI analytics, auto-investing.
+- Mobile (Swift for iOS), global scaling.
+
+---
+
+IXI is the ecosystem blockchain platform, not a separate token.
