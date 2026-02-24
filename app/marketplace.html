@@ -12,29 +12,29 @@
     <div class="container">
       <a href="../index.html" class="logo">OMNIXIUS</a>
       <nav class="nav">
-        <a href="marketplace.html">Marketplace</a>
-        <a href="mail.html">Mail</a>
-        <a href="orders.html">Orders</a>
-        <a href="dashboard.html">Profile</a>
-        <a href="../index.html">Site</a>
+        <a href="marketplace.html" data-i18n="navMarketplace">Marketplace</a>
+        <a href="mail.html" data-i18n="navMail">Mail</a>
+        <a href="orders.html" data-i18n="navOrders">Orders</a>
+        <a href="dashboard.html" data-i18n="navProfile">Profile</a>
+        <a href="../index.html" data-i18n="navSite">Site</a>
         <span class="lang-switcher"><a href="#" data-lang="en">EN</a> | <a href="#" data-lang="ru">RU</a> | <a href="#" data-lang="fr">FR</a></span>
-        <a href="login.html" id="navLogin">Sign in</a>
-        <a href="#" id="navLogout" style="display:none;">Sign out</a>
+        <a href="login.html" id="navLogin" data-i18n="signIn">Sign in</a>
+        <a href="#" id="navLogout" style="display:none;" data-i18n="signOut">Sign out</a>
       </nav>
     </div>
   </header>
   <main class="app-page">
     <div class="container">
-      <h1>Marketplace</h1>
+      <h1 data-i18n="marketplaceTitle">Marketplace</h1>
       <form id="filters" style="margin-bottom:1.5rem; display:flex; flex-wrap:wrap; gap:0.5rem; align-items:center;">
-        <input type="text" name="q" placeholder="Search" style="padding:0.5rem; width:180px;">
-        <input type="text" name="location" placeholder="City" style="padding:0.5rem; width:140px;">
+        <input type="text" name="q" data-i18n-placeholder="searchPlaceholder" placeholder="Search" style="padding:0.5rem; width:180px;">
+        <input type="text" name="location" data-i18n-placeholder="cityPlaceholder" placeholder="City" style="padding:0.5rem; width:140px;">
         <select name="category" style="padding:0.5rem;">
-          <option value="">All categories</option>
+          <option value="" data-i18n="allCategories">All categories</option>
         </select>
-        <input type="number" name="minPrice" placeholder="Price from" style="padding:0.5rem; width:100px;">
-        <input type="number" name="maxPrice" placeholder="to" style="padding:0.5rem; width:100px;">
-        <button type="submit" class="btn btn-primary">Search</button>
+        <input type="number" name="minPrice" data-i18n-placeholder="priceFrom" placeholder="Price from" style="padding:0.5rem; width:100px;">
+        <input type="number" name="maxPrice" data-i18n-placeholder="priceTo" placeholder="to" style="padding:0.5rem; width:100px;">
+        <button type="submit" class="btn btn-primary" data-i18n="searchBtn">Search</button>
       </form>
       <p id="authHint" style="color:var(--text-muted); margin-bottom:1rem;"></p>
       <div class="app-grid" id="list"></div>
@@ -48,27 +48,35 @@
     if (token) {
       document.getElementById('navLogin').style.display = 'none';
       document.getElementById('navLogout').style.display = 'inline';
-      document.getElementById('authHint').innerHTML = '<a href="product-create.html" class="btn btn-primary" style="display:inline-block;">Add listing</a>';
+      document.getElementById('authHint').innerHTML = '<a href="product-create.html" class="btn btn-primary" style="display:inline-block;" data-i18n="addListing">Add listing</a>';
     }
     document.getElementById('navLogout').onclick = () => { api.auth.logout(); location.reload(); };
 
     async function load(params = {}) {
       var listEl = document.getElementById('list');
-      listEl.innerHTML = '<p class="loading-state">Loading…</p>';
+      listEl.innerHTML = '<p class="loading-state">' + (window.i18n ? i18n.t('loading') : 'Loading…') + '</p>';
       try {
         const [data, cats] = await Promise.all([api.products.list(params), api.products.categories()]);
+        var allCat = window.i18n ? i18n.t('allCategories') : 'All categories';
         var sel = document.querySelector('select[name=category]');
-        if (sel && !sel.dataset.filled) { sel.innerHTML = '<option value="">All categories</option>' + (cats || []).map(c => '<option value="' + escapeHtml(c) + '">' + escapeHtml(c) + '</option>').join(''); sel.dataset.filled = '1'; }
+        if (sel && !sel.dataset.filled) { sel.innerHTML = '<option value="">' + allCat + '</option>' + (cats || []).map(c => '<option value="' + escapeHtml(c) + '">' + escapeHtml(c) + '</option>').join(''); sel.dataset.filled = '1'; }
+        var noPhoto = window.i18n ? i18n.t('noPhoto') : 'No photo';
+        var noResults = window.i18n ? i18n.t('noResults') : 'No results';
+        var noResultsHint = window.i18n ? i18n.t('noResultsHint') : 'Try different filters or add your own listing.';
         listEl.innerHTML = data.length
-          ? data.map(p => '<a href="product.html?id=' + p.id + '" class="app-card"><img src="' + (p.image_path ? (window.API_URL + '/uploads/' + p.image_path) : 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22260%22 height=%22180%22><rect fill=%22%23222%22 width=%22260%22 height=%22180%22/><text x=%2250%25%22 y=%2250%25%22 fill=%23666%22 text-anchor=%22middle%22 dy=%22.3em%22>No photo</text></svg>') + '" alt=""><div class="body"><h3>' + escapeHtml(p.title) + '</h3><p class="price">' + p.price + '</p><p class="meta">' + escapeHtml(p.category) + (p.location ? ' · ' + escapeHtml(p.location) : '') + '</p></div></a>').join('')
-          : '<div class="empty-state"><p class="empty-state-title">No results</p><p class="empty-state-text">Try different filters or add your own listing.</p></div>';
+          ? data.map(p => '<a href="product.html?id=' + p.id + '" class="app-card"><img src="' + (p.image_path ? (window.API_URL + '/uploads/' + p.image_path) : 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22260%22 height=%22180%22><rect fill=%22%23222%22 width=%22260%22 height=%22180%22/><text x=%2250%25%22 y=%2250%25%22 fill=%23666%22 text-anchor=%22middle%22 dy=%22.3em%22>' + encodeURIComponent(noPhoto) + '</text></svg>') + '" alt=""><div class="body"><h3>' + escapeHtml(p.title) + '</h3><p class="price">' + p.price + '</p><p class="meta">' + escapeHtml(p.category) + (p.location ? ' · ' + escapeHtml(p.location) : '') + '</p></div></a>').join('')
+          : '<div class="empty-state"><p class="empty-state-title">' + noResults + '</p><p class="empty-state-text">' + noResultsHint + '</p></div>';
       } catch (e) {
-        listEl.innerHTML = '<p class="error">Failed to load. Try again.</p>';
+        var loadFailed = window.i18n ? i18n.t('loadFailed') : 'Failed to load. Try again.';
+        var retry = window.i18n ? i18n.t('retry') : 'Retry';
+        listEl.innerHTML = '<p class="error">' + loadFailed + '</p><button type="button" class="btn btn-primary" id="retryBtn">' + retry + '</button>';
+        document.getElementById('retryBtn').onclick = function() { load(Object.fromEntries(new FormData(document.getElementById('filters')))); };
       }
     }
     function escapeHtml(s) { return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
     document.getElementById('filters').onsubmit = (e) => { e.preventDefault(); load(Object.fromEntries(new FormData(e.target))); };
     load();
+    if (window.i18n) i18n.apply();
   </script>
 </body>
 </html>

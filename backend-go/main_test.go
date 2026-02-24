@@ -71,3 +71,15 @@ func TestProductGet_NotFound_Returns404(t *testing.T) {
 		t.Errorf("got status %d, want 404", w.Code)
 	}
 }
+
+func TestOrderCreate_NoAuth_Returns401(t *testing.T) {
+	setupTestDB(t)
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+	c.Request = httptest.NewRequest(http.MethodPost, "/api/orders", strings.NewReader(`{"product_id":1,"quantity":1}`))
+	c.Request.Header.Set("Content-Type", "application/json")
+	handleOrderCreate(c)
+	if w.Code != http.StatusUnauthorized {
+		t.Errorf("got status %d, want 401", w.Code)
+	}
+}

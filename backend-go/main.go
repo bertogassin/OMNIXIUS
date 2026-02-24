@@ -45,10 +45,19 @@ func main() {
 	db.InitUploadDirs(cfg.UploadDir)
 
 	r := gin.New()
+	r.Use(securityHeaders())
 	r.Use(requestLogger())
 	r.Use(corsMiddleware())
 	r.Use(rateLimitMiddleware())
 	r.Static("/uploads", cfg.UploadDir)
+
+	r.GET("/health", func(c *gin.Context) {
+		if err := db.DB.Ping(); err != nil {
+			c.JSON(http.StatusServiceUnavailable, gin.H{"status": "unhealthy", "error": "db"})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{"status": "ok"})
+	})
 
 	api := r.Group("/api")
 	api.POST("/auth/register", handleRegister)
@@ -85,6 +94,15 @@ func main() {
 	port := ":" + cfg.Port
 	if err := r.Run(port); err != nil {
 		panic(err)
+	}
+}
+
+func securityHeaders() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Header("X-Content-Type-Options", "nosniff")
+		c.Header("X-Frame-Options", "DENY")
+		c.Header("X-XSS-Protection", "1; mode=block")
+		c.Next()
 	}
 }
 
@@ -629,6 +647,10 @@ func handleOrdersMy(c *gin.Context) {
 }
 
 func handleOrderCreate(c *gin.Context) {
+	if getUserID(c) == 0 {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
 	var body struct {
 		ProductID int64 `json:"product_id"`
 	}
