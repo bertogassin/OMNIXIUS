@@ -45,6 +45,11 @@
           <a href="../contact.html">Contact</a>
         </div>
       </nav>
+      <div class="lang-switcher">
+        <a href="#" data-lang="en">EN</a>
+        <a href="#" data-lang="ru">RU</a>
+        <a href="#" data-lang="fr">FR</a>
+      </div>
       <button class="menu-toggle" aria-label="Menu"><span></span></button>
     </div>
   </header>
@@ -67,7 +72,7 @@
         <input type="password" name="current" id="currentPwd" autocomplete="current-password">
         <label data-i18n="newPassword">New password</label>
         <input type="password" name="new" id="newPwd" minlength="8" maxlength="128" autocomplete="new-password">
-        <label data-i18n="confirmPassword">Confirm password</label>
+        <label data-i18n="confirmPasswordLabel">Confirm password</label>
         <input type="password" name="new2" id="newPwd2" minlength="8" maxlength="128" autocomplete="new-password">
         <p class="form-hint" id="pwdMismatch" style="display:none;" data-i18n="passwordMismatch">Passwords do not match</p>
         <button type="submit" class="btn btn-primary" data-i18n="save">Save</button>

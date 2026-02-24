@@ -16,38 +16,44 @@
       <a href="index.html" class="logo">OMNIXIUS</a>
       <nav class="nav nav-main nav-unified">
         <div class="nav-group nav-group-main">
-          <span class="nav-group-label">Main</span>
-          <a href="index.html#screens">All screens</a>
-          <a href="index.html#about">About</a>
-          <a href="index.html#map">Map</a>
-          <a href="app/login.html" id="navLogin" class="nav-cta">Sign in</a>
-          <a href="#" id="navLogout" style="display:none;">Sign out</a>
+          <span class="nav-group-label" data-i18n="navMain">Main</span>
+          <a href="index.html#screens" data-i18n="navAllScreens">All screens</a>
+          <a href="index.html#about" data-i18n="navAbout">About</a>
+          <a href="index.html#map" data-i18n="navMap">Map</a>
+          <a href="app/login.html" id="navLogin" class="nav-cta" data-i18n="signIn">Sign in</a>
+          <a href="#" id="navLogout" style="display:none;" data-i18n="signOut">Sign out</a>
         </div>
         <div class="nav-group nav-group-app">
-          <span class="nav-group-label">App</span>
-          <button type="button" class="nav-drop-trigger" aria-expanded="false" aria-haspopup="true">App ▾</button>
+          <span class="nav-group-label" data-i18n="navApp">App</span>
+          <button type="button" class="nav-drop-trigger" aria-expanded="false" aria-haspopup="true"><span data-i18n="navApp">App</span> ▾</button>
           <div class="nav-drop-panel">
-            <a href="app/marketplace.html">Marketplace</a>
-            <a href="app/mail.html">Mail</a>
-            <a href="app/orders.html">Orders</a>
-            <a href="app/dashboard.html">Profile</a>
+            <a href="app/marketplace.html" data-i18n="navMarketplace">Marketplace</a>
+            <a href="app/mail.html" data-i18n="navMail">Mail</a>
+            <a href="app/orders.html" data-i18n="navOrders">Orders</a>
+            <a href="app/dashboard.html" data-i18n="navProfile">Profile</a>
             <a href="app/ai.html">AI</a>
           </div>
           <div class="nav-group-app-links">
-            <a href="app/marketplace.html">Marketplace</a>
-            <a href="app/mail.html">Mail</a>
-            <a href="app/orders.html">Orders</a>
-            <a href="app/dashboard.html">Profile</a>
+            <a href="app/marketplace.html" data-i18n="navMarketplace">Marketplace</a>
+            <a href="app/mail.html" data-i18n="navMail">Mail</a>
+            <a href="app/orders.html" data-i18n="navOrders">Orders</a>
+            <a href="app/dashboard.html" data-i18n="navProfile">Profile</a>
             <a href="app/ai.html">AI</a>
           </div>
         </div>
         <div class="nav-group nav-group-info">
-          <span class="nav-group-label">Info</span>
-          <a href="ecosystem.html">Ecosystem</a>
-          <a href="architecture.html">Architecture</a>
-          <a href="contact.html">Contact</a>
+          <span class="nav-group-label" data-i18n="navInfo">Info</span>
+          <a href="ecosystem.html" data-i18n="navEcosystem">Ecosystem</a>
+          <a href="architecture.html" data-i18n="navArchitecture">Architecture</a>
+          <a href="contact.html" data-i18n="navContact">Contact</a>
         </div>
       </nav>
+      <div class="lang-switcher">
+        <span class="lang-switcher-label" data-i18n="langLabel">Language</span>
+        <a href="#" data-lang="en">EN</a>
+        <a href="#" data-lang="ru">RU</a>
+        <a href="#" data-lang="fr">FR</a>
+      </div>
       <button class="menu-toggle" aria-label="Menu"><span></span></button>
     </div>
   </header>
@@ -57,50 +63,50 @@
       <div class="hero-bg"></div>
       <div class="container">
         <h1>OMNIXIUS</h1>
-        <p class="hero-tagline">One ecosystem. Mail, Marketplace, Shop — Connect, Trade, Repositorium, Blockchain. One account.</p>
+        <p class="hero-tagline" data-i18n="heroTagline">One ecosystem. Mail, Marketplace, Shop — Connect, Trade, Repositorium, Blockchain. One account.</p>
         <div class="hero-actions">
-          <a href="#screens" class="btn btn-primary">All screens</a>
-          <a href="app/login.html" class="btn btn-outline">Sign in</a>
+          <a href="#screens" class="btn btn-primary" data-i18n="heroAllScreens">All screens</a>
+          <a href="app/login.html" class="btn btn-outline" data-i18n="signIn">Sign in</a>
         </div>
       </div>
     </section>
 
     <section id="screens" class="section section-quick">
       <div class="container">
-        <h2>All main screens</h2>
-        <p class="about-text" style="margin-bottom:1.5rem;">One list. Same order everywhere. No duplication.</p>
+        <h2 data-i18n="screensTitle">All main screens</h2>
+        <p class="about-text" style="margin-bottom:1.5rem;" data-i18n="screensIntro">One list. Same order everywhere. No duplication.</p>
         <ul class="screens-list">
-          <li><a href="index.html">Home</a> — this page</li>
-          <li><a href="app/login.html">Sign in</a> — enter the app</li>
-          <li><a href="#map">Map</a> — all places and platforms (below on this page)</li>
-          <li><a href="app/marketplace.html">Marketplace</a> — goods and services</li>
-          <li><a href="app/mail.html">Mail</a> — messages</li>
-          <li><a href="app/orders.html">Orders</a> — my orders</li>
-          <li><a href="app/dashboard.html">Profile</a> — account</li>
-          <li><a href="app/ai.html">AI</a> — assistant</li>
+          <li><a href="index.html" data-i18n="home">Home</a> <span data-i18n="homeDesc">— this page</span></li>
+          <li><a href="app/login.html" data-i18n="signIn">Sign in</a> <span data-i18n="signInDesc">— enter the app</span></li>
+          <li><a href="#map" data-i18n="navMap">Map</a> <span data-i18n="mapDesc">— all places and platforms (below on this page)</span></li>
+          <li><a href="app/marketplace.html" data-i18n="navMarketplace">Marketplace</a> <span data-i18n="marketplaceDesc">— goods and services</span></li>
+          <li><a href="app/mail.html" data-i18n="navMail">Mail</a> <span data-i18n="mailDesc">— messages</span></li>
+          <li><a href="app/orders.html" data-i18n="navOrders">Orders</a> <span data-i18n="ordersDesc">— my orders</span></li>
+          <li><a href="app/dashboard.html" data-i18n="navProfile">Profile</a> <span data-i18n="profileDesc">— account</span></li>
+          <li><a href="app/ai.html">AI</a> <span data-i18n="aiDesc">— assistant</span></li>
         </ul>
-        <p class="section-label" style="margin-top:2rem;">Reference (info only)</p>
+        <p class="section-label" style="margin-top:2rem;" data-i18n="referenceLabel">Reference (info only)</p>
         <ul class="screens-list screens-list-secondary">
-          <li><a href="ecosystem.html">Ecosystem</a> — how everything connects</li>
-          <li><a href="architecture.html">Architecture</a> — tech stack</li>
-          <li><a href="contact.html">Contact</a> — email, phone</li>
+          <li><a href="ecosystem.html" data-i18n="navEcosystem">Ecosystem</a> <span data-i18n="ecosystemDesc">— how everything connects</span></li>
+          <li><a href="architecture.html" data-i18n="navArchitecture">Architecture</a> <span data-i18n="architectureDesc">— tech stack</span></li>
+          <li><a href="contact.html" data-i18n="navContact">Contact</a> <span data-i18n="contactDesc">— email, phone</span></li>
         </ul>
       </div>
     </section>
 
     <section id="about" class="section about">
       <div class="container">
-        <h2>About</h2>
-        <p class="about-text">Self-sufficient ecosystem: communication, earning, investment, learning, asset management — in one application.</p>
+        <h2 data-i18n="aboutTitle">About</h2>
+        <p class="about-text" data-i18n="aboutText">Self-sufficient ecosystem: communication, earning, investment, learning, asset management — in one application.</p>
       </div>
     </section>
 
     <section id="map" class="section">
       <div class="container">
-        <h2>Map of all places</h2>
-        <p class="about-text" style="margin-bottom:1rem;">Four platforms and other directions. Everything on one page.</p>
+        <h2 data-i18n="mapTitle">Map of all places</h2>
+        <p class="about-text" style="margin-bottom:1rem;" data-i18n="mapIntro">Four platforms and other directions. Everything on one page.</p>
 
-        <h3 class="section-title">Four platforms</h3>
+        <h3 class="section-title" data-i18n="fourPlatforms">Four platforms</h3>
         <div class="directions-grid">
           <a href="app/connect.html" class="direction-card">
             <h3>OMNIXIUS CONNECT</h3>
@@ -124,7 +130,7 @@
           </a>
         </div>
 
-        <h3 class="section-title" style="margin-top:2.5rem;">Other directions</h3>
+        <h3 class="section-title" style="margin-top:2.5rem;" data-i18n="otherDirections">Other directions</h3>
         <div class="directions-grid">
           <a href="app/mail.html" class="direction-card">
             <h3>Mail</h3>
@@ -167,15 +173,15 @@
 
     <section class="section stack-preview">
       <div class="container">
-        <h2>Stack</h2>
-        <p class="about-text">Go, Rust, Spark, Swift, Kotlin. <a href="architecture.html">Architecture →</a></p>
+        <h2 data-i18n="stackTitle">Stack</h2>
+        <p class="about-text">Go, Rust, Spark, Swift, Kotlin. <a href="architecture.html" data-i18n="stackLink">Architecture →</a></p>
       </div>
     </section>
 
     <section id="contact" class="section contact">
       <div class="container">
-        <h2>Contact</h2>
-        <p><a href="contact.html" class="contact-email">Get in touch</a></p>
+        <h2 data-i18n="contactTitle">Contact</h2>
+        <p><a href="contact.html" class="contact-email" data-i18n="getInTouch">Get in touch</a></p>
       </div>
     </section>
   </main>
@@ -185,17 +191,26 @@
       <div class="footer-top">
         <span class="logo">OMNIXIUS</span>
         <nav class="footer-nav">
-          <a href="index.html#map">Map</a>
-          <a href="ecosystem.html">Ecosystem</a>
-          <a href="architecture.html">Architecture</a>
-          <a href="contact.html">Contact</a>
-          <a href="app/login.html">Sign in</a>
+          <a href="index.html#map" data-i18n="navMap">Map</a>
+          <a href="ecosystem.html" data-i18n="navEcosystem">Ecosystem</a>
+          <a href="architecture.html" data-i18n="navArchitecture">Architecture</a>
+          <a href="contact.html" data-i18n="navContact">Contact</a>
+          <a href="app/login.html" data-i18n="signIn">Sign in</a>
         </nav>
+      </div>
+      <div class="footer-lang">
+        <span class="lang-switcher-label" data-i18n="langLabel">Language</span>
+        <div class="lang-switcher lang-switcher-footer">
+          <a href="#" data-lang="en">EN</a>
+          <a href="#" data-lang="ru">RU</a>
+          <a href="#" data-lang="fr">FR</a>
+        </div>
       </div>
       <p class="footer-copy">© 2026 OMNIXIUS. All rights reserved.</p>
     </div>
   </footer>
 
+  <script src="app/js/i18n.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

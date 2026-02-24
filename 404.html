@@ -48,6 +48,12 @@
           <a href="contact.html">Contact</a>
         </div>
       </nav>
+      <div class="lang-switcher">
+        <span class="lang-switcher-label" data-i18n="langLabel">Language</span>
+        <a href="#" data-lang="en">EN</a>
+        <a href="#" data-lang="ru">RU</a>
+        <a href="#" data-lang="fr">FR</a>
+      </div>
       <button class="menu-toggle" aria-label="Menu"><span></span></button>
     </div>
   </header>
@@ -65,11 +71,19 @@
 
   <footer class="footer">
     <div class="container">
-      <span class="logo">OMNIXIUS</span>
-      <p>© 2026 OMNIXIUS. All rights reserved.</p>
+      <div class="footer-lang">
+        <span class="lang-switcher-label" data-i18n="langLabel">Language</span>
+        <div class="lang-switcher lang-switcher-footer">
+          <a href="#" data-lang="en">EN</a>
+          <a href="#" data-lang="ru">RU</a>
+          <a href="#" data-lang="fr">FR</a>
+        </div>
+      </div>
+      <p class="footer-copy">© 2026 OMNIXIUS. All rights reserved.</p>
     </div>
   </footer>
 
+  <script src="app/js/i18n.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>
