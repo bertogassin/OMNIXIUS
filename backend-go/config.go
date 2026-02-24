@@ -5,12 +5,14 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"strings"
 
 	"omnixius-api/pqc"
 )
 
 type Config struct {
 	Port             string
+	AppURL           string // frontend app base URL for redirect after register (e.g. https://bertogassin.github.io/OMNIXIUS)
 	AllowedOrigins   string // comma-separated; empty = "*" (dev)
 	MaxLoginAttempts int
 	UploadDir        string
@@ -35,8 +37,10 @@ func LoadConfig() Config {
 			mem = uint32(n)
 		}
 	}
+	appURL := strings.TrimSuffix(os.Getenv("APP_URL"), "/")
 	cfg := Config{
 		Port:             port,
+		AppURL:           appURL,
 		AllowedOrigins:   os.Getenv("ALLOWED_ORIGINS"), // e.g. "https://bertogassin.github.io,https://omnixius.com"
 		MaxLoginAttempts: 5,
 		UploadDir:        "uploads",

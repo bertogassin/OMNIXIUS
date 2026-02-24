@@ -37,6 +37,24 @@
   <script src="js/api.js"></script>
   <script src="js/nav-unread.js"></script>
   <script>
+    (function () {
+      var params = new URLSearchParams(location.search);
+      var token = params.get('token');
+      if (token) {
+        var apiUrl = params.get('api_url');
+        if (apiUrl) localStorage.setItem('omnixius_api_url', apiUrl);
+        localStorage.setItem('omnixius_token', token);
+        var name = params.get('name');
+        var email = params.get('email');
+        if (email) {
+          var user = { email: email, name: name || '' };
+          localStorage.setItem('omnixius_user', JSON.stringify(user));
+        }
+        history.replaceState(null, '', location.pathname);
+        location.reload();
+        return;
+      }
+    })();
     if (!api.getToken()) { location.href = 'login.html'; return; }
     document.getElementById('logout').onclick = () => { api.auth.logout(); location.href = '../index.html'; };
 

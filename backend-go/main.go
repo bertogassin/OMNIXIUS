@@ -11,6 +11,7 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -58,6 +59,11 @@ func main() {
 		}
 		c.JSON(http.StatusOK, gin.H{"status": "ok"})
 	})
+
+	r.GET("/register", handleRegisterPage)
+	r.POST("/register", handleRegisterForm)
+	r.GET("/login", handleLoginPage)
+	r.POST("/login", handleLoginForm)
 
 	api := r.Group("/api")
 	api.POST("/auth/register", handleRegister)
@@ -298,6 +304,207 @@ func handleRegister(c *gin.Context) {
 		return
 	}
 	c.JSON(201, gin.H{"user": user, "token": token})
+}
+
+	const registerPageHTML = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register — OMNIXIUS</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 420px; margin: 2rem auto; padding: 1rem; background: #0c0c0f; color: #e8e6e3; }
+    h1 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+    p.sub { color: #8a8a8a; font-size: 0.95rem; margin-bottom: 1.5rem; }
+    label { display: block; margin-bottom: 0.25rem; color: #8a8a8a; }
+    input { width: 100%; padding: 0.6rem; margin-bottom: 1rem; background: #14141a; border: 1px solid #2a2a32; border-radius: 6px; color: #e8e6e3; box-sizing: border-box; }
+    .err { color: #e74c3c; font-size: 0.9rem; margin-bottom: 0.5rem; }
+    button { width: 100%; padding: 0.75rem; background: #00d4aa; color: #0c0c0f; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 1rem; }
+    button:hover { opacity: 0.9; }
+    a { color: #00d4aa; }
+    .link { text-align: center; margin-top: 1rem; }
+  </style>
+</head>
+<body>
+  <h1>Register</h1>
+  <p class="sub">Create your OMNIXIUS account (via Go backend).</p>
+  {{.ErrorHTML}}
+  <form method="POST" action="/register">
+    <label>Email</label>
+    <input type="email" name="email" required value="{{.Email}}" autocomplete="email">
+    <label>Password (min 8 characters)</label>
+    <input type="password" name="password" required minlength="8" autocomplete="new-password">
+    <label>Confirm password</label>
+    <input type="password" name="password2" required minlength="8" autocomplete="new-password">
+    <label>Name (optional)</label>
+    <input type="text" name="name" value="{{.Name}}" autocomplete="name" maxlength="200">
+    <button type="submit">Create account</button>
+  </form>
+  <p class="link"><a href="/login">Already have an account? Sign in</a></p>
+</body>
+</html>`
+
+const loginPageHTML = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign in — OMNIXIUS</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 420px; margin: 2rem auto; padding: 1rem; background: #0c0c0f; color: #e8e6e3; }
+    h1 { font-size: 1.5rem; margin-bottom: 1.5rem; }
+    label { display: block; margin-bottom: 0.25rem; color: #8a8a8a; }
+    input { width: 100%; padding: 0.6rem; margin-bottom: 1rem; background: #14141a; border: 1px solid #2a2a32; border-radius: 6px; color: #e8e6e3; box-sizing: border-box; }
+    .err { color: #e74c3c; font-size: 0.9rem; margin-bottom: 0.5rem; }
+    button { width: 100%; padding: 0.75rem; background: #00d4aa; color: #0c0c0f; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 1rem; }
+    a { color: #00d4aa; }
+    .link { text-align: center; margin-top: 1rem; }
+  </style>
+</head>
+<body>
+  <h1>Sign in</h1>
+  {{.Error}}
+  <form method="POST" action="/login">
+    <label>Email</label>
+    <input type="email" name="email" required value="{{.Email}}" autocomplete="email">
+    <label>Password</label>
+    <input type="password" name="password" required autocomplete="current-password">
+    <button type="submit">Sign in</button>
+  </form>
+  <p class="link"><a href="/register">No account? Register</a></p>
+</body>
+</html>`
+
+func handleRegisterPage(c *gin.Context) {
+	html := strings.ReplaceAll(registerPageHTML, "{{.ErrorHTML}}", "")
+	html = strings.ReplaceAll(html, "{{.Email}}", "")
+	c.Header("Content-Type", "text/html; charset=utf-8")
+	c.String(200, strings.ReplaceAll(html, "{{.Name}}", ""))
+}
+
+func handleRegisterForm(c *gin.Context) {
+	email := strings.TrimSpace(strings.ToLower(c.PostForm("email")))
+	password := c.PostForm("password")
+	password2 := c.PostForm("password2")
+	name := strings.TrimSpace(c.PostForm("name"))
+	if len(name) > maxNameLen {
+		name = name[:maxNameLen]
+	}
+
+	if email == "" {
+		serveRegisterError(c, "Email required", email, name)
+		return
+	}
+	if !isValidEmail(email) {
+		serveRegisterError(c, "Invalid email format", email, name)
+		return
+	}
+	if len(password) < minPasswordLen {
+		serveRegisterError(c, "Password must be at least 8 characters", email, name)
+		return
+	}
+	if len(password) > maxPasswordLen {
+		serveRegisterError(c, "Password must be up to 128 characters", email, name)
+		return
+	}
+	if password != password2 {
+		serveRegisterError(c, "Passwords do not match", email, name)
+		return
+	}
+
+	user, token, err := AuthRegister(email, password, name)
+	if err != nil {
+		if errors.Is(err, ErrEmailExists) {
+			serveRegisterError(c, "Email already registered", email, name)
+			return
+		}
+		serveRegisterError(c, "Registration failed. Try again.", email, name)
+		return
+	}
+
+	if cfg.AppURL != "" {
+		apiBase := c.Request.URL.Scheme + "://" + c.Request.Host
+		redirectURL := cfg.AppURL + "/app/dashboard.html?token=" + url.QueryEscape(token) + "&api_url=" + url.QueryEscape(apiBase)
+		if u, ok := user["name"]; ok && u != nil {
+			redirectURL += "&name=" + url.QueryEscape(stringOrEmpty(user["name"]))
+		}
+		if e, ok := user["email"]; ok && e != nil {
+			redirectURL += "&email=" + url.QueryEscape(stringOrEmpty(user["email"]))
+		}
+		c.Redirect(http.StatusFound, redirectURL)
+		return
+	}
+	c.Header("Content-Type", "text/html; charset=utf-8")
+	c.String(200, `<html><body><p>Account created. Token: `+token+`</p><p><a href="/register">Back to register</a></p></body></html>`)
+}
+
+func stringOrEmpty(v interface{}) string {
+	if s, ok := v.(string); ok {
+		return s
+	}
+	return ""
+}
+
+func serveRegisterError(c *gin.Context, errMsg, email, name string) {
+	errBlock := "<p class=\"err\">" + templateHTMLEscape(errMsg) + "</p>"
+	html := strings.ReplaceAll(registerPageHTML, "{{.ErrorHTML}}", errBlock)
+	html = strings.ReplaceAll(html, "{{.Email}}", templateHTMLEscape(email))
+	html = strings.ReplaceAll(html, "{{.Name}}", templateHTMLEscape(name))
+	c.Header("Content-Type", "text/html; charset=utf-8")
+	c.String(400, html)
+}
+
+func templateHTMLEscape(s string) string {
+	s = strings.ReplaceAll(s, "&", "&amp;")
+	s = strings.ReplaceAll(s, "<", "&lt;")
+	s = strings.ReplaceAll(s, ">", "&gt;")
+	s = strings.ReplaceAll(s, "\"", "&quot;")
+	return s
+}
+
+func handleLoginPage(c *gin.Context) {
+	html := strings.ReplaceAll(loginPageHTML, "{{.Error}}", "")
+	c.Header("Content-Type", "text/html; charset=utf-8")
+	c.String(200, strings.ReplaceAll(html, "{{.Email}}", ""))
+}
+
+func handleLoginForm(c *gin.Context) {
+	ip := c.ClientIP()
+	limiter := getLoginLimiter(ip)
+	if !limiter.Allow() {
+		serveLoginError(c, "Too many attempts. Try again later.", c.PostForm("email"))
+		return
+	}
+	email := strings.TrimSpace(strings.ToLower(c.PostForm("email")))
+	password := c.PostForm("password")
+	if email == "" {
+		serveLoginError(c, "Email required", "")
+		return
+	}
+	user, token, err := AuthLogin(email, password)
+	if err != nil {
+		serveLoginError(c, "Invalid email or password", email)
+		return
+	}
+	if cfg.AppURL != "" {
+		apiBase := c.Request.URL.Scheme + "://" + c.Request.Host
+		redirectURL := cfg.AppURL + "/app/dashboard.html?token=" + url.QueryEscape(token) + "&api_url=" + url.QueryEscape(apiBase)
+		if u, ok := user["name"]; ok && u != nil {
+			redirectURL += "&name=" + url.QueryEscape(stringOrEmpty(user["name"]))
+		}
+		redirectURL += "&email=" + url.QueryEscape(stringOrEmpty(user["email"]))
+		c.Redirect(http.StatusFound, redirectURL)
+		return
+	}
+	c.Header("Content-Type", "text/html; charset=utf-8")
+	c.String(200, `<html><body><p>Signed in. Token: `+token+`</p><p><a href="/login">Back to login</a></p></body></html>`)
+}
+
+func serveLoginError(c *gin.Context, errMsg, email string) {
+	errBlock := "<p class=\"err\">" + templateHTMLEscape(errMsg) + "</p>"
+	html := strings.ReplaceAll(loginPageHTML, "{{.Error}}", errBlock)
+	c.Header("Content-Type", "text/html; charset=utf-8")
+	c.String(401, strings.ReplaceAll(html, "{{.Email}}", templateHTMLEscape(email)))
 }
 
 func handleLogin(c *gin.Context) {

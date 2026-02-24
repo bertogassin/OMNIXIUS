@@ -13,6 +13,8 @@ go build -o omnixius-api .
 
 API: `http://localhost:3000`
 
+**Register / login via Go (no JS):** Open `http://localhost:3000/register` or `http://localhost:3000/login`. Submit the form; if `APP_URL` is set (e.g. your GitHub Pages URL), you are redirected to the app with token and API URL saved.
+
 ## Run with Docker
 
 ```bash
@@ -26,6 +28,7 @@ Copy `.env.example` to `.env` in production. Variables:
 
 - `PORT` — default 3000
 - `DB_PATH` — default `db/omnixius.db`
+- `APP_URL` — frontend base URL for redirect after register/login (e.g. `https://bertogassin.github.io/OMNIXIUS`)
 - `ALLOWED_ORIGINS` — comma-separated origins for CORS; empty = `*` (dev)
 - `DILITHIUM_PUBLIC_KEY` / `DILITHIUM_PRIVATE_KEY` — base64 PQC keys (optional; ephemeral if unset)
 
