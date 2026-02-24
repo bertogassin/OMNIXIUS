@@ -90,6 +90,10 @@
           var url = prompt('Backend API URL:', localStorage.getItem('omnixius_api_url') || window.API_URL || '');
           if (url !== null) { localStorage.setItem('omnixius_api_url', url.replace(/\/$/, '')); location.reload(); }
         };
+      } else if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+        hint.innerHTML = '<span style="color:var(--text-muted); font-size:0.85rem;">Backend: run <code>go run .</code> in the backend-go folder if registration fails.</span>';
+        hint.style.display = 'block';
+        hint.style.marginBottom = '0.5rem';
       }
       if (window.i18n) i18n.apply();
     })();
@@ -163,48 +167,62 @@
     });
     document.getElementById('nameInp').addEventListener('input', updateNameHint);
 
+    function showError(msg) {
+      var err = document.getElementById('err');
+      err.textContent = msg;
+      err.style.display = 'block';
+      err.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
     form.onsubmit = async (e) => {
       e.preventDefault();
       var err = document.getElementById('err');
       var btn = document.getElementById('submitBtn');
       err.style.display = 'none';
-      var email = form.email.value.trim();
+
+      var emailEl = form.querySelector('input[name="email"]');
+      var pwdEl = form.querySelector('input[name="password"]');
+      var nameEl = form.querySelector('input[name="name"]');
+      var agreeEl = form.querySelector('input[name="agree"]');
+
+      var email = (emailEl && emailEl.value || '').trim();
+      var password = (pwdEl && pwdEl.value) || '';
+      var nameVal = (nameEl && nameEl.value || '').trim();
+      nameVal = nameVal || null;
+
+      if (!email) {
+        showError(window.i18n ? i18n.t('invalidEmail') : 'Please enter a valid email address.');
+        return;
+      }
       if (!validEmail(email)) {
-        err.textContent = window.i18n ? i18n.t('invalidEmail') : 'Please enter a valid email address.';
-        err.style.display = 'block';
+        showError(window.i18n ? i18n.t('invalidEmail') : 'Please enter a valid email address.');
         return;
       }
-      if (pwd.value.length < 8) {
-        err.textContent = window.i18n ? i18n.t('passwordTooShort') : 'Password must be at least 8 characters.';
-        err.style.display = 'block';
+      if (password.length < 8) {
+        showError(window.i18n ? i18n.t('passwordTooShort') : 'Password must be at least 8 characters.');
         return;
       }
-      if (pwd.value.length > 128) {
-        err.textContent = window.i18n ? i18n.t('passwordTooLong') : 'Password must be up to 128 characters.';
-        err.style.display = 'block';
+      if (password.length > 128) {
+        showError(window.i18n ? i18n.t('passwordTooLong') : 'Password must be up to 128 characters.');
         return;
       }
-      if (pwd.value !== pwd2.value) {
-        err.textContent = window.i18n ? i18n.t('passwordMismatch') : 'Passwords do not match';
-        err.style.display = 'block';
+      if (password !== (pwd2 && pwd2.value || '')) {
+        showError(window.i18n ? i18n.t('passwordMismatch') : 'Passwords do not match');
         return;
       }
-      if (!form.agree.checked) {
-        err.textContent = window.i18n ? i18n.t('agreeTerms') : 'Please agree to the Terms and Privacy.';
-        err.style.display = 'block';
+      if (!agreeEl || !agreeEl.checked) {
+        showError(window.i18n ? i18n.t('agreeTerms') : 'Please agree to the Terms and Privacy.');
         return;
       }
-      var password = pwd.value;
-      var name = form.name.value.trim() || null;
+
       btn.disabled = true;
       btn.textContent = window.i18n ? i18n.t('registering') : 'Creating account…';
       try {
-        var data = await api.auth.register(email, password, name);
+        var data = await api.auth.register(email, password, nameVal);
         if (!data || !data.token) {
-          err.textContent = window.i18n ? i18n.t('registerFailed') : 'Registration failed. Try again.';
-          err.style.display = 'block';
           btn.disabled = false;
           btn.textContent = window.i18n ? i18n.t('createAccount') : 'Create account';
+          showError(window.i18n ? i18n.t('registerFailed') : 'Registration failed. Try again.');
           return;
         }
         api.setToken(data.token, true);
@@ -214,15 +232,14 @@
         btn.disabled = false;
         btn.textContent = window.i18n ? i18n.t('createAccount') : 'Create account';
         if (x && x.status === 0) {
-          err.textContent = (x.data && x.data.error) || (window.i18n ? i18n.t('cannotConnect') : 'Cannot reach server. Set API URL?');
-        } else if (x && x.message && (x.message.includes('fetch') || x.message.includes('Failed'))) {
-          err.textContent = window.i18n ? i18n.t('cannotConnect') : 'Cannot reach server. Set API URL?';
-        } else if (x && x.status === 409 && (x.data && x.data.error && x.data.error.toLowerCase().indexOf('already') !== -1)) {
-          err.textContent = window.i18n ? i18n.t('emailAlreadyRegistered') : (x.data && x.data.error) || 'Email already registered.';
+          showError((x.data && x.data.error) || (window.i18n ? i18n.t('cannotConnect') : 'Cannot reach server. Set API URL?'));
+        } else if (x && x.message && (x.message.includes('fetch') || x.message.includes('Failed') || x.message === 'API URL not set')) {
+          showError(window.i18n ? i18n.t('cannotConnect') : 'Cannot reach server. Set API URL or start the backend (localhost).');
+        } else if (x && x.status === 409) {
+          showError(window.i18n ? i18n.t('emailAlreadyRegistered') : ((x.data && x.data.error) || 'Email already registered.'));
         } else {
-          err.textContent = (x && x.data && x.data.error) || (window.i18n ? i18n.t('registerFailed') : 'Registration failed');
+          showError((x && x.data && x.data.error) || (window.i18n ? i18n.t('registerFailed') : 'Registration failed'));
         }
-        err.style.display = 'block';
       }
     };
   </script>
