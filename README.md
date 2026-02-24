@@ -9,7 +9,7 @@
 **Стек (по направлениям):** сервер — Go, Rust, Spark; веб — TS/JS, React/Vue; мобилки — Swift, Kotlin; игры — C++/C#; ИИ — Python; инфра — Bash/Python, YAML. Полная таблица: **ARCHITECTURE.md** (§2).
 
 **Структура репо:**  
-`backend-go/` — основной API (Go); `app/` — веб-приложение (HTML/JS); `web/` — заготовка на React+TypeScript; `services/rust/`, `analytics/spark/` — Rust и Spark; `mobile/ios/`, `mobile/android/` — Swift и Kotlin; `ai/` — ИИ (Python); `infra/` — Docker, K8s, Terraform, мониторинг. `backend/` — legacy Node (deprecated).
+`backend-go/` — единственный API (Go); `app/` — веб-приложение (HTML/JS); `web/` — заготовка React+TypeScript; `services/rust/`, `analytics/spark/` — Rust и Spark; `mobile/ios/`, `mobile/android/` — Swift и Kotlin; `ai/` — ИИ (Python); `infra/` — Docker, K8s, Terraform, мониторинг, cache, Kafka.
 
 **Production:**  
 https://bertogassin.github.io/OMNIXIUS/  

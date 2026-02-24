@@ -19,8 +19,12 @@
     .ai-msg .meta { font-size: 0.75rem; opacity: 0.8; margin-top: 0.25rem; }
     .ai-send { display: flex; gap: 0.5rem; padding: 1rem; border-top: 1px solid var(--border); }
     .ai-send input { flex: 1; padding: 0.75rem 1rem; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; color: var(--text); font-size: 1rem; }
+    .ai-send input:focus { border-color: var(--accent); outline: none; }
     .ai-send input::placeholder { color: var(--text-muted); }
-    .ai-send button { padding: 0.75rem 1.25rem; white-space: nowrap; }
+    .ai-send button { padding: 0.75rem 1.25rem; white-space: nowrap; cursor: pointer; transition: transform 0.1s, opacity 0.1s; }
+    .ai-send button:hover { opacity: 0.95; }
+    .ai-send button:active { transform: scale(0.97); }
+    .ai-send button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
     .ai-offline { padding: 1rem; text-align: center; color: var(--text-muted); font-size: 0.9rem; }
     .ai-offline a { color: var(--accent); }
   </style>
@@ -44,6 +48,7 @@
   </header>
   <main class="app-page">
     <div class="container ai-page">
+      <p class="status-done">СДЕЛАНО: работает (Live). Дальше: свои модели, модерация.</p>
       <div class="ai-header">
         <h1>OMNIXIUS AI</h1>
         <p>Root of our AI — start here. Our models will run here and grow stronger.</p>

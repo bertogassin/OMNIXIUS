@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Test registration — OMNIXIUS</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="css/app.css">
+  <style>
+    body { background: #0c0c0f; color: #e8e6e3; min-height: 100vh; }
+    main { padding-top: 4rem; min-height: 60vh; }
+    .test-card { max-width: 420px; margin: 2rem auto; padding: 1.5rem; background: #14141a; border: 1px solid #2a2a32; border-radius: 12px; color: #e8e6e3; }
+    .test-card h1 { font-size: 1.25rem; margin-bottom: 1rem; color: #e8e6e3; }
+    .test-card p { margin: 0.5rem 0; font-size: 0.95rem; color: #8a8a8a; }
+    .test-card .creds { background: #0c0c0f; padding: 0.75rem; border-radius: 8px; font-family: monospace; font-size: 0.9rem; margin: 0.75rem 0; word-break: break-all; color: #e8e6e3; white-space: pre-wrap; }
+    .test-card .btn { margin-top: 0.5rem; display: inline-block; padding: 0.5rem 1rem; background: #00d4aa; color: #0c0c0f; text-decoration: none; border-radius: 6px; font-weight: 600; }
+    .test-card .btn:hover { opacity: 0.9; }
+    .test-card a:not(.btn) { color: #00d4aa; }
+  </style>
+</head>
+<body>
+  <header class="header header-auth" style="background: rgba(12,12,15,0.95); border-bottom: 1px solid #2a2a32;">
+    <div class="container">
+      <a href="../index.html" class="logo" style="color:#e8e6e3;">OMNIXIUS</a>
+      <nav class="nav"><a href="login.html">Sign in</a></nav>
+    </div>
+  </header>
+  <main class="app-page app-page-auth">
+    <div class="container">
+      <div id="status" class="test-card">
+        <h1>Test registration</h1>
+        <p id="msg">Loading…</p>
+        <p id="creds" class="creds" style="display:none;"></p>
+        <a href="#" id="loginLink" class="btn btn-primary" style="display:none;">Go to Sign in</a>
+      </div>
+    </div>
+  </main>
+  <script src="config.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    (function () {
+      var TEST_EMAIL = 'test@omnixius.local';
+      var TEST_PASS = 'TestPass123!';
+      var TEST_NAME = 'Test User';
+
+      function setMsg(text) {
+        var el = document.getElementById('msg');
+        if (el) el.textContent = text;
+      }
+      function setHtml(html) {
+        var el = document.getElementById('msg');
+        if (el) el.innerHTML = html;
+      }
+
+      try {
+        var fromUrl = new URLSearchParams(location.search).get('api_url');
+        if (fromUrl && typeof window.normalizeApiUrl === 'function') {
+          var u = window.normalizeApiUrl(fromUrl);
+          if (u) localStorage.setItem('omnixius_api_url', u);
+        }
+        if (fromUrl && !window.API_URL) {
+          location.reload();
+          return;
+        }
+
+        var msg = document.getElementById('msg');
+        var creds = document.getElementById('creds');
+        var loginLink = document.getElementById('loginLink');
+        if (!msg) { document.body.innerHTML = '<p style="padding:2rem;color:#e8e6e3;">Page error: #msg not found.</p>'; return; }
+
+        if (typeof api === 'undefined' || !api.auth || !api.auth.register) {
+          setMsg('Scripts did not load. Open from the site.');
+          return;
+        }
+        if (!window.API_URL) {
+          setHtml('No backend URL. Open with <strong>?api_url=...</strong>, e.g. <a href="test-register.html?api_url=http://localhost:3000">test-register.html?api_url=http://localhost:3000</a>');
+          return;
+        }
+
+        setMsg('Registering test user…');
+        api.auth.register(TEST_EMAIL, TEST_PASS, TEST_NAME).then(function () {
+          setMsg('Test user registered.');
+          if (creds) { creds.textContent = 'Email: ' + TEST_EMAIL + '\nPassword: ' + TEST_PASS; creds.style.display = 'block'; }
+          if (loginLink) {
+            loginLink.href = 'login.html?api_url=' + encodeURIComponent(window.API_URL);
+            loginLink.style.display = 'inline-block';
+            loginLink.textContent = 'Sign in with test account';
+          }
+        }).catch(function (x) {
+          if (x && x.status === 409) {
+            setMsg('Test user already exists. You can sign in.');
+            if (creds) { creds.textContent = 'Email: ' + TEST_EMAIL + '\nPassword: ' + TEST_PASS; creds.style.display = 'block'; }
+            if (loginLink) {
+              loginLink.href = 'login.html?api_url=' + encodeURIComponent(window.API_URL);
+              loginLink.style.display = 'inline-block';
+              loginLink.textContent = 'Sign in with test account';
+            }
+          } else {
+            var err = (x && x.data && x.data.error) ? x.data.error : (x && x.message) || 'Cannot reach server.';
+            setMsg('Error: ' + err + ' Run backend: go run . in backend-go folder. Then open this link from the same computer.');
+          }
+        });
+      } catch (e) {
+        setMsg('Error: ' + (e && e.message ? e.message : String(e)));
+      }
+    })();
+  </script>
+</body>
+</html>

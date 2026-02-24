@@ -1,19 +1,32 @@
-# Не загружать в GitHub
+# OSN / IDE
 .DS_Store
 Thumbs.db
 *.log
 
-# Backend
-backend/node_modules
-backend/uploads
-backend/db/*.db
+# Backend (only backend-go)
 backend-go/uploads
 backend-go/db/*.db
+backend-go/omnixius-api
 backend-go/omnixius-api.exe
 
 # Build / cache
+node_modules
+.web/
+web/dist
 mobile/android/.gradle
 mobile/android/build
 mobile/android/app/build
-.web/
-node_modules
+analytics/spark/target
+**/target/
+**/__pycache__/
+**/.pytest_cache/
+*.pyc
+*.pyo
+.cache/
+tmp/
+tmpdir/
+
+# Env (never commit secrets)
+.env
+.env.*
+!.env.example

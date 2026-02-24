@@ -72,9 +72,29 @@
 
 ---
 
+## Структура репо (масштабируемая)
+
+Один монорепозиторий. Новые сервисы — отдельная папка в корне (как `backend-go/`, `services/rust/`, `ai/`). Общий контракт — **API.md**. Конфиги и инфра — только в **infra/**.
+
+| Назначение        | Где |
+|-------------------|-----|
+| API (единственный)| `backend-go/` |
+| Высоконагруженные сервисы | `services/rust/` |
+| Аналитика, Big Data | `analytics/spark/` |
+| ИИ                | `ai/` |
+| Веб (статичный)   | `app/`, корень `index.html` |
+| Веб (React/TS)    | `web/` |
+| Мобилки           | `mobile/ios/`, `mobile/android/` |
+| Инфра, кэш, очереди | `infra/` (Docker, K8s, Terraform, monitoring, kafka, cache) |
+| Документация      | корень: ARCHITECTURE.md, API.md, ROADMAP.md, ECOSYSTEM.md, PLATFORM_INFRASTRUCTURE.md |
+
+Кэш (Redis) и очереди (Kafka) — заготовки в `infra/cache/`, `infra/kafka/`; подключение по мере роста.
+
+---
+
 ## Связь с проектом
 
 - **ARCHITECTURE.md** — видение и стек по направлениям.
-- **infra/** — скрипты, Docker Compose, K8s, Terraform, конфиги.
+- **infra/** — скрипты, Docker Compose, K8s, Terraform, конфиги, cache, kafka.
 - **.github/workflows/** — CI/CD.
 - Собственный ИИ: браузерный корень в `app/ai.html`, бэкенд — `ai/` (Python); далее обучение и масштабирование своих моделей.

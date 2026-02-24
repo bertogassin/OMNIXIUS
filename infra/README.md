@@ -8,6 +8,7 @@ Platform & Infrastructure Division: масштабируемость, автом
 - **terraform/** — Infrastructure as Code (placeholder; add cloud + K8s modules).
 - **monitoring/prometheus.yml** — Prometheus config for scraping metrics.
 - **kafka/** — Apache Kafka placeholder for event streaming at scale.
+- **cache/** — Redis/cache layer placeholder for sessions, rate-limit, API cache at scale.
 - **scripts/deploy.sh** — deploy script (Bash).
 - **scripts/health_check.py** — health check for API, Rust, AI (Python).
 

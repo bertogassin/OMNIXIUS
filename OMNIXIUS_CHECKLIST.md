@@ -67,6 +67,7 @@
 | **CI/CD (GitHub Actions)** | `.github/workflows/ci.yml` (сборка и тесты Go API) |
 | **Мониторинг (Prometheus, Grafana)** | `infra/docker-compose.monitoring.yml`, `infra/monitoring/prometheus.yml` |
 | **Потоки данных (Apache Kafka)** | `infra/kafka/README.md` (заготовка под масштаб) |
+| **Кэш (Redis)** | `infra/cache/README.md` (заготовка под масштаб) |
 
 Подробно: **PLATFORM_INFRASTRUCTURE.md**.
 
@@ -85,7 +86,7 @@
 
 | Вопрос | Ответ |
 |--------|--------|
-| **Два бэкенда?** | Один активный: **backend-go/** (Go). Папка **backend/** (Node) — legacy, помечена DEPRECATED в README; не дублировать логику. |
+| **Бэкенд** | Один: **backend-go/** (Go). Папка **backend/** — только README (legacy удалён). |
 | **Общая логика в app/** | **Один раз:** `app/js/utils.js` — escapeHtml, formatDate. Подключён в marketplace, product, mail, orders, conversation, ai. Дубликатов в страницах нет. |
 | **API, конфиг** | Один источник правды: **API.md** в корне. Конфиг фронта: **app/config.js** (API_URL, AI_URL). |
 | **Хедер/нав в каждом HTML** | Для статического сайта без сборки — норма: каждая страница содержит свой header/nav. Не перегруз. |

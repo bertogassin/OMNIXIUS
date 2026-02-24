@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>TRADE & FINANCE — OMNIXIUS</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <header class="header">
+    <div class="container">
+      <a href="../index.html" class="logo">OMNIXIUS</a>
+      <nav class="nav">
+        <a href="directions.html">Directions</a>
+        <a href="../index.html">Site</a>
+        <a href="login.html" id="navLogin">Sign in</a>
+        <a href="#" id="navLogout" style="display:none;">Sign out</a>
+      </nav>
+    </div>
+  </header>
+  <main class="app-page">
+    <div class="container">
+      <p class="status-done">СДЕЛАНО: место создано. Дальше: кошельки, биржа, copy trading.</p>
+      <h1>OMNIXIUS TRADE & FINANCE</h1>
+      <p class="about-text">Exchange: crypto, gold, oil, stocks, indices. Copy trading, portfolios, AI auto-investing. Wallets, Apple Pay, Google Pay, PayPal. Money and assets.</p>
+      <p style="margin-top:1.5rem; padding:1rem; background:var(--bg-card); border:1px solid var(--border); border-radius:10px; color:var(--text-muted);"><strong>Place ready.</strong> Develop from here: wallets, exchange (crypto/FIAT), copy trading MVP.</p>
+    </div>
+  </main>
+  <script src="config.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    (function(){ var t = localStorage.getItem('omnixius_token'); document.getElementById('navLogin').style.display = t ? 'none' : ''; document.getElementById('navLogout').style.display = t ? '' : 'none'; })();
+    document.getElementById('navLogout').onclick = function(e){ e.preventDefault(); localStorage.removeItem('omnixius_token'); localStorage.removeItem('omnixius_user'); location.href = 'login.html'; };
+  </script>
+</body>
+</html>

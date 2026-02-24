@@ -30,7 +30,7 @@
 ## Structure
 
 - `backend-go/` — REST API в **Go** (единственный активный бэкенд). Контракт: **API.md**.
-- `backend/` — Legacy Node.js (deprecated).
+- `backend/` — Deprecated (legacy Node removed); API only in backend-go.
 - `app/` — Страницы приложения (логин, регистрация, дашборд, маркетплейс, почта, заказы, ИИ).
 - `web/` — Заготовка веб-клиента на React + TypeScript (Vite).
 - `ai/` — ИИ: FastAPI, эндпоинт `/chat`; страница чата — `app/ai.html`.

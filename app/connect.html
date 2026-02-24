@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>CONNECT — OMNIXIUS</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="css/app.css">
+  <style>
+    .place-links { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1rem; margin-top: 1.5rem; }
+    .place-links a { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1rem; color: var(--accent); text-decoration: none; transition: border-color 0.2s, transform 0.1s, opacity 0.1s; }
+    .place-links a:hover { border-color: var(--accent); }
+    .place-links a:active { transform: scale(0.97); opacity: 0.9; }
+    .place-links a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="container">
+      <a href="../index.html" class="logo">OMNIXIUS</a>
+      <nav class="nav">
+        <a href="marketplace.html">Marketplace</a>
+        <a href="mail.html">Mail</a>
+        <a href="orders.html">Orders</a>
+        <a href="dashboard.html">Profile</a>
+        <a href="ai.html">AI</a>
+        <a href="directions.html">Directions</a>
+        <a href="../index.html">Site</a>
+        <a href="login.html" id="navLogin">Sign in</a>
+        <a href="#" id="navLogout" style="display:none;">Sign out</a>
+      </nav>
+    </div>
+  </header>
+  <main class="app-page">
+    <div class="container">
+      <p class="status-done">СДЕЛАНО: место создано. Дальше: развивать (geo, чат, видео).</p>
+      <h1>OMNIXIUS CONNECT</h1>
+      <p class="about-text">Social network, experts, marketplace, chat, video. People and services. One place for everything that connects people.</p>
+      <h2 class="section-title">Your place (live)</h2>
+      <div class="place-links">
+        <a href="mail.html">Mail</a>
+        <a href="marketplace.html">Marketplace</a>
+        <a href="orders.html">Orders</a>
+        <a href="dashboard.html">Profile</a>
+      </div>
+      <p style="margin-top:1.5rem; color:var(--text-muted); font-size:0.9rem;">Next: geo, chat, video, subscriptions. Develop from here.</p>
+    </div>
+  </main>
+  <script src="config.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    (function(){ var t = localStorage.getItem('omnixius_token'); document.getElementById('navLogin').style.display = t ? 'none' : ''; document.getElementById('navLogout').style.display = t ? '' : 'none'; })();
+    document.getElementById('navLogout').onclick = function(e){ e.preventDefault(); localStorage.removeItem('omnixius_token'); localStorage.removeItem('omnixius_user'); location.href = 'login.html'; };
+  </script>
+</body>
+</html>
