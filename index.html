@@ -14,19 +14,38 @@
   <header class="header">
     <div class="container">
       <a href="index.html" class="logo">OMNIXIUS</a>
-      <nav class="nav nav-unified">
-        <a href="index.html#about">About</a>
-        <a href="app/directions.html">Directions</a>
-        <a href="ecosystem.html">Ecosystem</a>
-        <a href="architecture.html">Architecture</a>
-        <a href="contact.html">Contact</a>
-        <a href="app/marketplace.html">Marketplace</a>
-        <a href="app/mail.html">Mail</a>
-        <a href="app/orders.html">Orders</a>
-        <a href="app/dashboard.html">Profile</a>
-        <a href="app/ai.html">AI</a>
-        <a href="app/login.html" id="navLogin" class="nav-cta">Sign in</a>
-        <a href="#" id="navLogout" style="display:none;">Sign out</a>
+      <nav class="nav nav-main nav-unified">
+        <div class="nav-group nav-group-main">
+          <span class="nav-group-label">Main</span>
+          <a href="index.html#about">About</a>
+          <a href="app/directions.html">Directions</a>
+          <a href="app/login.html" id="navLogin" class="nav-cta">Sign in</a>
+          <a href="#" id="navLogout" style="display:none;">Sign out</a>
+        </div>
+        <div class="nav-group nav-group-app">
+          <span class="nav-group-label">App</span>
+          <button type="button" class="nav-drop-trigger" aria-expanded="false" aria-haspopup="true">App ▾</button>
+          <div class="nav-drop-panel">
+            <a href="app/marketplace.html">Marketplace</a>
+            <a href="app/mail.html">Mail</a>
+            <a href="app/orders.html">Orders</a>
+            <a href="app/dashboard.html">Profile</a>
+            <a href="app/ai.html">AI</a>
+          </div>
+          <div class="nav-group-app-links">
+            <a href="app/marketplace.html">Marketplace</a>
+            <a href="app/mail.html">Mail</a>
+            <a href="app/orders.html">Orders</a>
+            <a href="app/dashboard.html">Profile</a>
+            <a href="app/ai.html">AI</a>
+          </div>
+        </div>
+        <div class="nav-group nav-group-info">
+          <span class="nav-group-label">Info</span>
+          <a href="ecosystem.html">Ecosystem</a>
+          <a href="architecture.html">Architecture</a>
+          <a href="contact.html">Contact</a>
+        </div>
       </nav>
       <button class="menu-toggle" aria-label="Menu"><span></span></button>
     </div>
@@ -37,7 +56,7 @@
       <div class="hero-bg"></div>
       <div class="container">
         <h1>OMNIXIUS</h1>
-        <p class="hero-tagline">One ecosystem: Mail, Marketplace, Shop — and Connect, Trade, Repositorium, Blockchain. One account.</p>
+        <p class="hero-tagline">One ecosystem. Mail, Marketplace, Shop — Connect, Trade, Repositorium, Blockchain. One account.</p>
         <div class="hero-actions">
           <a href="app/login.html" class="btn btn-primary">Sign in</a>
           <a href="app/directions.html" class="btn btn-outline">All directions</a>
@@ -47,17 +66,20 @@
 
     <section id="quick" class="section section-quick">
       <div class="container">
-        <p class="section-label">Quick access</p>
-        <h2>Everything in one place</h2>
+        <p class="section-label">Main</p>
+        <h2>Quick access</h2>
         <div class="hub-grid">
           <a href="app/login.html" class="hub-card"><span class="hub-icon">→</span><span>Sign in</span></a>
-          <a href="app/directions.html" class="hub-card"><span class="hub-icon">▣</span><span>All directions</span></a>
+          <a href="app/directions.html" class="hub-card"><span class="hub-icon">▣</span><span>Directions</span></a>
           <a href="app/marketplace.html" class="hub-card"><span class="hub-icon">◆</span><span>Marketplace</span></a>
           <a href="app/mail.html" class="hub-card"><span class="hub-icon">✉</span><span>Mail</span></a>
           <a href="app/ai.html" class="hub-card"><span class="hub-icon">◇</span><span>AI</span></a>
-          <a href="ecosystem.html" class="hub-card"><span class="hub-icon">○</span><span>Ecosystem</span></a>
-          <a href="architecture.html" class="hub-card"><span class="hub-icon">◈</span><span>Architecture</span></a>
-          <a href="contact.html" class="hub-card"><span class="hub-icon">·</span><span>Contact</span></a>
+        </div>
+        <p class="section-label" style="margin-top:2rem;">By purpose</p>
+        <div class="hub-grid">
+          <a href="ecosystem.html" class="hub-card hub-card-secondary"><span class="hub-icon">○</span><span>Ecosystem map</span></a>
+          <a href="architecture.html" class="hub-card hub-card-secondary"><span class="hub-icon">◈</span><span>Architecture</span></a>
+          <a href="contact.html" class="hub-card hub-card-secondary"><span class="hub-icon">·</span><span>Contact</span></a>
         </div>
       </div>
     </section>
@@ -65,52 +87,50 @@
     <section id="about" class="section about">
       <div class="container">
         <h2>About</h2>
-        <p class="about-text">Goal: a self-sufficient ecosystem — communication, earning, investment, learning, and asset management in one application, without dependence on centralized corporations.</p>
+        <p class="about-text">Self-sufficient ecosystem: communication, earning, investment, learning, asset management — in one application.</p>
       </div>
     </section>
 
     <section id="platforms" class="section services">
       <div class="container">
         <h2>Four platforms</h2>
+        <p class="about-text" style="margin-bottom:1rem;">Connect, Trade & Finance, Repositorium, Blockchain (IXI). Details and every direction → <a href="app/directions.html">Directions</a>.</p>
         <div class="cards">
           <article class="card">
             <span class="card-icon">◆</span>
-            <h3>OMNIXIUS CONNECT</h3>
-            <p>Social network, expert profiles, geo-based orders, chat and video calls, marketplace. Crypto, FIAT, cards. Smart contracts and AI moderation.</p>
+            <h3>CONNECT</h3>
+            <p>Social, experts, marketplace, chat, video. People and services.</p>
           </article>
           <article class="card">
             <span class="card-icon">◇</span>
-            <h3>OMNIXIUS TRADE & FINANCE</h3>
-            <p>Exchange: crypto, gold, oil, stocks, indices. Copy trading, long-term portfolios, AI auto-investing. Wallets, Apple/Google Pay, PayPal.</p>
+            <h3>TRADE & FINANCE</h3>
+            <p>Exchange, wallets, copy trading. Money and assets.</p>
           </article>
           <article class="card">
             <span class="card-icon">○</span>
-            <h3>OMNIXIUS REPOSITORIUM</h3>
-            <p>Decentralized cloud: home servers, storage rewards. IPFS + AI encryption, compute rental.</p>
+            <h3>REPOSITORIUM</h3>
+            <p>Decentralized storage and compute. Data and infrastructure.</p>
           </article>
           <article class="card">
             <span class="card-icon">▣</span>
-            <h3>OMNIXIUS BLOCKCHAIN (IXI)</h3>
-            <p>IXI blockchain: ZKP, hybrid Proof-of-Stake + Proof-of-Storage, AI monitoring. Buyback fund, 30-year economy.</p>
+            <h3>BLOCKCHAIN (IXI)</h3>
+            <p>Consensus, ZKP, tokenomics. Trust and economy.</p>
           </article>
         </div>
-        <p class="about-text" style="margin-top: 1.5rem;"><strong>Live now:</strong> Mail, Marketplace, Shop. <strong>Full ecosystem:</strong> Connect, Trade, Repositorium, Blockchain — and more to come. One account. <a href="ecosystem.html">Ecosystem map →</a></p>
       </div>
     </section>
 
     <section class="section stack-preview">
       <div class="container">
-        <h2>Technology stack</h2>
-        <p class="about-text">Backend & services: <strong>Go</strong>, <strong>Rust</strong>, <strong>C++</strong>. Data & analytics: <strong>Spark</strong>. Mobile: <strong>Swift</strong>, <strong>Kotlin</strong>.</p>
-        <a href="architecture.html" class="btn btn-primary">More</a>
+        <h2>Stack</h2>
+        <p class="about-text">Go, Rust, Spark, Swift, Kotlin. <a href="architecture.html">Architecture →</a></p>
       </div>
     </section>
 
     <section id="contact" class="section contact">
       <div class="container">
         <h2>Contact</h2>
-        <p>Get in touch with OMNIXIUS.</p>
-        <a href="mailto:hello@omnixius.com" class="contact-email">hello@omnixius.com</a>
+        <p><a href="contact.html" class="contact-email">Get in touch</a></p>
       </div>
     </section>
   </main>

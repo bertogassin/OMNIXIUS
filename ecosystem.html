@@ -14,19 +14,38 @@
   <header class="header">
     <div class="container">
       <a href="index.html" class="logo">OMNIXIUS</a>
-      <nav class="nav nav-unified">
-        <a href="index.html#about">About</a>
-        <a href="app/directions.html">Directions</a>
-        <a href="ecosystem.html">Ecosystem</a>
-        <a href="architecture.html">Architecture</a>
-        <a href="contact.html">Contact</a>
-        <a href="app/marketplace.html">Marketplace</a>
-        <a href="app/mail.html">Mail</a>
-        <a href="app/orders.html">Orders</a>
-        <a href="app/dashboard.html">Profile</a>
-        <a href="app/ai.html">AI</a>
-        <a href="app/login.html" id="navLogin" class="nav-cta">Sign in</a>
-        <a href="#" id="navLogout" style="display:none;">Sign out</a>
+      <nav class="nav nav-main nav-unified">
+        <div class="nav-group nav-group-main">
+          <span class="nav-group-label">Main</span>
+          <a href="index.html#about">About</a>
+          <a href="app/directions.html">Directions</a>
+          <a href="app/login.html" id="navLogin" class="nav-cta">Sign in</a>
+          <a href="#" id="navLogout" style="display:none;">Sign out</a>
+        </div>
+        <div class="nav-group nav-group-app">
+          <span class="nav-group-label">App</span>
+          <button type="button" class="nav-drop-trigger" aria-expanded="false" aria-haspopup="true">App ▾</button>
+          <div class="nav-drop-panel">
+            <a href="app/marketplace.html">Marketplace</a>
+            <a href="app/mail.html">Mail</a>
+            <a href="app/orders.html">Orders</a>
+            <a href="app/dashboard.html">Profile</a>
+            <a href="app/ai.html">AI</a>
+          </div>
+          <div class="nav-group-app-links">
+            <a href="app/marketplace.html">Marketplace</a>
+            <a href="app/mail.html">Mail</a>
+            <a href="app/orders.html">Orders</a>
+            <a href="app/dashboard.html">Profile</a>
+            <a href="app/ai.html">AI</a>
+          </div>
+        </div>
+        <div class="nav-group nav-group-info">
+          <span class="nav-group-label">Info</span>
+          <a href="ecosystem.html">Ecosystem</a>
+          <a href="architecture.html">Architecture</a>
+          <a href="contact.html">Contact</a>
+        </div>
       </nav>
       <button class="menu-toggle" aria-label="Menu"><span></span></button>
     </div>
@@ -35,8 +54,9 @@
   <main>
     <section class="section hero-section">
       <div class="container">
+        <p class="section-label">By purpose</p>
         <h1>Ecosystem map</h1>
-        <p class="about-text">What’s live now: Mail, Marketplace, Shop. Plus Connect, Trade, Repositorium, Blockchain — and more to come. One account.</p>
+        <p class="about-text">What’s live, full platform set, and how directions connect. One account.</p>
       </div>
     </section>
 
@@ -106,18 +126,21 @@
       </div>
     </section>
 
-    <section class="section contact">
-      <div class="container">
-        <h2>Contact</h2>
-        <p><a href="contact.html">Get in touch</a> · <a href="architecture.html">Architecture</a></p>
-      </div>
-    </section>
   </main>
 
   <footer class="footer">
     <div class="container">
-      <span class="logo">OMNIXIUS</span>
-      <p>© 2026 OMNIXIUS. All rights reserved.</p>
+      <div class="footer-top">
+        <span class="logo">OMNIXIUS</span>
+        <nav class="footer-nav">
+          <a href="app/directions.html">Directions</a>
+          <a href="ecosystem.html">Ecosystem</a>
+          <a href="architecture.html">Architecture</a>
+          <a href="contact.html">Contact</a>
+          <a href="app/login.html">Sign in</a>
+        </nav>
+      </div>
+      <p class="footer-copy">© 2026 OMNIXIUS. All rights reserved.</p>
     </div>
   </footer>
 
