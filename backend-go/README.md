@@ -1,6 +1,6 @@
 # OMNIXIUS API (Go)
 
-REST API: auth, marketplace, orders, internal mail. **Stack: Go only** (per project language policy).
+REST API: auth, marketplace, orders, internal mail. **Единственный активный бэкенд** проекта (см. ARCHITECTURE.md). Контракт API: корень репо **API.md**.
 
 ## Run
 
@@ -34,7 +34,7 @@ Copy `.env.example` to `.env` in production. Variables:
 
 ## Endpoints
 
-Same as before: `/api/auth/*`, `/api/users/*`, `/api/products/*`, `/api/orders/*`, `/api/conversations`, `/api/messages/*`. See PLATFORM.md or the Node backend README for the list.
+Полный список: **API.md** в корне репо. Основные группы: `/api/auth/*`, `/api/users/*`, `/api/products/*`, `/api/orders/*`, `/api/conversations`, `/api/messages/*`. Health: `GET /health`.
 
 ## DB
 

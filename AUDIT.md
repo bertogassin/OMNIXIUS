@@ -1,6 +1,6 @@
 # OMNIXIUS — Audit by 13 risk areas
 
-Pass over the project using the “pitfalls when developing with AI” checklist. Status: **done** / **partial** / **todo**.
+Pass over the project using the “pitfalls when developing with AI” checklist. Status: **done** / **partial** / **todo**. Уровень проекта: начало; фундамент заложен, аудит обновляется по мере развития.
 
 ---
 

@@ -1,6 +1,6 @@
 # OMNIXIUS — Quantum resistance
 
-**Requirement:** Site, blockchain (IXI), internal mail, and all components must be **quantum-resistant**. No rush; we have what we need — implement to the maximum.
+**Требование:** Сайт, блокчейн (IXI), внутренняя почта и все компоненты должны быть **квантово-устойчивыми**. Уровень: реализуем по максимуму; часть уже сделана (токены, пароли), остальное — по фазам ROADMAP.
 
 ---
 

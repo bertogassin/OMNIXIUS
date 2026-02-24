@@ -1,6 +1,6 @@
 # OMNIXIUS — Infrastructure
 
-Platform & Infrastructure Division: containerization, orchestration, IaC, CI/CD, monitoring. See **PLATFORM_INFRASTRUCTURE.md** in repo root.
+Platform & Infrastructure Division: масштабируемость, автоматизация, стабильность. **Уровень:** заготовки (Docker, K8s, Terraform, мониторинг); полное описание — **PLATFORM_INFRASTRUCTURE.md** в корне репо.
 
 - **docker-compose.yml** — local dev: Go API, Rust service, AI.
 - **docker-compose.monitoring.yml** — optional Prometheus + Grafana (`docker compose -f docker-compose.monitoring.yml up -d`).

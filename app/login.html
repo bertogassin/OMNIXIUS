@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Sign in — OMNIXIUS</title>
   <link rel="stylesheet" href="../css/style.css">
   <link rel="stylesheet" href="css/app.css">
@@ -21,7 +21,7 @@
       <div id="apiUrlHint" class="api-url-hint" style="display:none;"></div>
       <div class="auth-card">
         <h1 class="auth-title" data-i18n="loginTitle">Sign in</h1>
-        <form class="app-form app-form-slim" id="form">
+        <form class="app-form app-form-slim" id="form" novalidate>
           <p class="error" id="err" style="display:none;" role="alert"></p>
           <label data-i18n="email">Email</label>
           <input type="email" name="email" required autocomplete="email" placeholder="you@example.com" id="loginEmail" autofocus>
@@ -45,22 +45,22 @@
   <script src="js/api.js"></script>
   <script>
     var needApiUrl = !window.API_URL && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1';
+    function askApiUrl() {
+      var url = prompt((typeof window.i18n !== 'undefined' && window.i18n.t('apiUrlPrompt')) || 'Backend URL (to sign in):', localStorage.getItem('omnixius_api_url') || '');
+      if (url && url.trim()) { localStorage.setItem('omnixius_api_url', url.trim().replace(/\/$/, '')); location.reload(); }
+      return !!url;
+    }
     (function () {
       var hint = document.getElementById('apiUrlHint');
       if (needApiUrl) {
-        var setT = window.i18n ? window.i18n.t('setApiUrl') : 'Set API URL';
-        var explainT = window.i18n ? window.i18n.t('apiUrlExplain') : 'Paste the URL of your API (e.g. from Railway, Render, or your server). Then click the button below.';
-        hint.innerHTML = '<p class="api-url-hint-title" data-i18n="apiUrlHint">Backend URL not set. You cannot sign in or register until you set it.</p><p class="api-url-hint-explain">' + explainT + '</p><button type="button" class="btn btn-primary" id="setApiUrl">' + setT + '</button>';
+        var setT = (typeof window.i18n !== 'undefined' && window.i18n.t('setApiUrl')) || 'Set API URL';
+        var explainT = (typeof window.i18n !== 'undefined' && window.i18n.t('apiUrlExplain')) || 'Paste the URL of your API (e.g. from Railway, Render, or your server). Then click the button below.';
+        hint.innerHTML = '<p class="api-url-hint-title" data-i18n="apiUrlHint">Backend URL not set. Enter it below to sign in or register.</p><p class="api-url-hint-explain">' + explainT + '</p><button type="button" class="btn btn-primary" id="setApiUrl">' + setT + '</button>';
         hint.style.display = 'block';
         hint.classList.add('api-url-hint-required');
-        document.getElementById('submitBtn').disabled = true;
-        document.getElementById('setApiUrl').onclick = function (e) {
-          e.preventDefault();
-          var url = prompt('Backend API URL (e.g. https://your-api.example.com):', localStorage.getItem('omnixius_api_url') || '');
-          if (url && url.trim()) { localStorage.setItem('omnixius_api_url', url.trim().replace(/\/$/, '')); location.reload(); }
-        };
+        document.getElementById('setApiUrl').onclick = function (e) { e.preventDefault(); askApiUrl(); };
       } else if (location.hostname !== 'localhost' && location.hostname !== '127.0.0.1' && window.API_URL) {
-        hint.innerHTML = '<a href="#" id="changeApiUrl">' + (window.i18n ? window.i18n.t('changeApiUrl') : 'Change API URL') + '</a>';
+        hint.innerHTML = '<a href="#" id="changeApiUrl">' + ((typeof window.i18n !== 'undefined' && window.i18n.t('changeApiUrl')) || 'Change API URL') + '</a>';
         hint.style.display = 'block';
         hint.style.marginBottom = '0.5rem';
         document.getElementById('changeApiUrl').onclick = function (e) {
@@ -69,42 +69,57 @@
           if (url !== null) { localStorage.setItem('omnixius_api_url', url.replace(/\/$/, '')); location.reload(); }
         };
       }
-      if (window.i18n) i18n.apply();
+      if (typeof window.i18n !== 'undefined' && window.i18n.apply) i18n.apply();
     })();
-    if (api.getToken()) { location.href = 'dashboard.html'; return; }
+    try { if (typeof api !== 'undefined' && api.getToken && api.getToken()) { location.href = 'dashboard.html'; } } catch (_) {}
     (function () {
       var pwd = document.getElementById('pwd');
       var btn = document.getElementById('pwdToggle');
       if (pwd && btn) btn.onclick = function () { var isPass = pwd.type === 'password'; pwd.type = isPass ? 'text' : 'password'; btn.setAttribute('aria-label', isPass ? 'Hide password' : 'Show password'); btn.textContent = isPass ? '🙈' : '👁'; };
     })();
-    document.getElementById('form').onsubmit = async (e) => {
+    var formEl = document.getElementById('form');
+    if (formEl) formEl.onsubmit = async (e) => {
       e.preventDefault();
       var err = document.getElementById('err');
       var btn = document.getElementById('submitBtn');
-      var btnText = btn.textContent;
-      err.style.display = 'none';
-      var email = e.target.email.value.trim();
-      var password = e.target.password.value;
-      var remember = !!e.target.remember && e.target.remember.checked;
-      btn.disabled = true;
-      btn.textContent = window.i18n ? i18n.t('signingIn') : 'Signing in…';
+      var form = e.target;
+      var btnText = btn ? btn.textContent : '';
+      if (err) err.style.display = 'none';
+      if (typeof api === 'undefined' || !api.auth || !api.auth.login) {
+        if (err) { err.textContent = 'Page error: scripts did not load. Open from the same site (e.g. index → Sign in).'; err.style.display = 'block'; }
+        return;
+      }
+      var email = (form.email && form.email.value || '').trim();
+      var password = (form.password && form.password.value) || '';
+      if (!email || !password) {
+        if (err) { err.textContent = (typeof window.i18n !== 'undefined' && i18n.t('fillEmailPassword')) || 'Enter email and password'; err.style.display = 'block'; }
+        return;
+      }
+      if (!window.API_URL && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+        if (err) { err.textContent = (typeof window.i18n !== 'undefined' && i18n.t('cannotConnect')) || 'Set backend URL first (click the link above or enter when prompted).'; err.style.display = 'block'; }
+        askApiUrl();
+        return;
+      }
+      var remember = !!(form.remember && form.remember.checked);
+      if (btn) { btn.disabled = true; btn.textContent = (typeof window.i18n !== 'undefined' && i18n.t('signingIn')) || 'Signing in…'; }
       try {
         var data = await api.auth.login(email, password);
-        if (!data || !data.token) { err.textContent = window.i18n ? i18n.t('signInFailed') : 'Sign in failed'; err.style.display = 'block'; btn.disabled = false; btn.textContent = btnText; return; }
+        if (!data || !data.token) { if (err) { err.textContent = (typeof window.i18n !== 'undefined' && i18n.t('signInFailed')) || 'Sign in failed'; err.style.display = 'block'; } if (btn) { btn.disabled = false; btn.textContent = btnText; } return; }
         api.setToken(data.token, remember);
         api.user = data.user;
         location.href = 'dashboard.html';
       } catch (x) {
-        btn.disabled = false;
-        btn.textContent = btnText;
-        if (x && x.status === 0) {
-          err.textContent = (x.data && x.data.error) || (window.i18n ? i18n.t('cannotConnect') : 'Cannot reach server. Set API URL?');
-        } else if (x && x.message && (x.message.includes('fetch') || x.message.includes('Failed'))) {
-          err.textContent = window.i18n ? i18n.t('cannotConnect') : 'Cannot reach server. Set API URL?';
-        } else {
-          err.textContent = (x && x.data && x.data.error) || (window.i18n ? i18n.t('signInFailed') : 'Sign in failed');
+        if (btn) { btn.disabled = false; btn.textContent = btnText; }
+        if (err) {
+          if (x && x.status === 0) {
+            err.textContent = (x.data && x.data.error) || ((typeof window.i18n !== 'undefined' && i18n.t('cannotConnect')) || 'Cannot reach server. Set API URL?');
+          } else if (x && x.message && (x.message.includes('fetch') || x.message.includes('Failed'))) {
+            err.textContent = (typeof window.i18n !== 'undefined' && i18n.t('cannotConnect')) || 'Cannot reach server. Set API URL?';
+          } else {
+            err.textContent = (x && x.data && x.data.error) || ((typeof window.i18n !== 'undefined' && i18n.t('signInFailed')) || 'Sign in failed');
+          }
+          err.style.display = 'block';
         }
-        err.style.display = 'block';
       }
     };
   </script>

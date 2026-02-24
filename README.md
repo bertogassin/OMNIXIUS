@@ -1,15 +1,24 @@
 # OMNIXIUS
 
-Сайт и приложение (маркетплейс, почта, заказы) — всё выкладывается **только через GitHub**.
+Экосистема: сайт, приложение (маркетплейс, почта, заказы, ИИ), полное видение — **один репозиторий, деплой через GitHub**.
 
-**Стек по направлениям:** сервер — Go, Rust, Spark; веб — TS/JS, React/Vue; мобилки — Swift, Kotlin; игры — C++/C#; ИИ — Python; инфра — Bash/Python, YAML. Подробно: **ARCHITECTURE.md** (§2).
+**Уровень проекта:** мы **близки к началу** и **далеки от конца**. Фундамент заложен: стек зафиксирован, документация и заготовки по всем направлениям на месте. Дальше — поэтапное наращивание по ROADMAP.
 
-**Структура репо:** `backend-go/` — Go API; `app/` — текущее веб-приложение (HTML/JS); `web/` — React+TypeScript (Vite); `services/rust/` — Rust (видео, поиск); `analytics/spark/` — Spark (аналитика); `mobile/ios/` — Swift, `mobile/android/` — Kotlin; `ai/` — Python (ИИ); `infra/` — скрипты, docker-compose, YAML. `backend/` — legacy Node.
+---
 
-**Production:** https://bertogassin.github.io/OMNIXIUS/  
-**Приложение (вход, маркетплейс, заказы):** https://bertogassin.github.io/OMNIXIUS/app/marketplace.html  
+**Стек (по направлениям):** сервер — Go, Rust, Spark; веб — TS/JS, React/Vue; мобилки — Swift, Kotlin; игры — C++/C#; ИИ — Python; инфра — Bash/Python, YAML. Полная таблица: **ARCHITECTURE.md** (§2).
 
-Другого деплоя не нужно: пушишь в репозиторий → GitHub Pages обновляет сайт сам.
+**Структура репо:**  
+`backend-go/` — основной API (Go); `app/` — веб-приложение (HTML/JS); `web/` — заготовка на React+TypeScript; `services/rust/`, `analytics/spark/` — Rust и Spark; `mobile/ios/`, `mobile/android/` — Swift и Kotlin; `ai/` — ИИ (Python); `infra/` — Docker, K8s, Terraform, мониторинг. `backend/` — legacy Node (deprecated).
+
+**Production:**  
+https://bertogassin.github.io/OMNIXIUS/  
+https://bertogassin.github.io/OMNIXIUS/app/marketplace.html  
+https://bertogassin.github.io/OMNIXIUS/app/ai.html (ИИ)
+
+**Документация:** ARCHITECTURE.md (видение и стек) · PLATFORM.md (что в проде) · ECOSYSTEM.md (карта направлений) · ROADMAP.md (фазы) · API.md (эндпоинты) · PLATFORM_INFRASTRUCTURE.md (Docker, K8s, CI/CD) · OMNIXIUS_CHECKLIST.md (проверка всего в репо).
+
+Деплой: push в репозиторий → GitHub Pages обновляет сайт сам.
 
 ---
 

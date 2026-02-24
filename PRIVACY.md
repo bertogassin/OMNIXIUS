@@ -1,5 +1,7 @@
 # OMNIXIUS — Privacy & PII
 
+Политика применима с первого дня работы платформы. Контакт для запросов — на сайте (страница Contact).
+
 ## What we store (PII)
 
 - **Account:** email, name, password hash (Argon2id), optional avatar.

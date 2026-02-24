@@ -1,24 +1,37 @@
 # OMNIXIUS — Roadmap
 
-Phases and priorities. Stack: **SPARK, RUST, C++, SWIFT, GO only.**
+Фазы и приоритеты. Стек: **Go, Rust, Spark, Swift, Kotlin, TS/JS, Python** по направлениям (ARCHITECTURE.md).
 
 ---
 
-## Phase 1 — Foundation
-- Site and documentation (architecture, vision).
-- Infrastructure (multi-cloud, edge).
+## Текущая фаза: Foundation (мы здесь)
+
+- Сайт и документация (архитектура, видение, стек, чеклист).
+- Рабочее приложение: регистрация, логин, маркетплейс, почта, заказы, профиль, ИИ (корень).
+- Один бэкенд (Go), контракт API, безопасность (PQC, Argon2id).
+- Заготовки по всем направлениям: Rust, Spark, iOS, Android, React+TS, AI, инфра (Docker, K8s, Terraform, CI/CD, мониторинг).
+
+**Уровень:** Близки к началу, далеки от конца. Фундамент заложен; дальше — наращивание по фазам ниже.
+
+---
+
+## Phase 1 — Infrastructure & core
+
+- Инфраструктура (multi-cloud, edge, мониторинг в проде).
 - IXI blockchain prototype (consensus, ZKP, economy). **Rust / C++.**
 
 ## Phase 2 — Platforms
-- OMNIXIUS CONNECT: profiles, geo, chat, marketplace (MVP). **Go** API, **Swift** iOS.
-- OMNIXIUS TRADE & FINANCE: wallets, exchange (crypto/FIAT), copy trading (MVP). **Go / Rust.**
-- OMNIXIUS REPOSITORIUM: storage nodes, rewards, compute rental (MVP). **Rust / C++**, **Spark** for analytics where applicable.
+
+- OMNIXIUS CONNECT: профили, geo, чат, маркетплейс (расширение). **Go** API, **Swift** iOS, **Kotlin** Android.
+- OMNIXIUS TRADE & FINANCE: кошельки, биржа (crypto/FIAT), copy trading (MVP). **Go / Rust.**
+- OMNIXIUS REPOSITORIUM: узлы хранения, награды, аренда compute (MVP). **Rust / C++**, **Spark** для аналитики.
 
 ## Phase 3 — Integration & scale
-- All platforms connected via IXI blockchain and single account.
-- AI moderation, AI analytics, auto-investing.
-- Mobile (Swift for iOS), global scaling.
+
+- Все платформы связаны через IXI и один аккаунт.
+- ИИ: модерация, аналитика, свои модели.
+- Мобильные приложения, глобальное масштабирование.
 
 ---
 
-IXI is the ecosystem blockchain platform, not a separate token.
+IXI — блокчейн-платформа экосистемы, не отдельный токен.

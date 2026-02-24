@@ -1,10 +1,12 @@
 # OMNIXIUS API
 
-REST API for the OMNIXIUS app. Base URL: `https://your-api.example.com` (or `http://localhost:3000` in dev).
+REST API приложения OMNIXIUS. Реализация: **backend-go/** (Go). Base URL: `https://your-api.example.com` в проде или `http://localhost:3000` в разработке.
 
-**Auth:** Most endpoints require `Authorization: Bearer <token>`. Token is returned by `POST /api/auth/register` and `POST /api/auth/login`.
+**Quick start:** В папке `backend-go` выполни `go run .` → API на порту 3000. На фронте задай `API_URL` (локально подставляется сам для localhost/file). Проверка: `GET /health`, затем регистрация/логин через приложение.
 
-**Errors:** Responses use HTTP status codes and body `{"error": "message"}`.
+**Auth:** Большинство эндпоинтов требуют заголовок `Authorization: Bearer <token>`. Токен возвращают `POST /api/auth/register` и `POST /api/auth/login`.
+
+**Errors:** Ответы — HTTP-код и тело `{"error": "message"}`.
 
 ---
 

@@ -1,6 +1,6 @@
 # OMNIXIUS — iOS (Swift)
 
-iPhone app. Swift Package for shared logic; use Xcode to create an app target and add this package, or start a new iOS App project and copy Sources.
+Нативное приложение для iPhone (ARCHITECTURE.md — мобилки). **Уровень:** заготовка; Swift Package с минимальным модулем. Дальше: Xcode, создание app target, подключение пакета или копирование Sources.
 
 ```bash
 swift build

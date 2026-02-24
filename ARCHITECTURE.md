@@ -4,6 +4,8 @@ Global technology ecosystem: social network, professional platform, exchange, de
 
 **Goal:** Self-sufficient ecosystem — communication, earning, investment, learning, and asset management in one application, without dependence on centralized corporations.
 
+**Статус:** Проект в начале пути; видение и стек зафиксированы, заготовки по всем направлениям есть в репо. Наращивание — по ROADMAP и ECOSYSTEM.
+
 ---
 
 ## 1. Four platforms

@@ -1,6 +1,6 @@
 # OMNIXIUS — Ecosystem map
 
-One ecosystem: **what’s live now** (Mail, Marketplace, Shop, Profile) and **the full vision** (Connect, Trade & Finance, Repositorium, Blockchain, and more). Single account, one product.
+Одна экосистема: **what’s live now** (Mail, Marketplace, Shop, Profile, AI) и **полное видение** (Connect, Trade & Finance, Repositorium, Blockchain и др.). Один аккаунт, один продукт. **Уровень:** начало; карта и правила — здесь и в ROADMAP.
 
 ---
 
@@ -12,8 +12,9 @@ One ecosystem: **what’s live now** (Mail, Marketplace, Shop, Profile) and **th
 | **Marketplace** | Listings: browse, search, filters, categories. |
 | **Shop** | Buy and sell: orders, “Contact seller” (opens Mail), order status. |
 | **Profile** | Account, avatar, my orders (buyer/seller). |
+| **AI** | Корень своего ИИ: чат в браузере (`app/ai.html`), бэкенд `ai/` (Python). |
 
-Same app, same API (backend-go). More directions are added over time.
+Один фронт, один API (backend-go). Новые направления подключаются по этой карте.
 
 ---
 

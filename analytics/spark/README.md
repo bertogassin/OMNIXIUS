@@ -1,6 +1,8 @@
 # OMNIXIUS — Spark analytics
 
-Analytics & recommendations (Scala). Run with Spark 3.x:
+Аналитика и рекомендации (Scala/Java). По ARCHITECTURE.md — серверное направление. **Уровень:** заготовка (один джоб); дальше — реальные пайплайны.
+
+Run with Spark 3.x:
 
 ```bash
 sbt package

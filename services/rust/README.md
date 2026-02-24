@@ -1,6 +1,8 @@
 # OMNIXIUS — Rust service
 
-Video, search, heavy compute. Runs alongside Go API.
+Видео, поиск, тяжёлые вычисления (по ARCHITECTURE.md — серверное направление). Работает рядом с Go API.
+
+**Уровень:** заготовка; один эндпоинт `/health`. Дальше — реальная логика под видео/поиск/вычисления.
 
 ```bash
 cargo run
