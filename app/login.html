@@ -31,9 +31,9 @@
       <div class="auth-card">
         <h1 class="auth-title" data-i18n="loginTitle">Sign in</h1>
         <form class="app-form" id="form">
-          <p class="error" id="err" style="display:none;"></p>
+          <p class="error" id="err" style="display:none;" role="alert"></p>
           <label data-i18n="email">Email</label>
-          <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+          <input type="email" name="email" required autocomplete="email" placeholder="you@example.com" id="loginEmail" autofocus>
           <label data-i18n="password">Password</label>
           <div class="input-with-toggle">
             <input type="password" name="password" required autocomplete="current-password" id="pwd">
@@ -54,17 +54,29 @@
   <script src="js/i18n.js"></script>
   <script src="js/api.js"></script>
   <script>
+    var needApiUrl = !window.API_URL && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1';
     (function () {
       var hint = document.getElementById('apiUrlHint');
-      if (!window.API_URL && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+      if (needApiUrl) {
         hint.innerHTML = '<span data-i18n="apiUrlHint">Backend URL not set. You cannot sign in or register until you set it.</span> <a href="#" id="setApiUrl">' + (window.i18n ? window.i18n.t('setApiUrl') : 'Set API URL') + '</a>';
         hint.style.display = 'block';
+        document.getElementById('submitBtn').disabled = true;
         document.getElementById('setApiUrl').onclick = function (e) {
           e.preventDefault();
           var url = prompt('Backend API URL (e.g. https://your-api.example.com):', localStorage.getItem('omnixius_api_url') || '');
           if (url) { localStorage.setItem('omnixius_api_url', url.replace(/\/$/, '')); location.reload(); }
         };
+      } else if (location.hostname !== 'localhost' && location.hostname !== '127.0.0.1' && window.API_URL) {
+        hint.innerHTML = '<a href="#" id="changeApiUrl">' + (window.i18n ? window.i18n.t('changeApiUrl') : 'Change API URL') + '</a>';
+        hint.style.display = 'block';
+        hint.style.marginBottom = '0.5rem';
+        document.getElementById('changeApiUrl').onclick = function (e) {
+          e.preventDefault();
+          var url = prompt('Backend API URL:', localStorage.getItem('omnixius_api_url') || window.API_URL || '');
+          if (url !== null) { localStorage.setItem('omnixius_api_url', url.replace(/\/$/, '')); location.reload(); }
+        };
       }
+      if (window.i18n) i18n.apply();
     })();
     if (api.getToken()) { location.href = 'dashboard.html'; return; }
     (function () {
@@ -76,20 +88,25 @@
       e.preventDefault();
       var err = document.getElementById('err');
       var btn = document.getElementById('submitBtn');
+      var btnText = btn.textContent;
       err.style.display = 'none';
       var email = e.target.email.value.trim();
       var password = e.target.password.value;
       var remember = !!e.target.remember && e.target.remember.checked;
       btn.disabled = true;
+      btn.textContent = window.i18n ? i18n.t('signingIn') : 'Signing in…';
       try {
         var data = await api.auth.login(email, password);
-        if (!data || !data.token) { err.textContent = window.i18n ? i18n.t('signInFailed') : 'Sign in failed'; err.style.display = 'block'; btn.disabled = false; return; }
+        if (!data || !data.token) { err.textContent = window.i18n ? i18n.t('signInFailed') : 'Sign in failed'; err.style.display = 'block'; btn.disabled = false; btn.textContent = btnText; return; }
         api.setToken(data.token, remember);
         api.user = data.user;
         location.href = 'dashboard.html';
       } catch (x) {
         btn.disabled = false;
-        if (x && x.message && (x.message.includes('fetch') || x.message.includes('Failed'))) {
+        btn.textContent = btnText;
+        if (x && x.status === 0) {
+          err.textContent = (x.data && x.data.error) || (window.i18n ? i18n.t('cannotConnect') : 'Cannot reach server. Set API URL?');
+        } else if (x && x.message && (x.message.includes('fetch') || x.message.includes('Failed'))) {
           err.textContent = window.i18n ? i18n.t('cannotConnect') : 'Cannot reach server. Set API URL?';
         } else {
           err.textContent = (x && x.data && x.data.error) || (window.i18n ? i18n.t('signInFailed') : 'Sign in failed');

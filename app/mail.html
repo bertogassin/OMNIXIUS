@@ -12,46 +12,58 @@
     <div class="container">
       <a href="../index.html" class="logo">OMNIXIUS</a>
       <nav class="nav">
-        <a href="marketplace.html">Marketplace</a>
-        <a href="mail.html">Mail</a>
-        <a href="orders.html">Orders</a>
-        <a href="dashboard.html">Profile</a>
-        <a href="../index.html">Site</a>
-        <a href="#" id="logout">Sign out</a>
+        <a href="marketplace.html" data-i18n="navMarketplace">Marketplace</a>
+        <a href="mail.html" data-i18n="navMail">Mail</a>
+        <a href="orders.html" data-i18n="navOrders">Orders</a>
+        <a href="dashboard.html" data-i18n="navProfile">Profile</a>
+        <a href="../index.html" data-i18n="navSite">Site</a>
+        <a href="#" id="logout" data-i18n="signOut" aria-label="Sign out">Sign out</a>
         <span class="lang-switcher"><a href="#" data-lang="en">EN</a> | <a href="#" data-lang="ru">RU</a> | <a href="#" data-lang="fr">FR</a></span>
       </nav>
     </div>
   </header>
   <main class="app-page">
     <div class="container">
-      <h1>Internal mail</h1>
-      <p style="color:var(--text-muted); margin-bottom:1rem;">Inbox and sent conversations.</p>
+      <h1 data-i18n="mailTitle">Internal mail</h1>
+      <p style="color:var(--text-muted); margin-bottom:1rem;" data-i18n="mailSubtitle">Inbox and sent conversations.</p>
       <ul class="mail-list" id="list"></ul>
     </div>
   </main>
   <script src="config.js"></script>
   <script src="js/i18n.js"></script>
   <script src="js/api.js"></script>
+  <script src="js/nav-unread.js"></script>
   <script>
     if (!api.getToken()) { location.href = 'login.html'; return; }
     document.getElementById('logout').onclick = () => { api.auth.logout(); location.href = '../index.html'; };
+    var listEl = document.getElementById('list');
+    var t = function (k) { return window.i18n ? i18n.t(k) : k; };
     (async () => {
-      const list = await api.conversations.list();
-      document.getElementById('list').innerHTML = list.length
-        ? list.map(c => `
-          <li class="${c.unread ? 'unread' : ''}">
-            <a href="conversation.html?id=${c.id}">
-              <strong>${escapeHtml(c.other?.name || c.other?.email || 'User')}</strong>
-              ${c.product ? ` · ${escapeHtml(c.product.title)}` : ''}
-              <br><span style="font-size:0.9rem; color:var(--text-muted);">${(c.last_message || '').slice(0, 60)}...</span>
-            </a>
-            <span style="font-size:0.85rem; color:var(--text-muted);">${formatDate(c.updated_at)}</span>
-          </li>
-        `).join('')
-        : '<li style="color:var(--text-muted);">No conversations.</li>';
+      listEl.innerHTML = '<p class="loading-state">' + t('loading') + '</p>';
+      try {
+        const list = await api.conversations.list();
+        if (list.length === 0) {
+          listEl.innerHTML = '<div class="empty-state"><p class="empty-state-title">' + t('noConversations') + '</p><p class="empty-state-text">' + t('noConversationsHint') + '</p></div>';
+        } else {
+          listEl.innerHTML = list.map(c => `
+            <li class="${c.unread ? 'unread' : ''}">
+              <a href="conversation.html?id=${c.id}">
+                <strong>${escapeHtml(c.other?.name || c.other?.email || 'User')}</strong>
+                ${c.product ? ` · ${escapeHtml(c.product.title)}` : ''}
+                <br><span style="font-size:0.9rem; color:var(--text-muted);">${(c.last_message || '').slice(0, 60)}...</span>
+              </a>
+              <span style="font-size:0.85rem; color:var(--text-muted);">${formatDate(c.updated_at)}</span>
+            </li>
+          `).join('');
+        }
+      } catch (e) {
+        listEl.innerHTML = '<p class="error">' + t('loadFailed') + '</p><button type="button" class="btn btn-primary" id="mailRetry">' + t('retry') + '</button>';
+        document.getElementById('mailRetry').onclick = function () { location.reload(); };
+      }
     })();
     function escapeHtml(s) { return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
     function formatDate(t) { return t ? new Date(t * 1000).toLocaleString() : ''; }
+    if (window.i18n) i18n.apply();
   </script>
 </body>
 </html>

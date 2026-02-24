@@ -32,22 +32,29 @@
         <h1 class="auth-title" data-i18n="registerTitle">Register</h1>
         <p class="auth-subtitle" data-i18n="registerSubtitle">Create your OMNIXIUS account.</p>
         <form class="app-form" id="form">
-          <p class="error" id="err" style="display:none;"></p>
+          <p class="error" id="err" style="display:none;" role="alert"></p>
           <label data-i18n="email">Email</label>
-          <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+          <input type="email" name="email" required autocomplete="email" placeholder="you@example.com" maxlength="255" id="emailInp" autofocus>
+          <p class="form-rules" id="emailRulesText" data-i18n="emailRules">Allowed: letters, numbers, @ and a dot. Example: name@domain.com. Max 255 characters.</p>
+          <p class="form-hint form-hint-ok" id="emailValidHint" style="display:none;"></p>
           <label data-i18n="passwordMin">Password (min 8 characters)</label>
           <div class="input-with-toggle">
-            <input type="password" name="password" required minlength="8" autocomplete="new-password" id="pwd">
+            <input type="password" name="password" required minlength="8" maxlength="128" autocomplete="new-password" id="pwd">
             <button type="button" class="pwd-toggle" aria-label="Show password" id="pwdToggle1">👁</button>
           </div>
+          <p class="form-rules" id="passwordRulesText" data-i18n="passwordRules">Allowed: letters (A–Z, a–z), numbers (0–9), symbols (!@#$%^&* etc.). 8–128 characters.</p>
+          <p class="form-hint form-hint-ok" id="pwdLenHint" style="display:none; margin-top: -0.5rem;">✓ 8+ characters</p>
           <label data-i18n="confirmPassword">Confirm password</label>
           <div class="input-with-toggle">
-            <input type="password" name="password2" required minlength="8" autocomplete="new-password" id="pwd2">
+            <input type="password" name="password2" required minlength="8" maxlength="128" autocomplete="new-password" id="pwd2">
             <button type="button" class="pwd-toggle" aria-label="Show password" id="pwdToggle2">👁</button>
           </div>
           <p class="form-hint" id="pwdMismatch" style="display:none;" data-i18n="passwordMismatch">Passwords do not match</p>
+          <p class="form-hint form-hint-ok" id="pwdMatchOk" style="display:none;"></p>
           <label data-i18n="name">Name</label>
-          <input type="text" name="name" autocomplete="name" placeholder="Your name" maxlength="200">
+          <input type="text" name="name" autocomplete="name" data-i18n-placeholder="namePlaceholder" placeholder="Your name" maxlength="200" id="nameInp">
+          <p class="form-rules" id="nameRulesText" data-i18n="nameRules">Optional. Letters, spaces, hyphens. Max 200 characters.</p>
+          <p class="form-hint form-hint-ok" id="nameLenHint" style="display:none;"></p>
           <label class="checkbox-label">
             <input type="checkbox" name="agree" id="agree" required>
             <span><span data-i18n="agreeTermsPrefix">I agree to the</span> <a href="../contact.html" target="_blank" rel="noopener"><span data-i18n="termsAndPrivacy">Terms and Privacy</span></a></span>
@@ -62,17 +69,29 @@
   <script src="js/i18n.js"></script>
   <script src="js/api.js"></script>
   <script>
+    var needApiUrl = !window.API_URL && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1';
     (function () {
       var hint = document.getElementById('apiUrlHint');
-      if (!window.API_URL && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+      if (needApiUrl) {
         hint.innerHTML = '<span data-i18n="apiUrlHint">Backend URL not set. You cannot sign in or register until you set it.</span> <a href="#" id="setApiUrl">' + (window.i18n ? window.i18n.t('setApiUrl') : 'Set API URL') + '</a>';
         hint.style.display = 'block';
+        document.getElementById('submitBtn').disabled = true;
         document.getElementById('setApiUrl').onclick = function (e) {
           e.preventDefault();
           var url = prompt('Backend API URL (e.g. https://your-api.example.com):', localStorage.getItem('omnixius_api_url') || '');
           if (url) { localStorage.setItem('omnixius_api_url', url.replace(/\/$/, '')); location.reload(); }
         };
+      } else if (location.hostname !== 'localhost' && location.hostname !== '127.0.0.1' && window.API_URL) {
+        hint.innerHTML = '<a href="#" id="changeApiUrl">' + (window.i18n ? window.i18n.t('changeApiUrl') : 'Change API URL') + '</a>';
+        hint.style.display = 'block';
+        hint.style.marginBottom = '0.5rem';
+        document.getElementById('changeApiUrl').onclick = function (e) {
+          e.preventDefault();
+          var url = prompt('Backend API URL:', localStorage.getItem('omnixius_api_url') || window.API_URL || '');
+          if (url !== null) { localStorage.setItem('omnixius_api_url', url.replace(/\/$/, '')); location.reload(); }
+        };
       }
+      if (window.i18n) i18n.apply();
     })();
     if (api.getToken()) { location.href = 'dashboard.html'; }
 
@@ -89,25 +108,93 @@
     var pwd = document.getElementById('pwd');
     var pwd2 = document.getElementById('pwd2');
     var pwdMismatch = document.getElementById('pwdMismatch');
+    function validEmail(s) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s || '') && (s || '').length <= 255;
+    }
+    function updateEmailHint() {
+      var el = document.getElementById('emailInp');
+      var hint = document.getElementById('emailValidHint');
+      if (!el || !hint) return;
+      var v = el.value.trim();
+      if (v.length === 0) { hint.style.display = 'none'; return; }
+      hint.style.display = 'block';
+      hint.textContent = (window.i18n ? i18n.t('emailValid') : 'Valid email') + (validEmail(v) ? ' ✓' : '');
+      hint.classList.toggle('form-hint-ok', validEmail(v));
+      hint.classList.toggle('form-hint', v.length > 0 && !validEmail(v));
+    }
+    function updatePasswordHints() {
+      var lenHint = document.getElementById('pwdLenHint');
+      var matchOk = document.getElementById('pwdMatchOk');
+      var t = function (k) { return window.i18n ? i18n.t(k) : k; };
+      if (lenHint) {
+        var len = pwd.value.length;
+        lenHint.style.display = len > 0 ? 'block' : 'none';
+        lenHint.classList.toggle('form-hint-ok', len >= 8 && len <= 128);
+        lenHint.classList.toggle('form-hint', len > 0 && (len < 8 || len > 128));
+        if (len > 128) lenHint.textContent = t('passwordTooLong');
+        else if (len >= 8) lenHint.textContent = '✓ ' + t('passwordLengthOk');
+        else lenHint.textContent = len + ' / 8';
+      }
+      if (matchOk) {
+        var both = pwd.value && pwd2.value;
+        matchOk.style.display = both && pwd.value === pwd2.value ? 'block' : 'none';
+        matchOk.textContent = '✓ ' + t('passwordsMatch');
+      }
+    }
+    function updateNameHint() {
+      var el = document.getElementById('nameInp');
+      var hint = document.getElementById('nameLenHint');
+      if (!el || !hint) return;
+      var len = (el.value || '').length;
+      if (len === 0) { hint.style.display = 'none'; return; }
+      hint.style.display = 'block';
+      hint.textContent = (len + ' / 200') + (len <= 200 ? ' ✓' : '');
+      hint.classList.toggle('form-hint-ok', len <= 200);
+    }
+    document.getElementById('emailInp').addEventListener('input', updateEmailHint);
+    document.getElementById('emailInp').addEventListener('blur', updateEmailHint);
     pwd2.addEventListener('input', function () {
       pwdMismatch.style.display = (pwd.value && pwd2.value && pwd.value !== pwd2.value) ? 'block' : 'none';
+      updatePasswordHints();
     });
     pwd.addEventListener('input', function () {
       pwdMismatch.style.display = (pwd.value && pwd2.value && pwd.value !== pwd2.value) ? 'block' : 'none';
+      updatePasswordHints();
     });
+    document.getElementById('nameInp').addEventListener('input', updateNameHint);
 
     form.onsubmit = async (e) => {
       e.preventDefault();
       var err = document.getElementById('err');
       var btn = document.getElementById('submitBtn');
       err.style.display = 'none';
+      var email = form.email.value.trim();
+      if (!validEmail(email)) {
+        err.textContent = window.i18n ? i18n.t('invalidEmail') : 'Please enter a valid email address.';
+        err.style.display = 'block';
+        return;
+      }
+      if (pwd.value.length < 8) {
+        err.textContent = window.i18n ? i18n.t('passwordTooShort') : 'Password must be at least 8 characters.';
+        err.style.display = 'block';
+        return;
+      }
+      if (pwd.value.length > 128) {
+        err.textContent = window.i18n ? i18n.t('passwordTooLong') : 'Password must be up to 128 characters.';
+        err.style.display = 'block';
+        return;
+      }
       if (pwd.value !== pwd2.value) {
         err.textContent = window.i18n ? i18n.t('passwordMismatch') : 'Passwords do not match';
         err.style.display = 'block';
         return;
       }
-      var email = form.email.value.trim();
-      var password = form.password.value;
+      if (!form.agree.checked) {
+        err.textContent = window.i18n ? i18n.t('agreeTerms') : 'Please agree to the Terms and Privacy.';
+        err.style.display = 'block';
+        return;
+      }
+      var password = pwd.value;
       var name = form.name.value.trim() || null;
       btn.disabled = true;
       btn.textContent = window.i18n ? i18n.t('registering') : 'Creating account…';
@@ -126,8 +213,12 @@
       } catch (x) {
         btn.disabled = false;
         btn.textContent = window.i18n ? i18n.t('createAccount') : 'Create account';
-        if (x && x.message && (x.message.includes('fetch') || x.message.includes('Failed'))) {
+        if (x && x.status === 0) {
+          err.textContent = (x.data && x.data.error) || (window.i18n ? i18n.t('cannotConnect') : 'Cannot reach server. Set API URL?');
+        } else if (x && x.message && (x.message.includes('fetch') || x.message.includes('Failed'))) {
           err.textContent = window.i18n ? i18n.t('cannotConnect') : 'Cannot reach server. Set API URL?';
+        } else if (x && x.status === 409 && (x.data && x.data.error && x.data.error.toLowerCase().indexOf('already') !== -1)) {
+          err.textContent = window.i18n ? i18n.t('emailAlreadyRegistered') : (x.data && x.data.error) || 'Email already registered.';
         } else {
           err.textContent = (x && x.data && x.data.error) || (window.i18n ? i18n.t('registerFailed') : 'Registration failed');
         }

@@ -50,7 +50,15 @@
       if (u) storage.setItem(USER_KEY, JSON.stringify(u));
     },
     async request(path, options = {}) {
-      const url = API_URL + path;
+      const base = window.API_URL || API_URL || '';
+      const isLocal = (typeof location !== 'undefined') && (location.hostname === 'localhost' || location.hostname === '127.0.0.1');
+      if (!base && !isLocal) {
+        var err = new Error('API URL not set');
+        err.status = 0;
+        err.data = { error: 'Set API URL on login/register page. The app cannot call the backend until you set it.' };
+        throw err;
+      }
+      const url = (base || 'http://localhost:3000') + path;
       const headers = { ...getAuthHeaders(), ...options.headers };
       if (options.body && typeof options.body === 'object' && !(options.body instanceof FormData)) {
         headers['Content-Type'] = 'application/json';
@@ -73,6 +81,7 @@
       login: (email, password) => api.request('/api/auth/login', { method: 'POST', body: { email, password } }),
       logout: () => { api.setToken(null); api.user = null; },
       forgotPassword: (email) => api.request('/api/auth/forgot-password', { method: 'POST', body: { email } }),
+      changePassword: (currentPassword, newPassword) => api.request('/api/auth/change-password', { method: 'POST', body: { current_password: currentPassword, new_password: newPassword } }),
     },
     users: {
       me: () => api.request('/api/users/me'),
@@ -94,6 +103,7 @@
     },
     conversations: {
       list: () => api.request('/api/conversations'),
+      unreadCount: () => api.request('/api/conversations/unread-count'),
       create: (user_id, product_id) => api.request('/api/conversations', { method: 'POST', body: { user_id, product_id } }),
     },
     messages: {

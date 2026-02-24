@@ -12,30 +12,45 @@
     <div class="container">
       <a href="../index.html" class="logo">OMNIXIUS</a>
       <nav class="nav">
-        <a href="marketplace.html">Marketplace</a>
-        <a href="mail.html">Mail</a>
-        <a href="dashboard.html#orders">Orders</a>
-        <a href="dashboard.html">Profile</a>
-        <a href="../index.html">Site</a>
-        <a href="#" id="logout">Sign out</a>
+        <a href="marketplace.html" data-i18n="navMarketplace">Marketplace</a>
+        <a href="mail.html" data-i18n="navMail">Mail</a>
+        <a href="orders.html" data-i18n="navOrders">Orders</a>
+        <a href="dashboard.html" data-i18n="navProfile">Profile</a>
+        <a href="../index.html" data-i18n="navSite">Site</a>
+        <a href="#" id="logout" data-i18n="signOut" aria-label="Sign out">Sign out</a>
       </nav>
     </div>
   </header>
   <main class="app-page">
     <div class="container">
-      <h1>Settings</h1>
+      <h1 data-i18n="settingsTitle">Settings</h1>
       <form class="app-form" id="form">
-        <p class="error" id="err" style="display:none;"></p>
-        <label>Name</label>
+        <p class="error" id="err" style="display:none;" role="alert"></p>
+        <label data-i18n="name">Name</label>
         <input type="text" name="name" id="name">
-        <label>Profile photo</label>
+        <label data-i18n="profilePhoto">Profile photo</label>
         <input type="file" name="avatar" accept="image/jpeg,image/png,image/webp">
-        <button type="submit" class="btn btn-primary">Save</button>
+        <button type="submit" class="btn btn-primary" data-i18n="save">Save</button>
+      </form>
+      <hr style="margin:2rem 0; border-color:var(--border);">
+      <h2 style="font-size:1.1rem; margin-bottom:1rem;" data-i18n="changePassword">Change password</h2>
+      <form class="app-form" id="pwdForm" style="max-width:400px;">
+        <p class="error" id="pwdErr" style="display:none;" role="alert"></p>
+        <label data-i18n="currentPassword">Current password</label>
+        <input type="password" name="current" id="currentPwd" autocomplete="current-password">
+        <label data-i18n="newPassword">New password</label>
+        <input type="password" name="new" id="newPwd" minlength="8" maxlength="128" autocomplete="new-password">
+        <label data-i18n="confirmPassword">Confirm password</label>
+        <input type="password" name="new2" id="newPwd2" minlength="8" maxlength="128" autocomplete="new-password">
+        <p class="form-hint" id="pwdMismatch" style="display:none;" data-i18n="passwordMismatch">Passwords do not match</p>
+        <button type="submit" class="btn btn-primary" data-i18n="save">Save</button>
       </form>
     </div>
   </main>
   <script src="config.js"></script>
+  <script src="js/i18n.js"></script>
   <script src="js/api.js"></script>
+  <script src="js/nav-unread.js"></script>
   <script>
     if (!api.getToken()) { location.href = 'login.html'; return; }
     document.getElementById('logout').onclick = () => { api.auth.logout(); location.href = '../index.html'; };
@@ -67,6 +82,39 @@
         err.style.display = 'block';
       }
     };
+    document.getElementById('pwdForm').onsubmit = async (e) => {
+      e.preventDefault();
+      var pwdErr = document.getElementById('pwdErr');
+      var mismatch = document.getElementById('pwdMismatch');
+      pwdErr.style.display = 'none';
+      mismatch.style.display = 'none';
+      var cur = document.getElementById('currentPwd').value;
+      var newP = document.getElementById('newPwd').value;
+      var new2 = document.getElementById('newPwd2').value;
+      var t = function (k) { return window.i18n ? i18n.t(k) : k; };
+      if (newP.length < 8) { pwdErr.textContent = t('passwordTooShort'); pwdErr.style.display = 'block'; return; }
+      if (newP !== new2) { mismatch.style.display = 'block'; return; }
+      try {
+        await api.auth.changePassword(cur, newP);
+        pwdErr.style.display = 'block';
+        pwdErr.style.color = 'var(--accent)';
+        pwdErr.textContent = t('changePasswordSuccess');
+        document.getElementById('currentPwd').value = '';
+        document.getElementById('newPwd').value = '';
+        document.getElementById('newPwd2').value = '';
+      } catch (x) {
+        pwdErr.style.color = '';
+        pwdErr.textContent = (x && x.status === 401) ? t('currentPasswordWrong') : ((x && x.data && x.data.error) || 'Error');
+        pwdErr.style.display = 'block';
+      }
+    };
+    document.getElementById('newPwd2').addEventListener('input', function () {
+      var el = document.getElementById('pwdMismatch');
+      var p = document.getElementById('newPwd').value;
+      var p2 = document.getElementById('newPwd2').value;
+      el.style.display = (p && p2 && p !== p2) ? 'block' : 'none';
+    });
+    if (window.i18n) i18n.apply();
   </script>
 </body>
 </html>

@@ -12,13 +12,13 @@
     <div class="container">
       <a href="../index.html" class="logo">OMNIXIUS</a>
       <nav class="nav">
-        <a href="marketplace.html">Marketplace</a>
-        <a href="mail.html">Mail</a>
-        <a href="dashboard.html#orders">Orders</a>
-        <a href="dashboard.html">Profile</a>
-        <a href="../index.html">Site</a>
-        <a href="login.html" id="navLogin">Sign in</a>
-        <a href="#" id="navLogout" style="display:none;">Sign out</a>
+        <a href="marketplace.html" data-i18n="navMarketplace">Marketplace</a>
+        <a href="mail.html" data-i18n="navMail">Mail</a>
+        <a href="orders.html" data-i18n="navOrders">Orders</a>
+        <a href="dashboard.html" data-i18n="navProfile">Profile</a>
+        <a href="../index.html" data-i18n="navSite">Site</a>
+        <a href="login.html" id="navLogin" data-i18n="signIn">Sign in</a>
+        <a href="#" id="navLogout" style="display:none;" data-i18n="signOut" aria-label="Sign out">Sign out</a>
       </nav>
     </div>
   </header>
@@ -26,10 +26,13 @@
     <div class="container" id="root"></div>
   </main>
   <script src="config.js"></script>
+  <script src="js/i18n.js"></script>
   <script src="js/api.js"></script>
+  <script src="js/nav-unread.js"></script>
   <script>
+    var t = function (k) { return window.i18n ? i18n.t(k) : k; };
     const id = new URLSearchParams(location.search).get('id');
-    if (!id) { document.getElementById('root').innerHTML = '<p>Product ID missing.</p>'; throw 0; }
+    if (!id) { document.getElementById('root').innerHTML = '<p>' + t('productIdMissing') + '</p>'; throw 0; }
     const token = api.getToken();
     if (token) {
       document.getElementById('navLogin').style.display = 'none';
@@ -40,8 +43,12 @@
     (async () => {
       const p = await api.products.get(id);
       const root = document.getElementById('root');
+      var backToM = t('backToMarketplace');
+      var sellerLabel = t('seller');
+      var contactBtn = t('contactSeller');
+      var signInToContact = t('signInToContact');
       root.innerHTML = `
-        <p style="margin-bottom:1rem;"><a href="marketplace.html">← Marketplace</a></p>
+        <p style="margin-bottom:1rem;"><a href="marketplace.html">${escapeHtml(backToM)}</a></p>
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:2rem; align-items:start;">
           <img src="${p.image_path ? (window.API_URL + '/uploads/' + p.image_path) : 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22300%22><rect fill=%22%23222%22 width=%22400%22 height=%22300%22/></svg>'}" alt="" style="max-width:100%; border-radius:12px;">
           <div>
@@ -49,13 +56,14 @@
             <p class="price" style="font-size:1.5rem;">${p.price} ₽</p>
             <p style="color:var(--text-muted);">${escapeHtml(p.category)} · ${escapeHtml(p.location || '')}</p>
             <p style="margin-top:1rem;">${escapeHtml(p.description || '')}</p>
-            <p style="margin-top:1rem;">Продавец: <strong>${escapeHtml(p.seller_name || p.seller_email)}</strong></p>
-            ${token ? `<p style="margin-top:1rem;"><a href="conversation.html?userId=${p.seller_id}&productId=${p.id}" class="btn btn-primary">Contact seller</a></p>` : '<p style="margin-top:1rem;"><a href="login.html">Sign in</a> to contact the seller.</p>'}
+            <p style="margin-top:1rem;">${escapeHtml(sellerLabel)}: <strong>${escapeHtml(p.seller_name || p.seller_email)}</strong></p>
+            ${token ? `<p style="margin-top:1rem;"><a href="conversation.html?userId=${p.seller_id}&productId=${p.id}" class="btn btn-primary">${escapeHtml(contactBtn)}</a></p>` : '<p style="margin-top:1rem;"><a href="login.html">' + escapeHtml(signInToContact) + '</a></p>'}
           </div>
         </div>
       `;
     })();
     function escapeHtml(s) { return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+    if (window.i18n) i18n.apply();
   </script>
 </body>
 </html>

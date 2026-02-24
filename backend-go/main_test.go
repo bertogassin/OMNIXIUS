@@ -83,3 +83,16 @@ func TestOrderCreate_NoAuth_Returns401(t *testing.T) {
 		t.Errorf("got status %d, want 401", w.Code)
 	}
 }
+
+func TestMessageSend_NoAuth_Returns401(t *testing.T) {
+	setupTestDB(t)
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+	c.Request = httptest.NewRequest(http.MethodPost, "/api/messages/conversation/1", strings.NewReader(`{"body":"hello"}`))
+	c.Request.Header.Set("Content-Type", "application/json")
+	c.Params = gin.Params{{Key: "id", Value: "1"}}
+	handleMessageSend(c)
+	if w.Code != http.StatusUnauthorized {
+		t.Errorf("got status %d, want 401", w.Code)
+	}
+}

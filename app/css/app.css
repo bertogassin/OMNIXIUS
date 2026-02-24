@@ -37,6 +37,8 @@
 .app-form .link { margin-top: 1rem; text-align: center; }
 .app-form .link a { color: var(--accent); }
 .app-form .form-hint { color: #e74c3c; font-size: 0.85rem; margin-top: -0.5rem; margin-bottom: 0.5rem; }
+.app-form .form-hint-ok { color: var(--accent); }
+.app-form .form-rules { color: var(--text-muted); font-size: 0.8rem; margin-top: -0.5rem; margin-bottom: 0.5rem; line-height: 1.35; }
 
 .auth-card {
   max-width: 420px; margin: 2rem auto; padding: 2rem;
@@ -131,3 +133,10 @@
 .lang-switcher { margin-left: auto; font-size: 0.9rem; color: var(--text-muted); }
 .lang-switcher a { color: inherit; margin: 0 0.2rem; }
 .lang-switcher a.active { color: var(--accent); }
+
+.nav a { position: relative; }
+.nav-unread {
+  position: absolute; top: -4px; right: -8px; min-width: 18px; height: 18px; padding: 0 5px;
+  font-size: 0.7rem; font-weight: 600; line-height: 18px; text-align: center;
+  background: var(--accent); color: var(--bg); border-radius: 9px;
+}

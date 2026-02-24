@@ -68,15 +68,39 @@ func ConversationsList(uid int64) []gin.H {
 			lastByConv[cid] = body.String
 		}
 	}
+	// Unread per conversation: messages where sender != uid and read_at IS NULL
+	unreadRows, _ := db.DB.Query(`SELECT conversation_id, COUNT(*) FROM messages WHERE conversation_id IN (`+placeholders+`) AND sender_id != ? AND read_at IS NULL GROUP BY conversation_id`, append(cids, uid)...)
+	unreadByConv := make(map[int64]int64)
+	if unreadRows != nil {
+		defer unreadRows.Close()
+		for unreadRows.Next() {
+			var cid int64
+			var n int64
+			unreadRows.Scan(&cid, &n)
+			unreadByConv[cid] = n
+		}
+	}
 	list := make([]gin.H, 0, len(convs))
 	for _, c := range convs {
 		other := otherByConv[c.id]
 		if other == nil {
 			other = gin.H{"id": int64(0), "name": "", "email": ""}
 		}
-		list = append(list, gin.H{"id": c.id, "product_id": c.productID, "updated_at": c.updated, "last_message": lastByConv[c.id], "other": other})
+		unread := unreadByConv[c.id]
+		list = append(list, gin.H{"id": c.id, "product_id": c.productID, "updated_at": c.updated, "last_message": lastByConv[c.id], "other": other, "unread": unread > 0})
 	}
 	return list
+}
+
+// UnreadCount returns total count of unread messages for the user (messages from others, not yet read).
+func UnreadCount(uid int64) int64 {
+	var n int64
+	db.DB.QueryRow(`
+		SELECT COUNT(*) FROM messages m
+		JOIN conversation_participants cp ON cp.conversation_id = m.conversation_id AND cp.user_id = ?
+		WHERE m.sender_id != ? AND m.read_at IS NULL
+	`, uid, uid).Scan(&n)
+	return n
 }
 
 // ConversationCreate finds or creates a conversation between uid and otherUserID, optional productID. Returns conversation ID.

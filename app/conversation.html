@@ -12,28 +12,31 @@
     <div class="container">
       <a href="../index.html" class="logo">OMNIXIUS</a>
       <nav class="nav">
-        <a href="marketplace.html">Marketplace</a>
-        <a href="mail.html">Mail</a>
-        <a href="dashboard.html#orders">Orders</a>
-        <a href="dashboard.html">Profile</a>
-        <a href="../index.html">Site</a>
-        <a href="#" id="logout">Sign out</a>
+        <a href="marketplace.html" data-i18n="navMarketplace">Marketplace</a>
+        <a href="mail.html" data-i18n="navMail">Mail</a>
+        <a href="orders.html" data-i18n="navOrders">Orders</a>
+        <a href="dashboard.html" data-i18n="navProfile">Profile</a>
+        <a href="../index.html" data-i18n="navSite">Site</a>
+        <a href="#" id="logout" data-i18n="signOut" aria-label="Sign out">Sign out</a>
       </nav>
     </div>
   </header>
   <main class="app-page">
     <div class="container">
-      <p style="margin-bottom:1rem;"><a href="mail.html">← Mail</a></p>
+      <p style="margin-bottom:1rem;"><a href="mail.html" id="backToMail">← Mail</a></p>
       <div id="root"></div>
       <div class="thread-send" id="sendForm" style="display:none;">
-        <input type="text" id="msgInput" placeholder="Message">
+        <input type="text" id="msgInput" placeholder="Message" aria-label="Message text">
         <button type="button" class="btn btn-primary" id="sendBtn">Send</button>
       </div>
     </div>
   </main>
   <script src="config.js"></script>
+  <script src="js/i18n.js"></script>
   <script src="js/api.js"></script>
+  <script src="js/nav-unread.js"></script>
   <script>
+    var t = function (k) { return window.i18n ? i18n.t(k) : k; };
     if (!api.getToken()) { location.href = 'login.html'; return; }
     document.getElementById('logout').onclick = () => { api.auth.logout(); location.href = '../index.html'; };
 
@@ -49,31 +52,38 @@
         const messages = await api.messages.list(conversationId);
         render(messages);
         document.getElementById('sendForm').style.display = 'flex';
+        document.getElementById('msgInput').placeholder = t('messagePlaceholder');
+        document.getElementById('sendBtn').textContent = t('send');
+        document.getElementById('backToMail').textContent = t('backToMail');
         return;
       }
       if (userId) {
         const conv = await api.conversations.create(userId, productId || undefined);
         conversationId = conv.id;
         history.replaceState(null, '', 'conversation.html?id=' + conv.id);
-        document.getElementById('root').innerHTML = '<p style="color:var(--text-muted);">Conversation created. Send a message.</p>';
+        document.getElementById('root').innerHTML = '<p style="color:var(--text-muted);">' + t('conversationCreated') + '</p>';
         document.getElementById('sendForm').style.display = 'flex';
+        document.getElementById('msgInput').placeholder = t('messagePlaceholder');
+        document.getElementById('sendBtn').textContent = t('send');
+        document.getElementById('backToMail').textContent = t('backToMail');
         return;
       }
-      document.getElementById('root').innerHTML = '<p>Specify conversation id or userId.</p>';
+      document.getElementById('root').innerHTML = '<p>' + t('specifyConvId') + '</p>';
     }
 
     function render(messages) {
       const me = api.user?.id;
-      document.getElementById('root').innerHTML = `
-        <div class="thread">
+      var html = messages.length === 0
+        ? '<div class="empty-state"><p class="empty-state-text">' + t('noMessages') + '</p></div>'
+        : `<div class="thread">
           ${messages.map(m => `
             <div class="msg ${m.sender_id === me ? 'mine' : ''}">
               <div class="meta">${escapeHtml(m.sender_name)} · ${formatDate(m.created_at)}</div>
               <div>${escapeHtml(m.body)}</div>
             </div>
           `).join('')}
-        </div>
-      `;
+        </div>`;
+      document.getElementById('root').innerHTML = html;
     }
 
     document.getElementById('sendBtn').onclick = async () => {
@@ -86,10 +96,10 @@
       render(messages);
     };
 
-    loadOrCreate();
+    loadOrCreate().then(function () { if (window.i18n) i18n.apply(); });
 
     function escapeHtml(s) { return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-    function formatDate(t) { return t ? new Date(t * 1000).toLocaleString() : ''; }
+    function formatDate(ts) { return ts ? new Date(ts * 1000).toLocaleString() : ''; }
   </script>
 </body>
 </html>

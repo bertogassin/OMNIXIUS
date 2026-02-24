@@ -71,6 +71,7 @@ func main() {
 	auth.GET("/users/me", handleUserMe)
 	auth.PATCH("/users/me", handleUserUpdate)
 	auth.DELETE("/users/me", handleUserDelete)
+	auth.POST("/auth/change-password", handleChangePassword)
 	auth.GET("/users/me/orders", handleUserOrders)
 	auth.POST("/users/me/avatar", handleUserAvatar)
 
@@ -86,6 +87,7 @@ func main() {
 	auth.PATCH("/orders/:id", handleOrderUpdate)
 
 	auth.GET("/conversations", handleConversationsList)
+	auth.GET("/conversations/unread-count", handleConversationsUnreadCount)
 	auth.POST("/conversations", handleConversationCreate)
 	auth.GET("/messages/conversation/:id", handleMessagesList)
 	auth.POST("/messages/conversation/:id", handleMessageSend)
@@ -223,22 +225,65 @@ func getLoginLimiter(ip string) *rate.Limiter {
 	return l
 }
 
+const (
+	maxEmailLen    = 255
+	maxPasswordLen = 128
+	minPasswordLen = 8
+	maxNameLen     = 200
+)
+
+func isValidEmail(s string) bool {
+	if s == "" || len(s) > maxEmailLen {
+		return false
+	}
+	if strings.Contains(s, " ") {
+		return false
+	}
+	at := strings.LastIndex(s, "@")
+	if at <= 0 || at == len(s)-1 {
+		return false
+	}
+	domain := s[at+1:]
+	if !strings.Contains(domain, ".") || len(domain) < 2 {
+		return false
+	}
+	return true
+}
+
 func handleRegister(c *gin.Context) {
 	var body struct {
 		Email    string `json:"email"`
 		Password string `json:"password"`
 		Name     string `json:"name"`
 	}
-	if err := c.ShouldBindJSON(&body); err != nil || body.Email == "" || len(body.Password) < 8 {
-		c.JSON(400, gin.H{"error": "Invalid email or password (min 8 chars)"})
+	if err := c.ShouldBindJSON(&body); err != nil {
+		c.JSON(400, gin.H{"error": "Email and password required"})
 		return
 	}
-	if len(body.Email) > 255 {
-		c.JSON(400, gin.H{"error": "Email too long"})
+	body.Email = strings.TrimSpace(strings.ToLower(body.Email))
+	if body.Email == "" {
+		c.JSON(400, gin.H{"error": "Email required"})
 		return
 	}
-	if len(body.Name) > 200 {
-		body.Name = body.Name[:200]
+	if len(body.Email) > maxEmailLen {
+		c.JSON(400, gin.H{"error": "Email must be up to 255 characters"})
+		return
+	}
+	if !isValidEmail(body.Email) {
+		c.JSON(400, gin.H{"error": "Invalid email format. Use: letters, numbers, @ and a dot (e.g. name@domain.com)"})
+		return
+	}
+	if len(body.Password) < minPasswordLen {
+		c.JSON(400, gin.H{"error": "Password must be at least 8 characters"})
+		return
+	}
+	if len(body.Password) > maxPasswordLen {
+		c.JSON(400, gin.H{"error": "Password must be up to 128 characters"})
+		return
+	}
+	body.Name = strings.TrimSpace(body.Name)
+	if len(body.Name) > maxNameLen {
+		body.Name = body.Name[:maxNameLen]
 	}
 	user, token, err := AuthRegister(body.Email, body.Password, body.Name)
 	if err != nil {
@@ -267,6 +312,11 @@ func handleLogin(c *gin.Context) {
 		Password string `json:"password"`
 	}
 	if err := c.ShouldBindJSON(&body); err != nil {
+		c.JSON(400, gin.H{"error": "Email and password required"})
+		return
+	}
+	body.Email = strings.TrimSpace(strings.ToLower(body.Email))
+	if body.Email == "" {
 		c.JSON(400, gin.H{"error": "Email and password required"})
 		return
 	}
@@ -388,6 +438,42 @@ func handleUserUpdate(c *gin.Context) {
 	}
 	db.DB.Exec("UPDATE users SET name = ?, updated_at = unixepoch() WHERE id = ?", nullStr(body.Name), getUserID(c))
 	handleUserMe(c)
+}
+
+func handleChangePassword(c *gin.Context) {
+	if getUserID(c) == 0 {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+	var body struct {
+		CurrentPassword string `json:"current_password"`
+		NewPassword     string `json:"new_password"`
+	}
+	if err := c.ShouldBindJSON(&body); err != nil || body.CurrentPassword == "" || body.NewPassword == "" {
+		c.JSON(400, gin.H{"error": "current_password and new_password required"})
+		return
+	}
+	if len(body.NewPassword) < minPasswordLen {
+		c.JSON(400, gin.H{"error": "New password must be at least 8 characters"})
+		return
+	}
+	if len(body.NewPassword) > maxPasswordLen {
+		c.JSON(400, gin.H{"error": "New password must be up to 128 characters"})
+		return
+	}
+	uid := getUserID(c)
+	var hash string
+	if db.DB.QueryRow("SELECT password_hash FROM users WHERE id = ?", uid).Scan(&hash) != nil {
+		c.JSON(404, gin.H{"error": "User not found"})
+		return
+	}
+	if !checkPassword(hash, body.CurrentPassword) {
+		c.JSON(401, gin.H{"error": "Current password is incorrect"})
+		return
+	}
+	newHash := hashPasswordArgon2(body.NewPassword)
+	db.DB.Exec("UPDATE users SET password_hash = ?, updated_at = unixepoch() WHERE id = ?", newHash, uid)
+	c.JSON(200, gin.H{"ok": true})
 }
 
 func handleUserDelete(c *gin.Context) {
@@ -701,6 +787,11 @@ func handleConversationsList(c *gin.Context) {
 	c.JSON(200, ConversationsList(getUserID(c)))
 }
 
+func handleConversationsUnreadCount(c *gin.Context) {
+	n := UnreadCount(getUserID(c))
+	c.JSON(200, gin.H{"unread": n})
+}
+
 func handleConversationCreate(c *gin.Context) {
 	var body struct {
 		UserID    int64 `json:"user_id"`
@@ -742,6 +833,10 @@ func handleMessagesList(c *gin.Context) {
 }
 
 func handleMessageSend(c *gin.Context) {
+	if getUserID(c) == 0 {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
 	cid, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		c.JSON(400, gin.H{"error": "Invalid conversation id"})
