@@ -130,6 +130,10 @@
 
 .api-url-hint { background: rgba(255,193,7,0.1); border: 1px solid rgba(255,193,7,0.3); border-radius: 8px; padding: 1rem; margin-bottom: 1rem; font-size: 0.9rem; }
 .api-url-hint a { color: var(--accent); }
+.api-url-hint .api-url-hint-title { margin: 0 0 0.5rem 0; font-weight: 600; }
+.api-url-hint .api-url-hint-explain { margin: 0 0 1rem 0; color: var(--text-muted); font-size: 0.85rem; }
+.api-url-hint .btn { margin: 0; }
+.api-url-hint-required { border-color: rgba(255,193,7,0.5); }
 .lang-switcher { margin-left: auto; font-size: 0.9rem; color: var(--text-muted); }
 .lang-switcher a { color: inherit; margin: 0 0.2rem; }
 .lang-switcher a.active { color: var(--accent); }

@@ -73,13 +73,16 @@
     (function () {
       var hint = document.getElementById('apiUrlHint');
       if (needApiUrl) {
-        hint.innerHTML = '<span data-i18n="apiUrlHint">Backend URL not set. You cannot sign in or register until you set it.</span> <a href="#" id="setApiUrl">' + (window.i18n ? window.i18n.t('setApiUrl') : 'Set API URL') + '</a>';
+        var setT = window.i18n ? window.i18n.t('setApiUrl') : 'Set API URL';
+        var explainT = window.i18n ? window.i18n.t('apiUrlExplain') : 'Paste the URL of your API (e.g. from Railway, Render, or your server). Then click the button below.';
+        hint.innerHTML = '<p class="api-url-hint-title" data-i18n="apiUrlHint">Backend URL not set. You cannot sign in or register until you set it.</p><p class="api-url-hint-explain">' + explainT + '</p><button type="button" class="btn btn-primary" id="setApiUrl">' + setT + '</button>';
         hint.style.display = 'block';
+        hint.classList.add('api-url-hint-required');
         document.getElementById('submitBtn').disabled = true;
         document.getElementById('setApiUrl').onclick = function (e) {
           e.preventDefault();
           var url = prompt('Backend API URL (e.g. https://your-api.example.com):', localStorage.getItem('omnixius_api_url') || '');
-          if (url) { localStorage.setItem('omnixius_api_url', url.replace(/\/$/, '')); location.reload(); }
+          if (url && url.trim()) { localStorage.setItem('omnixius_api_url', url.trim().replace(/\/$/, '')); location.reload(); }
         };
       } else if (location.hostname !== 'localhost' && location.hostname !== '127.0.0.1' && window.API_URL) {
         hint.innerHTML = '<a href="#" id="changeApiUrl">' + (window.i18n ? window.i18n.t('changeApiUrl') : 'Change API URL') + '</a>';
