@@ -11,15 +11,21 @@
   <header class="header">
     <div class="container">
       <a href="../index.html" class="logo">OMNIXIUS</a>
-      <nav class="nav">
+      <nav class="nav nav-unified">
+        <a href="../index.html#about">About</a>
+        <a href="directions.html">Directions</a>
+        <a href="../ecosystem.html">Ecosystem</a>
+        <a href="../architecture.html">Architecture</a>
+        <a href="../contact.html">Contact</a>
         <a href="marketplace.html" data-i18n="navMarketplace">Marketplace</a>
         <a href="mail.html" data-i18n="navMail">Mail</a>
         <a href="orders.html" data-i18n="navOrders">Orders</a>
         <a href="dashboard.html" data-i18n="navProfile">Profile</a>
         <a href="ai.html">AI</a>
-        <a href="../index.html" data-i18n="navSite">Site</a>
-        <a href="#" id="logout" data-i18n="signOut" aria-label="Sign out">Sign out</a>
+        <a href="login.html" id="navLogin" style="display:none;">Sign in</a>
+        <a href="#" id="navLogout" data-i18n="signOut" aria-label="Sign out">Sign out</a>
       </nav>
+      <button class="menu-toggle" aria-label="Menu"><span></span></button>
     </div>
   </header>
   <main class="app-page">
@@ -54,7 +60,7 @@
   <script src="js/nav-unread.js"></script>
   <script>
     if (typeof api === 'undefined' || !api.getToken || !api.getToken()) { location.href = 'login.html'; return; }
-    document.getElementById('logout').onclick = () => { api.auth.logout(); location.href = '../index.html'; };
+    document.getElementById('navLogout').onclick = () => { api.auth.logout(); location.href = '../index.html'; };
     (async () => {
       const u = await api.users.me();
       document.getElementById('name').value = u.name || '';
@@ -117,5 +123,6 @@
     });
     if (window.i18n) i18n.apply();
   </script>
+  <script src="../js/main.js"></script>
 </body>
 </html>

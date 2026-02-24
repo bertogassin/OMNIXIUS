@@ -83,6 +83,11 @@ body {
   border-radius: 4px;
 }
 
+.nav-unified {
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+}
+
 .menu-toggle {
   display: none;
   width: 28px;

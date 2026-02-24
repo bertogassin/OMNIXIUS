@@ -8,12 +8,24 @@
   <link rel="stylesheet" href="css/app.css">
 </head>
 <body>
-  <header class="header header-auth">
+  <header class="header">
     <div class="container">
       <a href="../index.html" class="logo">OMNIXIUS</a>
-      <nav class="nav">
-        <a href="register.html" data-i18n="noAccount">Register</a>
+      <nav class="nav nav-unified">
+        <a href="../index.html#about">About</a>
+        <a href="directions.html">Directions</a>
+        <a href="../ecosystem.html">Ecosystem</a>
+        <a href="../architecture.html">Architecture</a>
+        <a href="../contact.html">Contact</a>
+        <a href="marketplace.html">Marketplace</a>
+        <a href="mail.html">Mail</a>
+        <a href="orders.html">Orders</a>
+        <a href="dashboard.html">Profile</a>
+        <a href="ai.html">AI</a>
+        <a href="login.html" id="navLogin" class="nav-cta">Sign in</a>
+        <a href="#" id="navLogout" style="display:none;">Sign out</a>
       </nav>
+      <button class="menu-toggle" aria-label="Menu"><span></span></button>
     </div>
   </header>
   <main class="app-page app-page-auth">
@@ -140,5 +152,6 @@
       }
     };
   </script>
+  <script src="../js/main.js"></script>
 </body>
 </html>

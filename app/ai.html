@@ -33,17 +33,21 @@
   <header class="header">
     <div class="container">
       <a href="../index.html" class="logo">OMNIXIUS</a>
-      <nav class="nav">
+      <nav class="nav nav-unified">
+        <a href="../index.html#about">About</a>
+        <a href="directions.html">Directions</a>
+        <a href="../ecosystem.html">Ecosystem</a>
+        <a href="../architecture.html">Architecture</a>
+        <a href="../contact.html">Contact</a>
         <a href="marketplace.html">Marketplace</a>
         <a href="mail.html">Mail</a>
         <a href="orders.html">Orders</a>
         <a href="dashboard.html">Profile</a>
         <a href="ai.html" style="color:var(--accent);">AI</a>
-        <a href="../index.html">Site</a>
-        <a href="login.html" id="navLogin">Sign in</a>
+        <a href="login.html" id="navLogin" class="nav-cta">Sign in</a>
         <a href="#" id="navLogout" style="display:none;">Sign out</a>
-        <span class="lang-switcher"><a href="#" data-lang="en">EN</a> | <a href="#" data-lang="ru">RU</a> | <a href="#" data-lang="fr">FR</a></span>
       </nav>
+      <button class="menu-toggle" aria-label="Menu"><span></span></button>
     </div>
   </header>
   <main class="app-page">
@@ -143,5 +147,6 @@
       setOffline(true);
     }
   </script>
+  <script src="../js/main.js"></script>
 </body>
 </html>
