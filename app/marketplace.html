@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Marketplace — OMNIXIUS</title>
   <link rel="stylesheet" href="../css/style.css">
   <link rel="stylesheet" href="css/app.css">
@@ -45,7 +45,8 @@
   <script src="js/utils.js"></script>
   <script src="js/nav-unread.js"></script>
   <script>
-    const token = api.getToken();
+    if (typeof api === 'undefined') { document.body.innerHTML = '<div class="container" style="padding:2rem;"><p class="error">Scripts did not load. <a href="login.html">Sign in</a></p></div>'; throw 0; }
+    const token = api.getToken && api.getToken();
     if (token) {
       document.getElementById('navLogin').style.display = 'none';
       document.getElementById('navLogout').style.display = 'inline';

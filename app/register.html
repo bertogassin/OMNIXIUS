@@ -65,12 +65,20 @@
     }
     (function () {
       var hint = document.getElementById('apiUrlHint');
+      var t = function (k, d) { return (typeof window.i18n !== 'undefined' && window.i18n.t(k)) || d || k; };
       if (needApiUrl) {
-        var setT = (typeof window.i18n !== 'undefined' && window.i18n.t('setApiUrl')) || 'Set API URL';
-        var explainT = (typeof window.i18n !== 'undefined' && window.i18n.t('apiUrlExplain')) || 'Paste the URL of your API (e.g. from Railway, Render, or your server). Then click the button below.';
-        hint.innerHTML = '<p class="api-url-hint-title" data-i18n="apiUrlHint">Backend URL not set. Enter it below to sign in or register.</p><p class="api-url-hint-explain">' + explainT + '</p><button type="button" class="btn btn-primary" id="setApiUrl">' + setT + '</button>';
+        var ph = t('apiUrlPlaceholder', 'https://your-api.onrender.com');
+        var saveT = t('saveApiUrl', 'Save');
+        hint.innerHTML = '<p class="api-url-hint-title" data-i18n="apiUrlHint">Backend URL not set. Enter it below to sign in or register.</p><p class="api-url-hint-explain">' + (t('apiUrlExplain') || '') + '</p><div class="api-url-row"><input type="url" id="apiUrlInput" placeholder="' + ph + '" value="" autocomplete="url"><button type="button" class="btn btn-primary" id="saveApiUrl">' + saveT + '</button></div><button type="button" class="btn btn-secondary api-url-link" id="setApiUrl">' + (t('setApiUrl') || 'Set API URL') + '</button>';
         hint.style.display = 'block';
         hint.classList.add('api-url-hint-required');
+        var input = document.getElementById('apiUrlInput');
+        if (input) input.value = localStorage.getItem('omnixius_api_url') || '';
+        document.getElementById('saveApiUrl').onclick = function (e) {
+          e.preventDefault();
+          var url = (document.getElementById('apiUrlInput').value || '').trim().replace(/\/$/, '');
+          if (url) { localStorage.setItem('omnixius_api_url', url); location.reload(); }
+        };
         document.getElementById('setApiUrl').onclick = function (e) { e.preventDefault(); askApiUrl(); };
       } else if (location.hostname !== 'localhost' && location.hostname !== '127.0.0.1' && window.API_URL) {
         hint.innerHTML = '<a href="#" id="changeApiUrl">' + ((typeof window.i18n !== 'undefined' && window.i18n.t('changeApiUrl')) || 'Change API URL') + '</a>';

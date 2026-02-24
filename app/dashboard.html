@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Dashboard — OMNIXIUS</title>
   <link rel="stylesheet" href="../css/style.css">
   <link rel="stylesheet" href="css/app.css">
@@ -56,7 +56,7 @@
         return;
       }
     })();
-    if (!api.getToken()) { location.href = 'login.html'; return; }
+    if (typeof api === 'undefined' || !api.getToken || !api.getToken()) { location.href = 'login.html'; return; }
     document.getElementById('logout').onclick = () => { api.auth.logout(); location.href = '../index.html'; };
 
     (async () => {

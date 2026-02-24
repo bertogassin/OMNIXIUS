@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Product — OMNIXIUS</title>
   <link rel="stylesheet" href="../css/style.css">
   <link rel="stylesheet" href="css/app.css">
@@ -32,10 +32,11 @@
   <script src="js/utils.js"></script>
   <script src="js/nav-unread.js"></script>
   <script>
-    var t = function (k) { return window.i18n ? i18n.t(k) : k; };
+    if (typeof api === 'undefined') { document.getElementById('root').innerHTML = '<p class="error">Scripts did not load. <a href="login.html">Sign in</a></p>'; throw 0; }
+    var t = function (k) { return typeof window.i18n !== 'undefined' && window.i18n.t ? i18n.t(k) : k; };
     const id = new URLSearchParams(location.search).get('id');
     if (!id) { document.getElementById('root').innerHTML = '<p>' + t('productIdMissing') + '</p>'; throw 0; }
-    const token = api.getToken();
+    const token = api.getToken && api.getToken();
     if (token) {
       document.getElementById('navLogin').style.display = 'none';
       document.getElementById('navLogout').style.display = 'inline';
