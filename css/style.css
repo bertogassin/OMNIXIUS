@@ -323,6 +323,40 @@ body {
   font-size: 1.1rem;
 }
 
+/* All main screens list */
+.screens-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-width: 520px;
+}
+.screens-list li {
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 1rem;
+}
+.screens-list li:last-child {
+  border-bottom: none;
+}
+.screens-list a {
+  color: var(--accent);
+  font-weight: 500;
+  text-decoration: none;
+}
+.screens-list a:hover {
+  text-decoration: underline;
+}
+.screens-list-secondary {
+  opacity: 0.9;
+}
+.screens-list-secondary a {
+  color: var(--text-muted);
+}
+.screens-list-secondary a:hover {
+  color: var(--accent);
+}
+
 /* Cards */
 .services .cards {
   display: grid;
