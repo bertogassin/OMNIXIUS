@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OMNIXIUS AI</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="css/app.css">
+  <style>
+    .ai-page { max-width: 720px; margin: 0 auto; padding: 0 1rem; }
+    .ai-header { text-align: center; margin-bottom: 1.5rem; }
+    .ai-header h1 { font-size: 1.75rem; }
+    .ai-header p { color: var(--text-muted); font-size: 0.95rem; margin-top: 0.25rem; }
+    .ai-chat { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; min-height: 320px; display: flex; flex-direction: column; }
+    .ai-messages { flex: 1; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: 0.75rem; }
+    .ai-msg { max-width: 85%; padding: 0.75rem 1rem; border-radius: 12px; font-size: 0.95rem; line-height: 1.5; }
+    .ai-msg.user { align-self: flex-end; background: var(--accent); color: var(--bg); }
+    .ai-msg.assistant { align-self: flex-start; background: var(--border); color: var(--text); }
+    .ai-msg .meta { font-size: 0.75rem; opacity: 0.8; margin-top: 0.25rem; }
+    .ai-send { display: flex; gap: 0.5rem; padding: 1rem; border-top: 1px solid var(--border); }
+    .ai-send input { flex: 1; padding: 0.75rem 1rem; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; color: var(--text); font-size: 1rem; }
+    .ai-send input::placeholder { color: var(--text-muted); }
+    .ai-send button { padding: 0.75rem 1.25rem; white-space: nowrap; }
+    .ai-offline { padding: 1rem; text-align: center; color: var(--text-muted); font-size: 0.9rem; }
+    .ai-offline a { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="container">
+      <a href="../index.html" class="logo">OMNIXIUS</a>
+      <nav class="nav">
+        <a href="marketplace.html">Marketplace</a>
+        <a href="mail.html">Mail</a>
+        <a href="orders.html">Orders</a>
+        <a href="dashboard.html">Profile</a>
+        <a href="ai.html" style="color:var(--accent);">AI</a>
+        <a href="../index.html">Site</a>
+        <a href="login.html" id="navLogin">Sign in</a>
+        <a href="#" id="navLogout" style="display:none;">Sign out</a>
+        <span class="lang-switcher"><a href="#" data-lang="en">EN</a> | <a href="#" data-lang="ru">RU</a> | <a href="#" data-lang="fr">FR</a></span>
+      </nav>
+    </div>
+  </header>
+  <main class="app-page">
+    <div class="container ai-page">
+      <div class="ai-header">
+        <h1>OMNIXIUS AI</h1>
+        <p>Root of our AI — start here. Our models will run here and grow stronger.</p>
+      </div>
+      <div class="ai-chat">
+        <div class="ai-messages" id="messages">
+          <div class="ai-msg assistant">
+            <span>Hello. I'm OMNIXIUS AI — the beginning of our own intelligence. Send a message to try. We'll plug in our models next.</span>
+            <div class="meta">omnixius-ai-v0</div>
+          </div>
+        </div>
+        <div id="aiOffline" class="ai-offline" style="display:none;">
+          AI service not reachable. Run <code>uvicorn main:app --port 8000</code> in the <code>ai/</code> folder, or set AI URL in console: <code>localStorage.setItem('omnixius_ai_url', 'https://your-ai.example.com')</code>. <a href="ai.html">Reload</a>.
+        </div>
+        <div class="ai-send" id="sendRow">
+          <input type="text" id="msgInput" placeholder="Message…" autocomplete="off" aria-label="Message">
+          <button type="button" class="btn btn-primary" id="sendBtn">Send</button>
+        </div>
+      </div>
+    </div>
+  </main>
+  <script src="config.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/utils.js"></script>
+  <script>
+    (function () {
+      var token = typeof api !== 'undefined' && api && api.getToken && api.getToken();
+      if (token) {
+        var login = document.getElementById('navLogin');
+        var logout = document.getElementById('navLogout');
+        if (login) login.style.display = 'none';
+        if (logout) { logout.style.display = 'inline'; logout.onclick = function () { api.auth.logout(); location.href = '../index.html'; }; }
+      }
+      if (window.i18n) i18n.apply();
+    })();
+
+    var messagesEl = document.getElementById('messages');
+    var inputEl = document.getElementById('msgInput');
+    var sendBtn = document.getElementById('sendBtn');
+    var offlineEl = document.getElementById('aiOffline');
+    var sendRow = document.getElementById('sendRow');
+
+    function appendMsg(text, who, model) {
+      var div = document.createElement('div');
+      div.className = 'ai-msg ' + who;
+      div.innerHTML = '<span>' + escapeHtml(text) + '</span>' + (model ? '<div class="meta">' + escapeHtml(model) + '</div>' : '');
+      messagesEl.appendChild(div);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    function setOffline(show) {
+      offlineEl.style.display = show ? 'block' : 'none';
+      sendRow.style.display = show ? 'none' : 'flex';
+    }
+
+    sendBtn.addEventListener('click', send);
+    inputEl.addEventListener('keydown', function (e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } });
+
+    function send() {
+      var msg = (inputEl.value || '').trim();
+      if (!msg) return;
+      var base = (typeof AI_URL !== 'undefined' && AI_URL) ? AI_URL : '';
+      if (!base) {
+        setOffline(true);
+        return;
+      }
+      setOffline(false);
+      inputEl.value = '';
+      appendMsg(msg, 'user');
+      sendBtn.disabled = true;
+      fetch(base.replace(/\/$/, '') + '/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: msg })
+      }).then(function (r) {
+        if (!r.ok) throw new Error(r.statusText);
+        return r.json();
+      }).then(function (data) {
+        appendMsg(data.reply || 'No reply.', 'assistant', data.model);
+      }).catch(function () {
+        appendMsg('Could not reach AI service. Start the ai server (port 8000) or set AI URL.', 'assistant');
+        setOffline(true);
+      }).finally(function () {
+        sendBtn.disabled = false;
+      });
+    }
+
+    if (typeof AI_URL !== 'undefined' && AI_URL) {
+      fetch(AI_URL.replace(/\/$/, '') + '/health').then(function (r) { return r.ok ? r.json() : Promise.reject(); }).catch(function () { setOffline(true); });
+    } else {
+      setOffline(true);
+    }
+  </script>
+</body>
+</html>

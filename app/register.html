@@ -8,56 +8,42 @@
   <link rel="stylesheet" href="css/app.css">
 </head>
 <body>
-  <header class="header">
+  <header class="header header-auth">
     <div class="container">
       <a href="../index.html" class="logo">OMNIXIUS</a>
       <nav class="nav">
-        <a href="marketplace.html">Marketplace</a>
-        <a href="mail.html">Mail</a>
-        <a href="orders.html">Orders</a>
-        <a href="dashboard.html">Profile</a>
-        <a href="../index.html">Site</a>
-        <a href="login.html">Sign in</a>
-        <a href="register.html">Register</a>
-        <span class="lang-switcher">
-          <a href="#" data-lang="en">EN</a> | <a href="#" data-lang="ru">RU</a> | <a href="#" data-lang="fr">FR</a>
-        </span>
+        <a href="login.html" data-i18n="signIn">Sign in</a>
       </nav>
     </div>
   </header>
-  <main class="app-page">
+  <main class="app-page app-page-auth">
     <div class="container">
       <div id="apiUrlHint" class="api-url-hint" style="display:none;"></div>
       <div class="auth-card">
         <h1 class="auth-title" data-i18n="registerTitle">Register</h1>
-        <p class="auth-subtitle" data-i18n="registerSubtitle">Create your OMNIXIUS account.</p>
-        <form class="app-form" id="form" novalidate>
+        <form class="app-form app-form-slim" id="form" novalidate>
           <p class="error" id="err" style="display:none;" role="alert"></p>
           <label data-i18n="email">Email</label>
           <input type="email" name="email" required autocomplete="email" placeholder="you@example.com" maxlength="255" id="emailInp" autofocus>
-          <p class="form-rules" id="emailRulesText" data-i18n="emailRules">Allowed: letters, numbers, @ and a dot. Example: name@domain.com. Max 255 characters.</p>
-          <p class="form-hint form-hint-ok" id="emailValidHint" style="display:none;"></p>
-          <label data-i18n="passwordMin">Password (min 8 characters)</label>
+          <p class="form-hint form-hint-inline" id="emailValidHint" style="display:none;"></p>
+          <label data-i18n="passwordMin">Password (min 8)</label>
           <div class="input-with-toggle">
             <input type="password" name="password" required minlength="8" maxlength="128" autocomplete="new-password" id="pwd">
             <button type="button" class="pwd-toggle" aria-label="Show password" id="pwdToggle1">👁</button>
           </div>
-          <p class="form-rules" id="passwordRulesText" data-i18n="passwordRules">Allowed: letters (A–Z, a–z), numbers (0–9), symbols (!@#$%^&* etc.). 8–128 characters.</p>
-          <p class="form-hint form-hint-ok" id="pwdLenHint" style="display:none; margin-top: -0.5rem;">✓ 8+ characters</p>
-          <label data-i18n="confirmPassword">Confirm password</label>
+          <p class="form-hint form-hint-inline" id="pwdLenHint" style="display:none;"></p>
+          <label data-i18n="confirmPassword">Confirm</label>
           <div class="input-with-toggle">
             <input type="password" name="password2" required minlength="8" maxlength="128" autocomplete="new-password" id="pwd2">
             <button type="button" class="pwd-toggle" aria-label="Show password" id="pwdToggle2">👁</button>
           </div>
-          <p class="form-hint" id="pwdMismatch" style="display:none;" data-i18n="passwordMismatch">Passwords do not match</p>
-          <p class="form-hint form-hint-ok" id="pwdMatchOk" style="display:none;"></p>
-          <label data-i18n="name">Name</label>
+          <p class="form-hint form-hint-inline" id="pwdMismatch" style="display:none;" data-i18n="passwordMismatch">Passwords do not match</p>
+          <p class="form-hint form-hint-ok form-hint-inline" id="pwdMatchOk" style="display:none;"></p>
+          <label data-i18n="name">Name <span class="label-optional" data-i18n="optional">(optional)</span></label>
           <input type="text" name="name" autocomplete="name" data-i18n-placeholder="namePlaceholder" placeholder="Your name" maxlength="200" id="nameInp">
-          <p class="form-rules" id="nameRulesText" data-i18n="nameRules">Optional. Letters, spaces, hyphens. Max 200 characters.</p>
-          <p class="form-hint form-hint-ok" id="nameLenHint" style="display:none;"></p>
           <label class="checkbox-label">
             <input type="checkbox" name="agree" id="agree" required>
-            <span><span data-i18n="agreeTermsPrefix">I agree to the</span> <a href="../contact.html" target="_blank" rel="noopener"><span data-i18n="termsAndPrivacy">Terms and Privacy</span></a></span>
+            <span><span data-i18n="agreeTermsPrefix">I agree to</span> <a href="../contact.html" target="_blank" rel="noopener"><span data-i18n="termsAndPrivacy">Terms and Privacy</span></a></span>
           </label>
           <button type="submit" class="btn btn-primary btn-block" id="submitBtn" data-i18n="createAccount">Create account</button>
         </form>
@@ -129,9 +115,8 @@
       var v = el.value.trim();
       if (v.length === 0) { hint.style.display = 'none'; return; }
       hint.style.display = 'block';
-      hint.textContent = (window.i18n ? i18n.t('emailValid') : 'Valid email') + (validEmail(v) ? ' ✓' : '');
+      hint.textContent = validEmail(v) ? '✓' : (window.i18n ? i18n.t('invalidEmail') : 'Invalid email');
       hint.classList.toggle('form-hint-ok', validEmail(v));
-      hint.classList.toggle('form-hint', v.length > 0 && !validEmail(v));
     }
     function updatePasswordHints() {
       var lenHint = document.getElementById('pwdLenHint');
@@ -141,26 +126,13 @@
         var len = pwd.value.length;
         lenHint.style.display = len > 0 ? 'block' : 'none';
         lenHint.classList.toggle('form-hint-ok', len >= 8 && len <= 128);
-        lenHint.classList.toggle('form-hint', len > 0 && (len < 8 || len > 128));
-        if (len > 128) lenHint.textContent = t('passwordTooLong');
-        else if (len >= 8) lenHint.textContent = '✓ ' + t('passwordLengthOk');
-        else lenHint.textContent = len + ' / 8';
+        lenHint.textContent = len >= 8 ? '✓' : (len > 128 ? t('passwordTooLong') : len + '/8');
       }
       if (matchOk) {
         var both = pwd.value && pwd2.value;
         matchOk.style.display = both && pwd.value === pwd2.value ? 'block' : 'none';
-        matchOk.textContent = '✓ ' + t('passwordsMatch');
+        matchOk.textContent = '✓';
       }
-    }
-    function updateNameHint() {
-      var el = document.getElementById('nameInp');
-      var hint = document.getElementById('nameLenHint');
-      if (!el || !hint) return;
-      var len = (el.value || '').length;
-      if (len === 0) { hint.style.display = 'none'; return; }
-      hint.style.display = 'block';
-      hint.textContent = (len + ' / 200') + (len <= 200 ? ' ✓' : '');
-      hint.classList.toggle('form-hint-ok', len <= 200);
     }
     document.getElementById('emailInp').addEventListener('input', updateEmailHint);
     document.getElementById('emailInp').addEventListener('blur', updateEmailHint);
@@ -172,7 +144,6 @@
       pwdMismatch.style.display = (pwd.value && pwd2.value && pwd.value !== pwd2.value) ? 'block' : 'none';
       updatePasswordHints();
     });
-    document.getElementById('nameInp').addEventListener('input', updateNameHint);
 
     function showError(msg) {
       var err = document.getElementById('err');

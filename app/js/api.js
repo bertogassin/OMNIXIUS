@@ -51,7 +51,7 @@
     },
     async request(path, options = {}) {
       const base = window.API_URL || API_URL || '';
-      const isLocal = (typeof location !== 'undefined') && (location.hostname === 'localhost' || location.hostname === '127.0.0.1');
+      const isLocal = (typeof location !== 'undefined') && (!location.hostname || location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.protocol === 'file:');
       if (!base && !isLocal) {
         var err = new Error('API URL not set');
         err.status = 0;

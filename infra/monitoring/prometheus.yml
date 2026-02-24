@@ -1,0 +1,15 @@
+# OMNIXIUS — Prometheus config (scrape API, AI, Rust when running)
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+  # Add when services expose /metrics:
+  # - job_name: 'api'
+  #   static_configs:
+  #     - targets: ['api:8080']
+  # - job_name: 'ai'
+  #   static_configs:
+  #     - targets: ['ai:8000']

@@ -1,0 +1,10 @@
+# OMNIXIUS — app config (YAML)
+env: dev
+services:
+  api:
+    port: 8080
+    host: "0.0.0.0"
+  rust:
+    port: 8081
+  ai:
+    port: 8000

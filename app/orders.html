@@ -16,6 +16,7 @@
         <a href="mail.html">Mail</a>
         <a href="orders.html">Orders</a>
         <a href="dashboard.html">Profile</a>
+        <a href="ai.html">AI</a>
         <a href="../index.html">Site</a>
         <a href="#" id="logout">Sign out</a>
         <span class="lang-switcher"><a href="#" data-lang="en">EN</a> | <a href="#" data-lang="ru">RU</a> | <a href="#" data-lang="fr">FR</a></span>
@@ -25,7 +26,6 @@
   <main class="app-page">
     <div class="container">
       <h1 data-i18n="ordersTitle">My orders</h1>
-      <p class="orders-hint" data-i18n="ordersHint">Purchases and sales in one place.</p>
       <section class="orders-section" id="asBuyerSection">
         <h2 data-i18n="ordersAsBuyer">As buyer</h2>
         <div id="asBuyerList"><p class="loading-state">Loading…</p></div>
@@ -39,6 +39,7 @@
   <script src="config.js"></script>
   <script src="js/i18n.js"></script>
   <script src="js/api.js"></script>
+  <script src="js/utils.js"></script>
   <script src="js/nav-unread.js"></script>
   <script>
     if (!api.getToken()) { location.href = 'login.html'; return; }
@@ -60,11 +61,6 @@
           </div>
         </article>
       `;
-    }
-    function escapeHtml(s) {
-      const div = document.createElement('div');
-      div.textContent = s;
-      return div.innerHTML;
     }
 
     (async () => {

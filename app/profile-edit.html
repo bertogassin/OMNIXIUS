@@ -16,6 +16,7 @@
         <a href="mail.html" data-i18n="navMail">Mail</a>
         <a href="orders.html" data-i18n="navOrders">Orders</a>
         <a href="dashboard.html" data-i18n="navProfile">Profile</a>
+        <a href="ai.html">AI</a>
         <a href="../index.html" data-i18n="navSite">Site</a>
         <a href="#" id="logout" data-i18n="signOut" aria-label="Sign out">Sign out</a>
       </nav>
@@ -24,7 +25,7 @@
   <main class="app-page">
     <div class="container">
       <h1 data-i18n="settingsTitle">Settings</h1>
-      <form class="app-form" id="form">
+      <form class="app-form" id="form" style="max-width:400px;">
         <p class="error" id="err" style="display:none;" role="alert"></p>
         <label data-i18n="name">Name</label>
         <input type="text" name="name" id="name">
@@ -32,8 +33,7 @@
         <input type="file" name="avatar" accept="image/jpeg,image/png,image/webp">
         <button type="submit" class="btn btn-primary" data-i18n="save">Save</button>
       </form>
-      <hr style="margin:2rem 0; border-color:var(--border);">
-      <h2 style="font-size:1.1rem; margin-bottom:1rem;" data-i18n="changePassword">Change password</h2>
+      <h2 class="section-title" style="margin-top:2rem;" data-i18n="changePassword">Change password</h2>
       <form class="app-form" id="pwdForm" style="max-width:400px;">
         <p class="error" id="pwdErr" style="display:none;" role="alert"></p>
         <label data-i18n="currentPassword">Current password</label>

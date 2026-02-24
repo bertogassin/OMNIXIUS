@@ -10,3 +10,10 @@ backend/db/*.db
 backend-go/uploads
 backend-go/db/*.db
 backend-go/omnixius-api.exe
+
+# Build / cache
+mobile/android/.gradle
+mobile/android/build
+mobile/android/app/build
+.web/
+node_modules

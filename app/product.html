@@ -16,6 +16,7 @@
         <a href="mail.html" data-i18n="navMail">Mail</a>
         <a href="orders.html" data-i18n="navOrders">Orders</a>
         <a href="dashboard.html" data-i18n="navProfile">Profile</a>
+        <a href="ai.html">AI</a>
         <a href="../index.html" data-i18n="navSite">Site</a>
         <a href="login.html" id="navLogin" data-i18n="signIn">Sign in</a>
         <a href="#" id="navLogout" style="display:none;" data-i18n="signOut" aria-label="Sign out">Sign out</a>
@@ -28,6 +29,7 @@
   <script src="config.js"></script>
   <script src="js/i18n.js"></script>
   <script src="js/api.js"></script>
+  <script src="js/utils.js"></script>
   <script src="js/nav-unread.js"></script>
   <script>
     var t = function (k) { return window.i18n ? i18n.t(k) : k; };
@@ -62,7 +64,6 @@
         </div>
       `;
     })();
-    function escapeHtml(s) { return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
     if (window.i18n) i18n.apply();
   </script>
 </body>

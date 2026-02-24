@@ -1,0 +1,7 @@
+# OMNIXIUS — Kubernetes namespace (placeholder)
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: omnixius
+  labels:
+    app.kubernetes.io/name: omnixius

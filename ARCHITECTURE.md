@@ -35,21 +35,68 @@ Global technology ecosystem: social network, professional platform, exchange, de
 
 ---
 
-## 2. Technology stack (only)
+## 2. Technology stack
 
-**Allowed languages and runtimes: SPARK, RUST, C++, SWIFT, GO. No other languages in the codebase.**
+### Приоритет 1 (ядро системы)
+| Стек | Назначение |
+|------|------------|
+| **Rust** | Видео, поиск, высоконагруженные движки. |
+| **Go** | API, чаты, микросервисы, авторизация. |
+| **Spark** (Scala/Java) | Аналитика, рекомендации, Big Data. |
 
-| Layer | Technologies |
-|-------|--------------|
-| Backend / API / Services | **Go**, **Rust**, **C++** |
-| Data / Analytics | **Apache Spark** (or SPARK as designated) |
-| Mobile (Apple) | **Swift** (iOS) |
-| Blockchain / low-level | **Rust**, **C++** |
+### Приоритет 2 (клиенты)
+| Стек | Назначение |
+|------|------------|
+| **Swift** | Нативное iOS-приложение. |
+| **Kotlin** | Нативное Android-приложение. |
+| **TypeScript/JavaScript** | Веб-версия (сайт). |
 
-- No JavaScript/TypeScript, Kotlin, Python, etc. in core services.
-- Frontend: all user-facing content is multilingual; **English is the fallback language**. UI and APIs support all languages; Russian is not prioritized over others.
+### Приоритет 3 (инфраструктура)
+| Стек | Назначение |
+|------|------------|
+| **Python / Bash / YAML** | Автоматизация, скрипты, DevOps. |
 
-**Quantum resistance:** All crypto must be quantum-resistant or on a clear migration path. Auth tokens: Dilithium3 (PQC). Passwords: Argon2id. TLS in production with PQC hybrid where available. Blockchain IXI: PQC signatures and KEM in consensus. See QUANTUM_READINESS.md.
+### По направлениям
+
+### Сервер (логика, данные, нагрузка)
+| Язык / стек | Назначение |
+|-------------|------------|
+| **Go** | API, микросервисы, чаты. |
+| **Rust** | Видео, поиск, тяжёлые вычисления. |
+| **Spark** (Scala/Java) | Аналитика, рекомендации. |
+
+### Веб-сайт (то, что в браузере)
+| Язык / стек | Назначение |
+|-------------|------------|
+| **TypeScript / JavaScript** | Основной язык. |
+| **React / Vue** | Фреймворки для интерфейса. |
+
+### Мобильные приложения (телефоны)
+| Язык / стек | Назначение |
+|-------------|------------|
+| **Swift** | iPhone. |
+| **Kotlin** | Android. |
+
+### Игры (если будут)
+| Язык / стек | Назначение |
+|-------------|------------|
+| **C++** | Мощные движки (Unreal). |
+| **C#** | Unity. |
+
+### ИИ и умные штуки
+| Язык / стек | Назначение |
+|-------------|------------|
+| **Python** | Нейросети, распознавание. |
+
+### Инфраструктура (чтобы работало)
+| Язык / стек | Назначение |
+|-------------|------------|
+| **Bash / Python** | Скрипты. |
+| **YAML** | Настройки серверов. |
+
+- Все пользовательские тексты и интерфейсы — мультиязычные; **английский — язык по умолчанию**. Русский не приоритетнее остальных.
+
+**Quantum resistance:** Вся криптография — квантово-устойчивая или с путём миграции. Токены: Dilithium3 (PQC). Пароли: Argon2id. В проде — TLS с PQC hybrid. Blockchain IXI: PQC-подписи и KEM в консенсусе. См. QUANTUM_READINESS.md.
 
 ---
 
@@ -66,8 +113,15 @@ See **ECOSYSTEM.md** for the full map and how to add new directions.
 
 ---
 
-## 4. Documents
+## 4. Браузер OMNIXIUS и ИИ OMNIXIUS
 
-- **ARCHITECTURE.md** — this file (vision and architecture).
-- **ECOSYSTEM.md** — map of 4 platforms + other directions; single place to plug in new projects.
-- **ROADMAP.md** — phases and priorities.
+- **Браузер OMNIXIUS** — то, что открывается в браузере: сайт `index.html`, приложение `app/` (логин, маркетплейс, почта, заказы, профиль), заготовка веб-клиента на React+TS в `web/`.
+- **ИИ OMNIXIUS** — корень своего ИИ: страница в браузере `app/ai.html` (чат), бэкенд `ai/` (Python, FastAPI, эндпоинт `/chat`). Дальше — обучение и подключение своих моделей.
+
+## 5. Documents
+
+- **ARCHITECTURE.md** — этот файл (видение и стек).
+- **OMNIXIUS_CHECKLIST.md** — проверка: всё ли из стека и инфраструктуры есть в репозитории.
+- **ECOSYSTEM.md** — карта 4 платформ и направлений.
+- **PLATFORM_INFRASTRUCTURE.md** — Platform & Infrastructure Division: Docker, Kubernetes, Terraform, CI/CD, Prometheus, Grafana, Kafka.
+- **ROADMAP.md** — фазы и приоритеты.

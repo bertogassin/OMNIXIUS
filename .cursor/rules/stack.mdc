@@ -1,0 +1,17 @@
+---
+description: OMNIXIUS tech stack by direction — use only these languages per area
+alwaysApply: true
+---
+
+# OMNIXIUS — Stack by direction
+
+When adding or changing code, use only the stack below for each direction.
+
+- **Server (logic, data, load):** Go (API, microservices, chats), Rust (video, search, heavy compute), Spark/Scala/Java (analytics, recommendations).
+- **Website (browser):** TypeScript/JavaScript, React or Vue for UI.
+- **Mobile:** Swift (iPhone), Kotlin (Android).
+- **Games (if any):** C++ (Unreal), C# (Unity).
+- **AI / smart features:** Python (neural nets, recognition).
+- **Infrastructure:** Bash/Python scripts, YAML for server config.
+
+Existing code: `backend-go/` = Go API; `app/`, `js/` = web (migrate to TS + React/Vue when refactoring). Do not introduce new server logic in Node; use Go or Rust. See ARCHITECTURE.md §2 for full table.

@@ -16,6 +16,7 @@
         <a href="mail.html" data-i18n="navMail">Mail</a>
         <a href="orders.html" data-i18n="navOrders">Orders</a>
         <a href="dashboard.html" data-i18n="navProfile">Profile</a>
+        <a href="ai.html">AI</a>
         <a href="../index.html" data-i18n="navSite">Site</a>
         <span class="lang-switcher"><a href="#" data-lang="en">EN</a> | <a href="#" data-lang="ru">RU</a> | <a href="#" data-lang="fr">FR</a></span>
         <a href="login.html" id="navLogin" data-i18n="signIn">Sign in</a>
@@ -26,14 +27,12 @@
   <main class="app-page">
     <div class="container">
       <h1 data-i18n="marketplaceTitle">Marketplace</h1>
-      <form id="filters" style="margin-bottom:1.5rem; display:flex; flex-wrap:wrap; gap:0.5rem; align-items:center;">
-        <input type="text" name="q" data-i18n-placeholder="searchPlaceholder" placeholder="Search" style="padding:0.5rem; width:180px;">
-        <input type="text" name="location" data-i18n-placeholder="cityPlaceholder" placeholder="City" style="padding:0.5rem; width:140px;">
-        <select name="category" style="padding:0.5rem;">
-          <option value="" data-i18n="allCategories">All categories</option>
-        </select>
-        <input type="number" name="minPrice" data-i18n-placeholder="priceFrom" placeholder="Price from" style="padding:0.5rem; width:100px;">
-        <input type="number" name="maxPrice" data-i18n-placeholder="priceTo" placeholder="to" style="padding:0.5rem; width:100px;">
+      <form id="filters" class="filters-row">
+        <input type="text" name="q" data-i18n-placeholder="searchPlaceholder" placeholder="Search">
+        <input type="text" name="location" data-i18n-placeholder="cityPlaceholder" placeholder="City">
+        <select name="category"><option value="" data-i18n="allCategories">All</option></select>
+        <input type="number" name="minPrice" data-i18n-placeholder="priceFrom" placeholder="From" min="0" step="0.01">
+        <input type="number" name="maxPrice" data-i18n-placeholder="priceTo" placeholder="To" min="0" step="0.01">
         <button type="submit" class="btn btn-primary" data-i18n="searchBtn">Search</button>
       </form>
       <p id="authHint" style="color:var(--text-muted); margin-bottom:1rem;"></p>
@@ -43,6 +42,7 @@
   <script src="config.js"></script>
   <script src="js/i18n.js"></script>
   <script src="js/api.js"></script>
+  <script src="js/utils.js"></script>
   <script src="js/nav-unread.js"></script>
   <script>
     const token = api.getToken();
@@ -74,7 +74,6 @@
         document.getElementById('retryBtn').onclick = function() { load(Object.fromEntries(new FormData(document.getElementById('filters')))); };
       }
     }
-    function escapeHtml(s) { return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
     document.getElementById('filters').onsubmit = (e) => { e.preventDefault(); load(Object.fromEntries(new FormData(e.target))); };
     load();
     if (window.i18n) i18n.apply();

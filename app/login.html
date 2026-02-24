@@ -8,36 +8,27 @@
   <link rel="stylesheet" href="css/app.css">
 </head>
 <body>
-  <header class="header">
+  <header class="header header-auth">
     <div class="container">
       <a href="../index.html" class="logo">OMNIXIUS</a>
       <nav class="nav">
-        <a href="marketplace.html">Marketplace</a>
-        <a href="mail.html">Mail</a>
-        <a href="orders.html">Orders</a>
-        <a href="dashboard.html">Profile</a>
-        <a href="../index.html">Site</a>
-        <a href="login.html">Sign in</a>
-        <a href="register.html">Register</a>
-        <span class="lang-switcher">
-          <a href="#" data-lang="en">EN</a> | <a href="#" data-lang="ru">RU</a> | <a href="#" data-lang="fr">FR</a>
-        </span>
+        <a href="register.html" data-i18n="noAccount">Register</a>
       </nav>
     </div>
   </header>
-  <main class="app-page">
+  <main class="app-page app-page-auth">
     <div class="container">
       <div id="apiUrlHint" class="api-url-hint" style="display:none;"></div>
       <div class="auth-card">
         <h1 class="auth-title" data-i18n="loginTitle">Sign in</h1>
-        <form class="app-form" id="form">
+        <form class="app-form app-form-slim" id="form">
           <p class="error" id="err" style="display:none;" role="alert"></p>
           <label data-i18n="email">Email</label>
           <input type="email" name="email" required autocomplete="email" placeholder="you@example.com" id="loginEmail" autofocus>
           <label data-i18n="password">Password</label>
           <div class="input-with-toggle">
             <input type="password" name="password" required autocomplete="current-password" id="pwd">
-            <button type="button" class="pwd-toggle" aria-label="Show password" title="Show password" id="pwdToggle">👁</button>
+            <button type="button" class="pwd-toggle" aria-label="Show password" id="pwdToggle">👁</button>
           </div>
           <label class="checkbox-label">
             <input type="checkbox" name="remember" id="remember" checked>
@@ -45,8 +36,7 @@
           </label>
           <button type="submit" class="btn btn-primary btn-block" id="submitBtn" data-i18n="signIn">Sign in</button>
         </form>
-        <p class="auth-link"><a href="forgot-password.html" data-i18n="forgotPassword">Forgot password?</a></p>
-        <p class="auth-link"><a href="register.html" data-i18n="noAccount">No account? Register</a></p>
+        <p class="auth-links"><a href="forgot-password.html" data-i18n="forgotPassword">Forgot password?</a> · <a href="register.html" data-i18n="noAccount">Register</a></p>
       </div>
     </div>
   </main>

@@ -2,6 +2,10 @@
 
 Сайт и приложение (маркетплейс, почта, заказы) — всё выкладывается **только через GitHub**.
 
+**Стек по направлениям:** сервер — Go, Rust, Spark; веб — TS/JS, React/Vue; мобилки — Swift, Kotlin; игры — C++/C#; ИИ — Python; инфра — Bash/Python, YAML. Подробно: **ARCHITECTURE.md** (§2).
+
+**Структура репо:** `backend-go/` — Go API; `app/` — текущее веб-приложение (HTML/JS); `web/` — React+TypeScript (Vite); `services/rust/` — Rust (видео, поиск); `analytics/spark/` — Spark (аналитика); `mobile/ios/` — Swift, `mobile/android/` — Kotlin; `ai/` — Python (ИИ); `infra/` — скрипты, docker-compose, YAML. `backend/` — legacy Node.
+
 **Production:** https://bertogassin.github.io/OMNIXIUS/  
 **Приложение (вход, маркетплейс, заказы):** https://bertogassin.github.io/OMNIXIUS/app/marketplace.html  
 
