@@ -19,7 +19,7 @@
           <span class="nav-group-label">Main</span>
           <a href="index.html#screens">All screens</a>
           <a href="index.html#about">About</a>
-          <a href="app/directions.html">Directions</a>
+          <a href="index.html#map">Map</a>
           <a href="app/login.html" id="navLogin" class="nav-cta">Sign in</a>
           <a href="#" id="navLogout" style="display:none;">Sign out</a>
         </div>
@@ -72,7 +72,7 @@
         <ul class="screens-list">
           <li><a href="index.html">Home</a> — this page</li>
           <li><a href="app/login.html">Sign in</a> — enter the app</li>
-          <li><a href="app/directions.html">Directions</a> — map of all places (platforms, Marketplace, Mail, AI…)</li>
+          <li><a href="#map">Map</a> — all places and platforms (below on this page)</li>
           <li><a href="app/marketplace.html">Marketplace</a> — goods and services</li>
           <li><a href="app/mail.html">Mail</a> — messages</li>
           <li><a href="app/orders.html">Orders</a> — my orders</li>
@@ -95,31 +95,72 @@
       </div>
     </section>
 
-    <section id="platforms" class="section services">
+    <section id="map" class="section">
       <div class="container">
-        <h2>Four platforms</h2>
-        <p class="about-text" style="margin-bottom:1rem;">Connect, Trade & Finance, Repositorium, Blockchain (IXI). Details and every direction → <a href="app/directions.html">Directions</a>.</p>
-        <div class="cards">
-          <article class="card">
-            <span class="card-icon">◆</span>
-            <h3>CONNECT</h3>
+        <h2>Map of all places</h2>
+        <p class="about-text" style="margin-bottom:1rem;">Four platforms and other directions. Everything on one page.</p>
+
+        <h3 class="section-title">Four platforms</h3>
+        <div class="directions-grid">
+          <a href="app/connect.html" class="direction-card">
+            <h3>OMNIXIUS CONNECT</h3>
             <p>Social, experts, marketplace, chat, video. People and services.</p>
-          </article>
-          <article class="card">
-            <span class="card-icon">◇</span>
-            <h3>TRADE & FINANCE</h3>
-            <p>Exchange, wallets, copy trading. Money and assets.</p>
-          </article>
-          <article class="card">
-            <span class="card-icon">○</span>
-            <h3>REPOSITORIUM</h3>
+            <span class="live">Live: Mail, Marketplace, Shop, Profile →</span>
+          </a>
+          <a href="app/trade.html" class="direction-card">
+            <h3>OMNIXIUS TRADE & FINANCE</h3>
+            <p>Exchange, wallets, copy trading, investments.</p>
+            <span class="live">Place ready →</span>
+          </a>
+          <a href="app/repositorium.html" class="direction-card">
+            <h3>OMNIXIUS REPOSITORIUM</h3>
             <p>Decentralized storage and compute. Data and infrastructure.</p>
-          </article>
-          <article class="card">
-            <span class="card-icon">▣</span>
-            <h3>BLOCKCHAIN (IXI)</h3>
-            <p>Consensus, ZKP, tokenomics. Trust and economy.</p>
-          </article>
+            <span class="live">Place ready →</span>
+          </a>
+          <a href="app/ixi.html" class="direction-card">
+            <h3>OMNIXIUS BLOCKCHAIN (IXI)</h3>
+            <p>Consensus, ZKP, tokenomics, buyback fund.</p>
+            <span class="live">Place ready →</span>
+          </a>
+        </div>
+
+        <h3 class="section-title" style="margin-top:2.5rem;">Other directions</h3>
+        <div class="directions-grid">
+          <a href="app/mail.html" class="direction-card">
+            <h3>Mail</h3>
+            <p>Conversations and messages.</p>
+            <span class="live">Live →</span>
+          </a>
+          <a href="app/marketplace.html" class="direction-card">
+            <h3>Marketplace & Shop</h3>
+            <p>Listings, orders, contact seller.</p>
+            <span class="live">Live →</span>
+          </a>
+          <a href="app/learning.html" class="direction-card">
+            <h3>Learning / Courses</h3>
+            <p>Experts, payments, storage for materials.</p>
+            <span class="live">Place ready →</span>
+          </a>
+          <a href="app/startups.html" class="direction-card">
+            <h3>Startups / IXI Launchpad</h3>
+            <p>Tokens, fundraising, community.</p>
+            <span class="live">Place ready →</span>
+          </a>
+          <a href="app/media.html" class="direction-card">
+            <h3>Media / Content</h3>
+            <p>Creators, subscriptions, delivery.</p>
+            <span class="live">Place ready →</span>
+          </a>
+          <a href="app/rewards.html" class="direction-card">
+            <h3>Rewards / Loyalty</h3>
+            <p>Activity, referrals, payouts and IXI.</p>
+            <span class="live">Place ready →</span>
+          </a>
+          <a href="app/ai.html" class="direction-card">
+            <h3>AI</h3>
+            <p>Chat, models, moderation.</p>
+            <span class="live">Live →</span>
+          </a>
         </div>
       </div>
     </section>
@@ -144,7 +185,7 @@
       <div class="footer-top">
         <span class="logo">OMNIXIUS</span>
         <nav class="footer-nav">
-          <a href="app/directions.html">Directions</a>
+          <a href="index.html#map">Map</a>
           <a href="ecosystem.html">Ecosystem</a>
           <a href="architecture.html">Architecture</a>
           <a href="contact.html">Contact</a>

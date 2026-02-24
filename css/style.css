@@ -316,6 +316,12 @@ body {
   margin-bottom: 1.5rem;
   color: var(--text);
 }
+.section-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+}
 
 .about-text {
   max-width: 600px;
@@ -397,6 +403,50 @@ body {
 .card p {
   color: var(--text-muted);
   font-size: 0.95rem;
+}
+
+/* Map of directions (on main page) */
+.directions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+.direction-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem;
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  transition: border-color 0.2s, transform 0.1s, opacity 0.1s;
+}
+.direction-card:hover {
+  border-color: var(--accent);
+}
+.direction-card h3 {
+  margin: 0 0 0.35rem 0;
+  font-size: 1.1rem;
+}
+.direction-card p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+.direction-card .live {
+  color: var(--accent);
+  font-weight: 600;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+}
+.direction-card:active {
+  transform: scale(0.98);
+  opacity: 0.95;
+}
+.direction-card:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 /* Quick access / hub */
