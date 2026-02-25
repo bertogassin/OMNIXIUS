@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Horizon Mail — Коммуникации, защищённые от времени</title>
+  <meta name="description" content="Почта с постквантовой защитой. E2EE, распределённые узлы, без рекламы.">
+  <link rel="stylesheet" href="css/horizon.css">
+  <style>
+    .horizon-hero {
+      min-height: 85vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      padding: 2rem;
+    }
+    .horizon-hero-bg {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(212, 175, 55, 0.06) 0%, transparent 55%);
+      pointer-events: none;
+    }
+    .horizon-hero-sphere {
+      position: absolute;
+      width: min(320px, 70vw);
+      height: min(320px, 70vw);
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, rgba(212, 175, 55, 0.08) 0%, transparent 50%),
+                  radial-gradient(circle at 70% 70%, rgba(160, 160, 160, 0.05) 0%, transparent 45%);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      box-shadow: inset 0 0 60px rgba(212, 175, 55, 0.03);
+      pointer-events: none;
+    }
+    .horizon-hero-content {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      max-width: 560px;
+    }
+    .horizon-hero-content .horizon-title {
+      font-size: clamp(2rem, 5vw, 3rem);
+      margin-bottom: 0.75rem;
+      line-height: 1.15;
+    }
+    .horizon-hero-content .horizon-tagline {
+      margin-bottom: 2rem;
+      font-size: 1.15rem;
+    }
+    .horizon-hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
+    }
+    .horizon-hero-actions .horizon-btn {
+      min-width: 160px;
+    }
+    .horizon-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      padding: 1rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+      background: rgba(30, 30, 47, 0.85);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+    }
+    .horizon-nav .horizon-logo {
+      font-family: var(--font-head);
+      font-weight: 800;
+      font-size: 1.2rem;
+      letter-spacing: 0.04em;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .horizon-nav .horizon-logo:hover { color: var(--accent); }
+    .horizon-nav-links { display: flex; gap: 1.5rem; }
+    .horizon-nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.95rem;
+      transition: color 0.2s;
+    }
+    .horizon-nav-links a:hover { color: var(--accent); }
+    .horizon-foot {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+    .horizon-foot a { color: var(--accent-platinum); }
+    .horizon-foot a:hover { color: var(--accent); }
+  </style>
+</head>
+<body class="horizon">
+  <nav class="horizon-nav">
+    <a href="index.html" class="horizon-logo">HORIZON</a>
+    <div class="horizon-nav-links">
+      <a href="app/mail.html">Почта</a>
+      <a href="app/login.html">Вход</a>
+      <a href="HORIZON-DESIGN.md">Дизайн-концепция</a>
+    </div>
+  </nav>
+
+  <main class="horizon-hero">
+    <div class="horizon-hero-bg"></div>
+    <div class="horizon-hero-sphere" aria-hidden="true"></div>
+    <div class="horizon-hero-content">
+      <h1 class="horizon-title">Коммуникации, защищённые от времени</h1>
+      <p class="horizon-tagline">Постквантовая криптография, E2EE по умолчанию, распределённые узлы. Без рекламы.</p>
+      <div class="horizon-hero-actions">
+        <a href="app/register.html" class="horizon-btn horizon-btn-primary">Создать аккаунт</a>
+        <a href="app/login.html" class="horizon-btn">Войти</a>
+      </div>
+    </div>
+  </main>
+
+  <footer class="horizon-foot">
+    <p>Часть экосистемы <a href="index.html">OMNIXIUS</a>. Концепция: <a href="HORIZON-DESIGN.md">Физика доверия</a>.</p>
+  </footer>
+</body>
+</html>

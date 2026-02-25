@@ -1,95 +1,57 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <base href="/OMNIXIUS/">
-  <title>Page not found — OMNIXIUS</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
+  <title>404 — Horizon Mail</title>
+  <link rel="stylesheet" href="css/horizon.css">
+  <style>
+    .horizon-404 {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      text-align: center;
+    }
+    .horizon-404-foil {
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 2rem;
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.4) 0%, rgba(212, 175, 55, 0.1) 50%, transparent 70%);
+      clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+      transform: rotate(15deg);
+      box-shadow: 0 0 40px rgba(212, 175, 55, 0.15);
+    }
+    .horizon-404-title {
+      font-family: var(--font-head);
+      font-weight: 700;
+      font-size: 1.5rem;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+    .horizon-404-text {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      max-width: 320px;
+      line-height: 1.6;
+      margin-bottom: 2rem;
+    }
+    .horizon-404 .horizon-btn {
+      margin: 0 0.5rem;
+    }
+  </style>
 </head>
-<body>
-  <header class="header">
-    <div class="container">
-      <a href="index.html" class="logo">OMNIXIUS</a>
-      <nav class="nav nav-main nav-unified">
-        <div class="nav-group nav-group-main">
-          <span class="nav-group-label">Main</span>
-          <a href="index.html#screens">All screens</a>
-          <a href="index.html#about">About</a>
-          <a href="index.html#map">Map</a>
-          <a href="app/login.html" id="navLogin" class="nav-cta">Sign in</a>
-          <a href="#" id="navLogout" style="display:none;">Sign out</a>
-        </div>
-        <div class="nav-group nav-group-app">
-          <span class="nav-group-label">App</span>
-          <button type="button" class="nav-drop-trigger" aria-expanded="false" aria-haspopup="true">App ▾</button>
-          <div class="nav-drop-panel">
-            <a href="app/marketplace.html">Marketplace</a>
-            <a href="app/mail.html">Mail</a>
-            <a href="app/orders.html">Orders</a>
-            <a href="app/dashboard.html">Profile</a>
-            <a href="app/ai.html">AI</a>
-          </div>
-          <div class="nav-group-app-links">
-            <a href="app/marketplace.html">Marketplace</a>
-            <a href="app/mail.html">Mail</a>
-            <a href="app/orders.html">Orders</a>
-            <a href="app/dashboard.html">Profile</a>
-            <a href="app/ai.html">AI</a>
-          </div>
-        </div>
-        <div class="nav-group nav-group-info">
-          <span class="nav-group-label">Info</span>
-          <a href="ecosystem.html">Ecosystem</a>
-          <a href="architecture.html">Architecture</a>
-          <a href="contact.html">Contact</a>
-        </div>
-      </nav>
-      <div class="lang-switcher">
-        <span class="lang-switcher-label" data-i18n="langLabel">Language</span>
-        <a href="#" data-lang="en">EN</a>
-        <a href="#" data-lang="ru">RU</a>
-        <a href="#" data-lang="fr">FR</a>
-        <a href="#" data-lang="de">DE</a>
-        <a href="#" data-lang="es">ES</a>
-        <a href="#" data-lang="it">IT</a>
-        <a href="#" data-lang="ar">AR</a>
-        <a href="#" data-lang="zh">ZH</a>
-        <a href="#" data-lang="ja">JA</a>
-      </div>
-      <button class="menu-toggle" aria-label="Menu"><span></span></button>
+<body class="horizon">
+  <main class="horizon-404">
+    <div class="horizon-404-foil" aria-hidden="true"></div>
+    <h1 class="horizon-404-title">404</h1>
+    <p class="horizon-404-text">Письмо находится в суперпозиции. Попробуйте найти его в другом измерении.</p>
+    <div>
+      <a href="index.html" class="horizon-btn horizon-btn-primary">На главную</a>
+      <a href="app/mail.html" class="horizon-btn">В почту</a>
     </div>
-  </header>
-
-  <main>
-    <section class="section error-section">
-      <div class="container">
-        <p class="error-code">404</p>
-        <h1>Page not found</h1>
-        <p class="about-text">This page does not exist. You may have followed an old link.</p>
-        <p class="about-text" style="margin-top:1rem;"><a href="index.html" class="btn btn-primary">Home</a> &nbsp; <a href="https://bertogassin.github.io/OMNIXIUS/">Open main site</a></p>
-      </div>
-    </section>
   </main>
-
-  <footer class="footer">
-    <div class="container">
-      <div class="footer-lang">
-        <span class="lang-switcher-label" data-i18n="langLabel">Language</span>
-        <div class="lang-switcher lang-switcher-footer">
-          <a href="#" data-lang="en">EN</a>
-          <a href="#" data-lang="ru">RU</a>
-          <a href="#" data-lang="fr">FR</a>
-        </div>
-      </div>
-      <p class="footer-copy">© 2026 OMNIXIUS. All rights reserved.</p>
-    </div>
-  </footer>
-
-  <script src="app/js/i18n.js"></script>
-  <script src="js/main.js"></script>
 </body>
 </html>
