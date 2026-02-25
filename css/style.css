@@ -343,8 +343,11 @@ body {
 
 /* Sections */
 .section {
-  padding: 5rem 0;
+  padding: 4rem 0 5rem;
   border-top: 1px solid var(--border);
+}
+.section-quick {
+  padding-top: 4rem;
 }
 
 .section h2 {
@@ -457,10 +460,11 @@ body {
   display: block;
   color: inherit;
   text-decoration: none;
-  transition: border-color 0.2s, transform 0.1s, opacity 0.1s;
+  transition: border-color 0.2s, transform 0.1s, opacity 0.1s, box-shadow 0.2s;
 }
 .direction-card:hover {
   border-color: var(--accent);
+  box-shadow: 0 4px 20px rgba(0, 212, 170, 0.08);
 }
 .direction-card h3 {
   margin: 0 0 0.35rem 0;

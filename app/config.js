@@ -27,3 +27,13 @@ window.normalizeApiUrl = function (s) {
   }
   window.AI_URL = localStorage.getItem('omnixius_ai_url') || '';
 })();
+
+// Connected apps/libraries per AI module (shown in each panel). Uncomment and edit to display integrations.
+// window.AI_INTEGRATIONS = {
+//   code: ['GitHub', 'VS Code'],
+//   data: ['Excel', 'Google Sheets'],
+//   tasks: ['Notion', 'Trello'],
+//   content: ['Google Docs', 'Grammarly'],
+//   media: ['Figma', 'Canva'],
+//   knowledge: ['Notion', 'Anki']
+// };

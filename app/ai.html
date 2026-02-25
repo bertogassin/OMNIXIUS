@@ -7,26 +7,72 @@
   <link rel="stylesheet" href="../css/style.css">
   <link rel="stylesheet" href="css/app.css">
   <style>
-    .ai-page { max-width: 720px; margin: 0 auto; padding: 0 1rem; }
-    .ai-header { text-align: center; margin-bottom: 1.5rem; }
+    .ai-page { max-width: 1400px; margin: 0 auto; padding: 0 1rem; }
+    .ai-header { text-align: center; margin-bottom: 1rem; }
     .ai-header h1 { font-size: 1.75rem; }
     .ai-header p { color: var(--text-muted); font-size: 0.95rem; margin-top: 0.25rem; }
-    .ai-chat { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; min-height: 320px; display: flex; flex-direction: column; }
-    .ai-messages { flex: 1; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: 0.75rem; }
-    .ai-msg { max-width: 85%; padding: 0.75rem 1rem; border-radius: 12px; font-size: 0.95rem; line-height: 1.5; }
-    .ai-msg.user { align-self: flex-end; background: var(--accent); color: var(--bg); }
-    .ai-msg.assistant { align-self: flex-start; background: var(--border); color: var(--text); }
-    .ai-msg .meta { font-size: 0.75rem; opacity: 0.8; margin-top: 0.25rem; }
-    .ai-send { display: flex; gap: 0.5rem; padding: 1rem; border-top: 1px solid var(--border); }
-    .ai-send input { flex: 1; padding: 0.75rem 1rem; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; color: var(--text); font-size: 1rem; }
-    .ai-send input:focus { border-color: var(--accent); outline: none; }
-    .ai-send input::placeholder { color: var(--text-muted); }
-    .ai-send button { padding: 0.75rem 1.25rem; white-space: nowrap; cursor: pointer; transition: transform 0.1s, opacity 0.1s; }
-    .ai-send button:hover { opacity: 0.95; }
-    .ai-send button:active { transform: scale(0.97); }
-    .ai-send button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-    .ai-offline { padding: 1rem; text-align: center; color: var(--text-muted); font-size: 0.9rem; }
-    .ai-offline a { color: var(--accent); }
+    .ai-modules { margin-bottom: 1rem; }
+    .ai-modules-title { font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-muted); }
+    .ai-modules-grid { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+    .ai-module-card { display: block; padding: 0.5rem 0.75rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; color: var(--text); text-decoration: none; font-size: 0.8rem; transition: border-color 0.15s, background 0.15s; cursor: pointer; }
+    .ai-module-card:hover { border-color: var(--accent); background: var(--bg); }
+    .ai-module-card.active { border-color: var(--accent); background: rgba(0, 212, 170, 0.12); }
+    .ai-module-card strong { display: block; margin-bottom: 0.1rem; }
+    .ai-module-card span { font-size: 0.7rem; color: var(--text-muted); }
+
+    .ai-panels { display: block; }
+    .ai-panel { display: none; min-height: 480px; }
+    .ai-panel.active { display: block; }
+    .ai-panel.has-chat.active { display: grid; grid-template-columns: 1fr minmax(300px, 360px); grid-template-rows: 1fr; gap: 1rem; align-items: stretch; }
+    @media (max-width: 900px) { .ai-panel.has-chat.active { grid-template-columns: 1fr; grid-template-rows: 1fr auto; } }
+
+    .panel-workspace { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; display: flex; flex-direction: column; min-height: 400px; }
+    .panel-workspace .toolbar { display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--border); }
+    .panel-workspace .toolbar .btn { padding: 0.4rem 0.75rem; font-size: 0.85rem; }
+    .panel-workspace .body { flex: 1; padding: 0.75rem; overflow: auto; }
+    .panel-workspace textarea { width: 100%; min-height: 200px; padding: 0.75rem; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: inherit; font-size: 0.9rem; resize: vertical; box-sizing: border-box; }
+    .panel-workspace textarea:focus { border-color: var(--accent); outline: none; }
+    .panel-workspace textarea.code { font-family: 'Consolas', 'Monaco', monospace; font-size: 0.85rem; }
+    .panel-workspace .drop-zone { border: 2px dashed var(--border); border-radius: 12px; padding: 2rem; text-align: center; color: var(--text-muted); min-height: 180px; display: flex; align-items: center; justify-content: center; }
+    .panel-workspace .drop-zone.dragover { border-color: var(--accent); background: rgba(0, 212, 170, 0.05); }
+    .panel-workspace .preview-area { margin-top: 0.75rem; min-height: 80px; font-size: 0.85rem; color: var(--text-muted); }
+    .panel-workspace .list-add { display: flex; gap: 0.5rem; margin-bottom: 0.5rem; }
+    .panel-workspace .list-add input { flex: 1; padding: 0.5rem; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); }
+    .panel-workspace .list-items { list-style: none; padding: 0; margin: 0; }
+    .panel-workspace .list-items li { display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem 0; border-bottom: 1px solid var(--border); }
+    .panel-workspace .list-items li input[type="checkbox"] { cursor: pointer; }
+    .panel-workspace .list-items li .text { flex: 1; }
+    .panel-workspace .list-items li .del { color: var(--text-muted); cursor: pointer; font-size: 1.1rem; }
+    .panel-workspace .list-items li .del:hover { color: #e74c3c; }
+    .panel-workspace table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    .panel-workspace table th, .panel-workspace table td { padding: 0.4rem 0.5rem; border: 1px solid var(--border); text-align: left; }
+    .panel-workspace table th { background: var(--bg); color: var(--text-muted); }
+    .panel-workspace .data-table-wrap { overflow: auto; max-height: 280px; margin-top: 0.5rem; }
+    .panel-workspace .ai-single-result { margin-top: 0.75rem; padding: 0.75rem; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem; white-space: pre-wrap; }
+    .panel-workspace .ai-single-result.loading { color: var(--text-muted); }
+    .panel-workspace .task-status { font-size: 0.75rem; padding: 0.2rem 0.4rem; border-radius: 4px; background: var(--bg); color: var(--text-muted); }
+    .panel-workspace .task-status.done { color: var(--accent); }
+    .panel-workspace .task-status.progress { color: #f39c12; }
+    .panel-workspace .pomo-timer { font-size: 2rem; font-variant-numeric: tabular-nums; margin: 0.5rem 0; }
+    .panel-workspace .pomo-timer.work { color: var(--accent); }
+
+    .panel-integrations { margin-top: 0.75rem; padding: 0.5rem 0.75rem; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; font-size: 0.8rem; }
+    .panel-integrations-label { color: var(--text-muted); margin-right: 0.4rem; }
+    .panel-integrations-list { color: var(--text); }
+    .panel-integrations-list .tag { display: inline-block; margin: 0.15rem 0.2rem 0.15rem 0; padding: 0.2rem 0.45rem; background: rgba(0, 212, 170, 0.15); border-radius: 6px; color: var(--accent); font-size: 0.75rem; }
+
+    .panel-chat { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; display: flex; flex-direction: column; min-height: 400px; }
+    .panel-chat .ai-messages { flex: 1; overflow-y: auto; padding: 0.75rem; display: flex; flex-direction: column; gap: 0.5rem; min-height: 0; }
+    .panel-chat .ai-msg { max-width: 90%; padding: 0.6rem 0.75rem; border-radius: 10px; font-size: 0.9rem; line-height: 1.45; }
+    .panel-chat .ai-msg.user { align-self: flex-end; background: var(--accent); color: var(--bg); }
+    .panel-chat .ai-msg.assistant { align-self: flex-start; background: var(--border); color: var(--text); }
+    .panel-chat .ai-msg .meta { font-size: 0.7rem; opacity: 0.8; margin-top: 0.2rem; }
+    .panel-chat .ai-send { display: flex; gap: 0.4rem; padding: 0.6rem 0.75rem; border-top: 1px solid var(--border); }
+    .panel-chat .ai-send input { flex: 1; padding: 0.6rem 0.75rem; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 0.95rem; }
+    .panel-chat .ai-send input:focus { border-color: var(--accent); outline: none; }
+    .panel-chat .ai-send button { padding: 0.6rem 1rem; white-space: nowrap; cursor: pointer; font-size: 0.9rem; }
+    .panel-chat .ai-offline { padding: 0.75rem; text-align: center; color: var(--text-muted); font-size: 0.8rem; }
+    .panel-chat .ai-offline a { color: var(--accent); }
   </style>
 </head>
 <body>
@@ -35,36 +81,36 @@
       <a href="../index.html" class="logo">OMNIXIUS</a>
       <nav class="nav nav-main nav-unified">
         <div class="nav-group nav-group-main">
-          <span class="nav-group-label">Main</span>
-          <a href="../index.html#screens">All screens</a>
-          <a href="../index.html#about">About</a>
-          <a href="../index.html#map">Map</a>
-          <a href="login.html" id="navLogin" class="nav-cta">Sign in</a>
-          <a href="#" id="navLogout" style="display:none;">Sign out</a>
+          <span class="nav-group-label" data-i18n="navMain">Main</span>
+          <a href="../index.html#screens" data-i18n="navAllScreens">All screens</a>
+          <a href="../index.html#about" data-i18n="navAbout">About</a>
+          <a href="../index.html#map" data-i18n="navMap">Map</a>
+          <a href="login.html" id="navLogin" class="nav-cta" data-i18n="signIn">Sign in</a>
+          <a href="#" id="navLogout" style="display:none;" data-i18n="signOut">Sign out</a>
         </div>
         <div class="nav-group nav-group-app">
-          <span class="nav-group-label">App</span>
-          <button type="button" class="nav-drop-trigger" aria-expanded="false" aria-haspopup="true">App ▾</button>
+          <span class="nav-group-label" data-i18n="navApp">App</span>
+          <button type="button" class="nav-drop-trigger" aria-expanded="false" aria-haspopup="true"><span data-i18n="navApp">App</span> ▾</button>
           <div class="nav-drop-panel">
-            <a href="marketplace.html">Marketplace</a>
-            <a href="mail.html">Mail</a>
-            <a href="orders.html">Orders</a>
-            <a href="dashboard.html">Profile</a>
+            <a href="marketplace.html" data-i18n="navMarketplace">Marketplace</a>
+            <a href="mail.html" data-i18n="navMail">Mail</a>
+            <a href="orders.html" data-i18n="navOrders">Orders</a>
+            <a href="dashboard.html" data-i18n="navProfile">Profile</a>
             <a href="ai.html" style="color:var(--accent);">AI</a>
           </div>
           <div class="nav-group-app-links">
-            <a href="marketplace.html">Marketplace</a>
-            <a href="mail.html">Mail</a>
-            <a href="orders.html">Orders</a>
-            <a href="dashboard.html">Profile</a>
+            <a href="marketplace.html" data-i18n="navMarketplace">Marketplace</a>
+            <a href="mail.html" data-i18n="navMail">Mail</a>
+            <a href="orders.html" data-i18n="navOrders">Orders</a>
+            <a href="dashboard.html" data-i18n="navProfile">Profile</a>
             <a href="ai.html" style="color:var(--accent);">AI</a>
           </div>
         </div>
         <div class="nav-group nav-group-info">
-          <span class="nav-group-label">Info</span>
-          <a href="../ecosystem.html">Ecosystem</a>
-          <a href="../architecture.html">Architecture</a>
-          <a href="../contact.html">Contact</a>
+          <span class="nav-group-label" data-i18n="navInfo">Info</span>
+          <a href="../ecosystem.html" data-i18n="navEcosystem">Ecosystem</a>
+          <a href="../architecture.html" data-i18n="navArchitecture">Architecture</a>
+          <a href="../contact.html" data-i18n="navContact">Contact</a>
         </div>
       </nav>
       <div class="lang-switcher">
@@ -77,24 +123,145 @@
   </header>
   <main class="app-page">
     <div class="container ai-page">
-      <p class="status-done">СДЕЛАНО: работает (Live). Дальше: свои модели, модерация.</p>
       <div class="ai-header">
         <h1>OMNIXIUS AI</h1>
-        <p>Root of our AI — start here. Our models will run here and grow stronger.</p>
+        <p data-i18n="aiHeaderSub">Root of our AI — choose a module and work with chat.</p>
       </div>
-      <div class="ai-chat">
-        <div class="ai-messages" id="messages">
-          <div class="ai-msg assistant">
-            <span>Hello. I'm OMNIXIUS AI — the beginning of our own intelligence. Send a message to try. We'll plug in our models next.</span>
-            <div class="meta">omnixius-ai-v0</div>
+      <section class="ai-modules" id="modules">
+        <h2 class="ai-modules-title" data-i18n="aiModulesTitle">Universal AI</h2>
+        <div class="ai-modules-grid">
+          <a href="#code" class="ai-module-card" id="mod-code" data-module="code"><strong data-i18n="aiModule1">Code & Automation</strong><span data-i18n="aiModule1Desc">Code, scripts, automation.</span></a>
+          <a href="#data" class="ai-module-card" id="mod-data" data-module="data"><strong data-i18n="aiModule2">Data & Finance</strong><span data-i18n="aiModule2Desc">Data, analytics, finance.</span></a>
+          <a href="#tasks" class="ai-module-card" id="mod-tasks" data-module="tasks"><strong data-i18n="aiModule3">Tasks & Productivity</strong><span data-i18n="aiModule3Desc">Tasks, projects, habits, timer.</span></a>
+          <a href="#content" class="ai-module-card" id="mod-content" data-module="content"><strong data-i18n="aiModule4">Content, Writing & Messages</strong><span data-i18n="aiModule4Desc">Texts, copy, drafts, writing.</span></a>
+          <a href="#media" class="ai-module-card" id="mod-media" data-module="media"><strong data-i18n="aiModule5">Media & Design</strong><span data-i18n="aiModule5Desc">Images, video, design.</span></a>
+          <a href="#knowledge" class="ai-module-card" id="mod-knowledge" data-module="knowledge"><strong data-i18n="aiModule6">Knowledge & Education</strong><span data-i18n="aiModule6Desc">Learning, knowledge base.</span></a>
+        </div>
+      </section>
+
+      <div class="ai-panels">
+        <!-- 1. Code & Automation — среда: редактор кода + чат -->
+        <div class="ai-panel has-chat active" id="panel-code" data-module="code">
+          <div class="panel-workspace">
+            <div class="toolbar">
+              <button type="button" class="btn btn-primary ai-btn-run" data-i18n="aiRun">Run</button>
+              <button type="button" class="btn ai-btn-save" data-i18n="aiSave">Save</button>
+              <button type="button" class="btn ai-btn-clear" data-i18n="aiClear">Clear</button>
+            </div>
+            <div class="body">
+              <textarea class="code" id="workspace-code" data-i18n-placeholder="aiCodePlaceholder" placeholder="Write or paste code here." spellcheck="false"></textarea>
+              <div class="panel-integrations"><span class="panel-integrations-label" data-i18n="aiConnected">Connected:</span><span class="panel-integrations-list" id="integrations-code" data-i18n="aiNone">—</span></div>
+            </div>
+          </div>
+          <div class="panel-chat" data-chat="code">
+            <div class="ai-messages" id="messages-code"></div>
+            <div class="ai-offline" data-offline="code" style="display:none;" data-i18n="aiOfflineLong">AI not reachable.</div>
+            <div class="ai-send" data-send="code">
+              <input type="text" data-input="code" data-i18n-placeholder="aiMessagePlaceholder" placeholder="Message…" autocomplete="off">
+              <button type="button" class="btn btn-primary" data-sendbtn="code" data-i18n="aiSend">Send</button>
+            </div>
           </div>
         </div>
-        <div id="aiOffline" class="ai-offline" style="display:none;">
-          AI service not reachable. Run <code>uvicorn main:app --port 8000</code> in the <code>ai/</code> folder, or set AI URL in console: <code>localStorage.setItem('omnixius_ai_url', 'https://your-ai.example.com')</code>. <a href="ai.html">Reload</a>.
+
+        <!-- 2. Data & Finance — среда: таблица, импорт/экспорт, одна кнопка «Анализ ИИ» (без чата) -->
+        <div class="ai-panel" id="panel-data" data-module="data">
+          <div class="panel-workspace">
+            <div class="toolbar">
+              <label class="btn" style="cursor:pointer;" data-i18n="aiImportCsv">Import CSV<input type="file" accept=".csv,.txt" id="data-import-csv" style="position:absolute;opacity:0;width:0;height:0;"></label>
+              <button type="button" class="btn ai-btn-parse-data" data-i18n="aiParseToTable">Parse to table</button>
+              <button type="button" class="btn btn-primary ai-btn-export" data-i18n="aiExportCsv">Export CSV</button>
+              <button type="button" class="btn ai-btn-clear" data-i18n="aiClear">Clear</button>
+              <button type="button" class="btn btn-primary ai-btn-analyze" data-i18n="aiAnalyzeWithAi">Analyze with AI</button>
+            </div>
+            <div class="body">
+              <textarea id="workspace-data" data-i18n-placeholder="aiDataPlaceholder" placeholder="Paste CSV or data here." spellcheck="false"></textarea>
+              <div class="data-table-wrap" id="data-table-wrap" style="display:none;"><table id="data-table"></table></div>
+              <div class="ai-single-result" id="data-ai-result" style="display:none;"></div>
+              <div class="panel-integrations"><span class="panel-integrations-label" data-i18n="aiConnected">Connected:</span><span class="panel-integrations-list" id="integrations-data" data-i18n="aiNone">—</span></div>
+            </div>
+          </div>
         </div>
-        <div class="ai-send" id="sendRow">
-          <input type="text" id="msgInput" placeholder="Message…" autocomplete="off" aria-label="Message">
-          <button type="button" class="btn btn-primary" id="sendBtn">Send</button>
+
+        <!-- 3. Tasks & Productivity — среда: задачи со статусом, заметки, таймер, Summarize (без чата) -->
+        <div class="ai-panel" id="panel-tasks" data-module="tasks">
+          <div class="panel-workspace">
+            <div class="toolbar">
+              <button type="button" class="btn btn-primary ai-btn-add-task" data-i18n="aiAddTask">+ Task</button>
+              <button type="button" class="btn ai-btn-summarize-notes" data-i18n="aiSummarizeNotes">Summarize notes with AI</button>
+              <button type="button" class="btn" id="pomo-start" data-i18n="aiTimer25">Timer 25 min</button>
+              <span class="pomo-timer" id="pomo-timer" style="display:none;">25:00</span>
+            </div>
+            <div class="body">
+              <div class="list-add" style="display:none;"><input type="text" id="tasks-task-input" data-i18n-placeholder="aiNewTaskPlaceholder" placeholder="New task…"><select id="tasks-task-status"><option value="todo" data-i18n="aiTodo">To do</option><option value="progress" data-i18n="aiInProgress">In progress</option><option value="done" data-i18n="aiDone">Done</option></select><button type="button" class="btn btn-primary" id="tasks-task-add" data-i18n="aiAdd">Add</button></div>
+              <ul class="list-items" id="tasks-tasks"></ul>
+              <textarea id="workspace-tasks" data-i18n-placeholder="aiMeetingNotesPlaceholder" placeholder="Meeting notes, daily goals…" style="margin-top:0.75rem; min-height:120px;"></textarea>
+              <div class="ai-single-result" id="tasks-ai-result" style="display:none;"></div>
+              <div class="panel-integrations"><span class="panel-integrations-label" data-i18n="aiConnected">Connected:</span><span class="panel-integrations-list" id="integrations-tasks" data-i18n="aiNone">—</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Content, Writing & Messages — среда: редактор + Improve with AI + чат -->
+        <div class="ai-panel has-chat" id="panel-content" data-module="content">
+          <div class="panel-workspace">
+            <div class="toolbar">
+              <button type="button" class="btn btn-primary ai-btn-save" data-i18n="aiSave">Save</button>
+              <button type="button" class="btn ai-btn-clear" data-i18n="aiClear">Clear</button>
+              <button type="button" class="btn btn-primary" id="content-improve-ai" data-i18n="aiImproveWithAi">Improve with AI</button>
+            </div>
+            <div class="body">
+              <span class="word-count" id="content-word-count" style="font-size:0.8rem;color:var(--text-muted);"></span>
+              <textarea id="workspace-content" data-i18n-placeholder="aiContentPlaceholder" placeholder="Write text or draft." style="min-height:240px;"></textarea>
+              <div class="panel-integrations"><span class="panel-integrations-label" data-i18n="aiConnected">Connected:</span><span class="panel-integrations-list" id="integrations-content" data-i18n="aiNone">—</span></div>
+            </div>
+          </div>
+          <div class="panel-chat" data-chat="content">
+            <div class="ai-messages" id="messages-content"></div>
+            <div class="ai-offline" data-offline="content" style="display:none;" data-i18n="aiOfflineShort">AI not reachable.</div>
+            <div class="ai-send" data-send="content">
+              <input type="text" data-input="content" data-i18n-placeholder="aiMessagePlaceholder" placeholder="Message…" autocomplete="off">
+              <button type="button" class="btn btn-primary" data-sendbtn="content" data-i18n="aiSend">Send</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. Media & Design — среда: загрузка, превью, описание от ИИ (без чата) -->
+        <div class="ai-panel" id="panel-media" data-module="media">
+          <div class="panel-workspace">
+            <div class="toolbar"><button type="button" class="btn ai-btn-clear" data-i18n="aiClear">Clear</button></div>
+            <div class="body">
+              <div class="drop-zone" id="drop-zone-media" data-i18n="aiDropImage">Drop image here or paste URL</div>
+              <div class="preview-area" id="preview-media"></div>
+              <div style="margin-top:0.75rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
+                <input type="text" id="media-ai-prompt" data-i18n-placeholder="aiAskAiImage" placeholder="Ask AI about this image…" style="flex:1;min-width:180px;padding:0.5rem;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);">
+                <button type="button" class="btn btn-primary" id="media-ai-describe" data-i18n="aiDescribeAnalyze">Describe / Analyze</button>
+              </div>
+              <div class="ai-single-result" id="media-ai-result" style="display:none;"></div>
+              <div class="panel-integrations"><span class="panel-integrations-label" data-i18n="aiConnected">Connected:</span><span class="panel-integrations-list" id="integrations-media" data-i18n="aiNone">—</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6. Knowledge & Education — среда: заметки + чат -->
+        <div class="ai-panel has-chat" id="panel-knowledge" data-module="knowledge">
+          <div class="panel-workspace">
+            <div class="toolbar">
+              <button type="button" class="btn btn-primary ai-btn-save" data-i18n="aiSave">Save</button>
+              <button type="button" class="btn ai-btn-clear" data-i18n="aiClear">Clear</button>
+            </div>
+            <div class="body">
+              <textarea id="workspace-knowledge" data-i18n-placeholder="aiKnowledgePlaceholder" placeholder="Notes, questions. Ask AI in chat." style="min-height:240px;"></textarea>
+              <div class="panel-integrations"><span class="panel-integrations-label" data-i18n="aiConnected">Connected:</span><span class="panel-integrations-list" id="integrations-knowledge" data-i18n="aiNone">—</span></div>
+            </div>
+          </div>
+          <div class="panel-chat" data-chat="knowledge">
+            <div class="ai-messages" id="messages-knowledge"></div>
+            <div class="ai-offline" data-offline="knowledge" style="display:none;" data-i18n="aiOfflineShort">AI not reachable.</div>
+            <div class="ai-send" data-send="knowledge">
+              <input type="text" data-input="knowledge" data-i18n-placeholder="aiMessagePlaceholder" placeholder="Message…" autocomplete="off">
+              <button type="button" class="btn btn-primary" data-sendbtn="knowledge" data-i18n="aiSend">Send</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -115,62 +282,310 @@
       if (typeof window.i18n !== 'undefined' && window.i18n.apply) i18n.apply();
     })();
 
-    var messagesEl = document.getElementById('messages');
-    var inputEl = document.getElementById('msgInput');
-    var sendBtn = document.getElementById('sendBtn');
-    var offlineEl = document.getElementById('aiOffline');
-    var sendRow = document.getElementById('sendRow');
+    var MODULES = ['code', 'data', 'tasks', 'content', 'media', 'knowledge'];
+    var MODULES_WITH_CHAT = ['code', 'content', 'knowledge'];
+    var currentModule = (location.hash || '#code').replace(/^#/, '') || 'code';
+    if (MODULES.indexOf(currentModule) === -1) currentModule = 'code';
 
-    function appendMsg(text, who, model) {
+    function setActiveModule(id) {
+      currentModule = id || 'code';
+      location.hash = currentModule;
+      document.querySelectorAll('.ai-module-card').forEach(function (el) { el.classList.remove('active'); });
+      var card = document.getElementById('mod-' + currentModule);
+      if (card) card.classList.add('active');
+      document.querySelectorAll('.ai-panel').forEach(function (el) {
+        el.classList.toggle('active', el.getAttribute('data-module') === currentModule);
+      });
+    }
+
+    function applyHash() {
+      var hash = (location.hash || '#code').replace(/^#/, '');
+      if (MODULES.indexOf(hash) !== -1) setActiveModule(hash);
+    }
+    document.querySelectorAll('.ai-module-card').forEach(function (a) {
+      a.addEventListener('click', function (e) {
+        e.preventDefault();
+        var mod = a.getAttribute('data-module');
+        if (mod) setActiveModule(mod);
+      });
+    });
+    window.addEventListener('hashchange', applyHash);
+    applyHash();
+
+    var chatState = {};
+    MODULES.forEach(function (m) { chatState[m] = []; });
+
+    function appendMsg(moduleId, text, who, model) {
+      var el = document.getElementById('messages-' + moduleId);
+      if (!el) return;
       var div = document.createElement('div');
       div.className = 'ai-msg ' + who;
-      div.innerHTML = '<span>' + escapeHtml(text) + '</span>' + (model ? '<div class="meta">' + escapeHtml(model) + '</div>' : '');
-      messagesEl.appendChild(div);
-      messagesEl.scrollTop = messagesEl.scrollHeight;
+      div.innerHTML = '<span>' + (window.escapeHtml ? escapeHtml(text) : text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')) + '</span>' + (model ? '<div class="meta">' + (window.escapeHtml ? escapeHtml(model) : model) + '</div>' : '');
+      el.appendChild(div);
+      el.scrollTop = el.scrollHeight;
+      chatState[moduleId].push({ who: who, text: text, model: model });
     }
 
-    function setOffline(show) {
-      offlineEl.style.display = show ? 'block' : 'none';
-      sendRow.style.display = show ? 'none' : 'flex';
+    function setOffline(moduleId, show) {
+      var off = document.querySelector('.panel-chat[data-chat="' + moduleId + '"] .ai-offline');
+      var row = document.querySelector('.panel-chat[data-chat="' + moduleId + '"] .ai-send');
+      if (off) off.style.display = show ? 'block' : 'none';
+      if (row) row.style.display = show ? 'none' : 'flex';
     }
 
-    sendBtn.addEventListener('click', send);
-    inputEl.addEventListener('keydown', function (e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } });
-
-    function send() {
-      var msg = (inputEl.value || '').trim();
+    function sendMessage(moduleId) {
+      var input = document.querySelector('.panel-chat[data-chat="' + moduleId + '"] input[data-input="' + moduleId + '"]');
+      if (!input) return;
+      var msg = (input.value || '').trim();
       if (!msg) return;
       var base = (typeof AI_URL !== 'undefined' && AI_URL) ? AI_URL : '';
       if (!base) {
-        setOffline(true);
+        setOffline(moduleId, true);
+        appendMsg(moduleId, 'AI service not reachable. Set AI URL or start server.', 'assistant');
         return;
       }
-      setOffline(false);
-      inputEl.value = '';
-      appendMsg(msg, 'user');
-      sendBtn.disabled = true;
+      setOffline(moduleId, false);
+      input.value = '';
+      appendMsg(moduleId, msg, 'user');
+      var btn = document.querySelector('[data-sendbtn="' + moduleId + '"]');
+      if (btn) btn.disabled = true;
       fetch(base.replace(/\/$/, '') + '/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: msg })
+        body: JSON.stringify({ message: msg, module: moduleId })
       }).then(function (r) {
         if (!r.ok) throw new Error(r.statusText);
         return r.json();
       }).then(function (data) {
-        appendMsg(data.reply || 'No reply.', 'assistant', data.model);
+        appendMsg(moduleId, data.reply || 'No reply.', 'assistant', data.model);
       }).catch(function () {
-        appendMsg('Could not reach AI service. Start the ai server (port 8000) or set AI URL.', 'assistant');
-        setOffline(true);
+        appendMsg(moduleId, 'Could not reach AI service.', 'assistant');
+        setOffline(moduleId, true);
       }).finally(function () {
-        sendBtn.disabled = false;
+        if (btn) btn.disabled = false;
+      });
+    }
+
+    MODULES_WITH_CHAT.forEach(function (m) {
+      var input = document.querySelector('input[data-input="' + m + '"]');
+      var btn = document.querySelector('[data-sendbtn="' + m + '"]');
+      if (input && btn) {
+        btn.addEventListener('click', function () { sendMessage(m); });
+        input.addEventListener('keydown', function (e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(m); } });
+      }
+    });
+
+    function aiSingleRequest(moduleId, payload, resultElId) {
+      var el = document.getElementById(resultElId);
+      var base = (typeof AI_URL !== 'undefined' && AI_URL) ? AI_URL : '';
+      if (!el) return Promise.reject();
+      if (!base) { el.style.display = 'block'; el.textContent = 'AI service not configured.'; el.classList.remove('loading'); return Promise.reject(); }
+      el.style.display = 'block'; el.textContent = '…'; el.classList.add('loading');
+      return fetch(base.replace(/\/$/, '') + '/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: payload.message || payload, module: moduleId, context: payload.context })
+      }).then(function (r) { if (!r.ok) throw new Error(r.statusText); return r.json(); }).then(function (data) {
+        el.textContent = data.reply || ''; el.classList.remove('loading');
+      }).catch(function () {
+        el.textContent = 'Could not reach AI.'; el.classList.remove('loading');
       });
     }
 
     if (typeof AI_URL !== 'undefined' && AI_URL) {
-      fetch(AI_URL.replace(/\/$/, '') + '/health').then(function (r) { return r.ok ? r.json() : Promise.reject(); }).catch(function () { setOffline(true); });
+      fetch(AI_URL.replace(/\/$/, '') + '/health').then(function (r) { return r.ok ? r.json() : Promise.reject(); }).catch(function () {
+        MODULES_WITH_CHAT.forEach(function (m) { setOffline(m, true); });
+      });
     } else {
-      setOffline(true);
+      MODULES_WITH_CHAT.forEach(function (m) { setOffline(m, true); });
     }
+
+    (function initCodePanel() {
+      var ta = document.getElementById('workspace-code');
+      document.querySelector('#panel-code .ai-btn-save').addEventListener('click', function () {
+        if (ta) try { localStorage.setItem('ai_workspace_code', ta.value); alert('Saved'); } catch (e) {}
+      });
+      document.querySelector('#panel-code .ai-btn-clear').addEventListener('click', function () { if (ta) ta.value = ''; });
+      if (ta && localStorage.getItem('ai_workspace_code')) ta.value = localStorage.getItem('ai_workspace_code');
+    })();
+
+    (function initDataPanel() {
+      var ta = document.getElementById('workspace-data');
+      var wrap = document.getElementById('data-table-wrap');
+      var tbl = document.getElementById('data-table');
+      var resultEl = document.getElementById('data-ai-result');
+      document.getElementById('data-import-csv').addEventListener('change', function () {
+        var f = this.files[0];
+        if (!f || !ta) return;
+        var r = new FileReader();
+        r.onload = function () { ta.value = r.result; };
+        r.readAsText(f);
+      });
+      document.querySelector('#panel-data .ai-btn-parse-data').addEventListener('click', function () {
+        if (!ta || !ta.value.trim() || !tbl || !wrap) return;
+        var lines = ta.value.trim().split(/\r?\n/);
+        var rows = lines.map(function (l) { return l.split(',').map(function (c) { return c.replace(/^"|"$/g, '').trim(); }); });
+        tbl.innerHTML = '';
+        if (rows.length === 0) return;
+        var thead = document.createElement('thead');
+        var tr = document.createElement('tr');
+        rows[0].forEach(function (c) { var th = document.createElement('th'); th.textContent = c; tr.appendChild(th); });
+        thead.appendChild(tr); tbl.appendChild(thead);
+        var tbody = document.createElement('tbody');
+        for (var i = 1; i < rows.length; i++) {
+          var r = document.createElement('tr');
+          rows[i].forEach(function (c) { var td = document.createElement('td'); td.textContent = c; r.appendChild(td); });
+          tbody.appendChild(r);
+        }
+        tbl.appendChild(tbody);
+        wrap.style.display = 'block';
+      });
+      document.querySelector('#panel-data .ai-btn-export').addEventListener('click', function () {
+        if (!ta || !ta.value) return;
+        var a = document.createElement('a');
+        a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(ta.value);
+        a.download = 'data.csv';
+        a.click();
+      });
+      document.querySelector('#panel-data .ai-btn-clear').addEventListener('click', function () {
+        if (ta) ta.value = '';
+        if (wrap) wrap.style.display = 'none';
+        if (tbl) tbl.innerHTML = '';
+        if (resultEl) { resultEl.style.display = 'none'; resultEl.textContent = ''; }
+      });
+      document.querySelector('#panel-data .ai-btn-analyze').addEventListener('click', function () {
+        var text = (ta && ta.value) ? ta.value.trim().slice(0, 3000) : '';
+        aiSingleRequest('data', { message: 'Analyze this data and give short insights:\n' + text }, 'data-ai-result');
+      });
+    })();
+
+    (function initTasksPanel() {
+      var list = document.getElementById('tasks-tasks');
+      var addBtn = document.querySelector('#panel-tasks .ai-btn-add-task');
+      var input = document.getElementById('tasks-task-input');
+      var statusSel = document.getElementById('tasks-task-status');
+      var add = document.getElementById('tasks-task-add');
+      var addRow = document.querySelector('#panel-tasks .list-add');
+      var notesTa = document.getElementById('workspace-tasks');
+      function addTask(text, status) {
+        if (!text || !list) return;
+        var st = status || (statusSel ? statusSel.value : 'todo');
+        var lab = st === 'done' ? ' done' : (st === 'progress' ? ' progress' : '');
+        var li = document.createElement('li');
+        li.innerHTML = '<input type="checkbox" ' + (st === 'done' ? 'checked' : '') + '><span class="text">' + (window.escapeHtml ? escapeHtml(text) : text) + '</span><span class="task-status' + lab + '">' + st + '</span><span class="del">×</span>';
+        li.querySelector('.del').onclick = function () { li.remove(); };
+        list.appendChild(li);
+      }
+      if (addBtn && addRow) addBtn.addEventListener('click', function () { addRow.style.display = addRow.style.display === 'none' ? 'flex' : 'none'; });
+      if (add && input) add.addEventListener('click', function () { addTask(input.value.trim(), statusSel ? statusSel.value : 'todo'); input.value = ''; });
+      if (input) input.addEventListener('keydown', function (e) { if (e.key === 'Enter') { addTask(input.value.trim(), statusSel ? statusSel.value : 'todo'); input.value = ''; } });
+      document.querySelector('#panel-tasks .ai-btn-summarize-notes').addEventListener('click', function () {
+        var text = (notesTa && notesTa.value) ? notesTa.value.trim() : '';
+        if (!text) { var r = document.getElementById('tasks-ai-result'); if (r) { r.style.display = 'block'; r.textContent = 'Add notes first.'; } return; }
+        aiSingleRequest('tasks', { message: 'Summarize these notes in a few bullet points:\n' + text }, 'tasks-ai-result');
+      });
+      var pomoStart = document.getElementById('pomo-start');
+      var pomoTimer = document.getElementById('pomo-timer');
+      var pomoInterval;
+      if (pomoStart && pomoTimer) {
+        pomoStart.addEventListener('click', function () {
+          var sec = 25 * 60;
+          pomoTimer.style.display = 'inline-block';
+          pomoTimer.textContent = '25:00';
+          pomoTimer.classList.add('work');
+          if (pomoInterval) clearInterval(pomoInterval);
+          pomoInterval = setInterval(function () {
+            sec--;
+            var m = Math.floor(sec / 60), s = sec % 60;
+            pomoTimer.textContent = (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+            if (sec <= 0) { clearInterval(pomoInterval); pomoTimer.classList.remove('work'); }
+          }, 1000);
+        });
+      }
+    })();
+
+    (function initContentPanel() {
+      var ta = document.getElementById('workspace-content');
+      var wc = document.getElementById('content-word-count');
+      function updateWordCount() {
+        if (!wc || !ta) return;
+        var t = (ta.value || '').trim();
+        var n = t ? t.split(/\s+/).length : 0;
+        wc.textContent = n + ' words';
+      }
+      if (ta) { ta.addEventListener('input', updateWordCount); updateWordCount(); }
+      document.querySelector('#panel-content .ai-btn-save').addEventListener('click', function () {
+        if (ta) try { localStorage.setItem('ai_workspace_content', ta.value); alert('Saved'); } catch (e) {}
+      });
+      document.querySelector('#panel-content .ai-btn-clear').addEventListener('click', function () { if (ta) ta.value = ''; if (wc) wc.textContent = '0 words'; });
+      var improveBtn = document.getElementById('content-improve-ai');
+      if (improveBtn && ta) improveBtn.addEventListener('click', function () {
+        var text = (ta.value || '').trim();
+        if (!text) return;
+        var base = (typeof AI_URL !== 'undefined' && AI_URL) ? AI_URL : '';
+        if (!base) { alert('AI service not configured.'); return; }
+        fetch(base.replace(/\/$/, '') + '/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: 'Improve this message for clarity and tone. Reply only with the improved text, no preamble:\n\n' + text, module: 'content' })
+        }).then(function (r) { if (!r.ok) throw new Error(r.statusText); return r.json(); }).then(function (data) {
+          if (ta && data.reply) ta.value = data.reply.trim();
+        }).catch(function () { alert('Could not reach AI.'); });
+      });
+      if (ta && localStorage.getItem('ai_workspace_content')) ta.value = localStorage.getItem('ai_workspace_content'); if (wc && ta) updateWordCount();
+    })();
+
+    (function initMediaPanel() {
+      var zone = document.getElementById('drop-zone-media');
+      var preview = document.getElementById('preview-media');
+      var promptInput = document.getElementById('media-ai-prompt');
+      var resultEl = document.getElementById('media-ai-result');
+      if (zone) {
+        zone.addEventListener('dragover', function (e) { e.preventDefault(); zone.classList.add('dragover'); });
+        zone.addEventListener('dragleave', function () { zone.classList.remove('dragover'); });
+        zone.addEventListener('drop', function (e) {
+          e.preventDefault();
+          zone.classList.remove('dragover');
+          var f = e.dataTransfer.files[0];
+          if (f && f.type.indexOf('image') !== -1) {
+            var r = new FileReader();
+            r.onload = function () { if (preview) preview.innerHTML = '<img src="' + r.result + '" alt="Preview" style="max-width:100%; max-height:200px; border-radius:8px;">'; };
+            r.readAsDataURL(f);
+          }
+        });
+      }
+      document.querySelector('#panel-media .ai-btn-clear').addEventListener('click', function () {
+        if (preview) preview.innerHTML = '';
+        if (resultEl) { resultEl.style.display = 'none'; resultEl.textContent = ''; }
+        if (promptInput) promptInput.value = '';
+      });
+      document.getElementById('media-ai-describe').addEventListener('click', function () {
+        var msg = (promptInput && promptInput.value.trim()) ? promptInput.value.trim() : 'Describe this image in detail.';
+        aiSingleRequest('media', { message: msg }, 'media-ai-result');
+      });
+    })();
+
+    (function initKnowledgePanel() {
+      var ta = document.getElementById('workspace-knowledge');
+      document.querySelector('#panel-knowledge .ai-btn-save').addEventListener('click', function () {
+        if (ta) try { localStorage.setItem('ai_workspace_knowledge', ta.value); alert('Saved'); } catch (e) {}
+      });
+      document.querySelector('#panel-knowledge .ai-btn-clear').addEventListener('click', function () { if (ta) ta.value = ''; });
+      if (ta && localStorage.getItem('ai_workspace_knowledge')) ta.value = localStorage.getItem('ai_workspace_knowledge');
+    })();
+
+    (function renderIntegrations() {
+      var INTEGRATIONS = window.AI_INTEGRATIONS || { code: [], data: [], tasks: [], content: [], media: [], knowledge: [] };
+      MODULES.forEach(function (mod) {
+        var el = document.getElementById('integrations-' + mod);
+        if (!el) return;
+        var list = INTEGRATIONS[mod];
+        if (list && list.length > 0) {
+          el.innerHTML = list.map(function (name) { return '<span class="tag">' + (window.escapeHtml ? escapeHtml(name) : name) + '</span>'; }).join('');
+          el.removeAttribute('data-i18n');
+        }
+      });
+    })();
   </script>
   <script src="../js/main.js"></script>
 </body>
