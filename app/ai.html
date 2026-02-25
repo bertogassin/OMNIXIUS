@@ -349,10 +349,12 @@
       appendMsg(moduleId, msg, 'user');
       var btn = document.querySelector('[data-sendbtn="' + moduleId + '"]');
       if (btn) btn.disabled = true;
+      var apiToken = (typeof api !== 'undefined' && api && api.getToken) ? api.getToken() : '';
+      var apiUrl = (typeof window.API_URL !== 'undefined') ? (window.API_URL || '') : '';
       fetch(base.replace(/\/$/, '') + '/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: msg, module: moduleId })
+        body: JSON.stringify({ message: msg, module: moduleId, api_token: apiToken || undefined, api_url: apiUrl || undefined })
       }).then(function (r) {
         if (!r.ok) throw new Error(r.statusText);
         return r.json();

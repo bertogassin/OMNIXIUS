@@ -83,20 +83,114 @@
       var sellerLabel = t('seller');
       var contactBtn = t('contactSeller');
       var signInToContact = t('signInToContact');
+      var isService = p.is_service === 1 || p.is_service === true;
+      var myId = (api.user && api.user.id) ? Number(api.user.id) : 0;
+      var isOwner = token && myId && Number(p.seller_id) === myId;
       root.innerHTML = `
         <p style="margin-bottom:1rem;"><a href="marketplace.html">${escapeHtml(backToM)}</a></p>
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:2rem; align-items:start;">
           <img src="${p.image_path ? (window.API_URL + '/uploads/' + p.image_path) : 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22300%22><rect fill=%22%23222%22 width=%22400%22 height=%22300%22/></svg>'}" alt="" style="max-width:100%; border-radius:12px;">
           <div>
-            <h1>${escapeHtml(p.title)}</h1>
+            <h1>${escapeHtml(p.title)}${isService ? ' <span class="card-badge card-badge-service">' + (t('filterServiceBadge') || 'Service') + '</span>' : ''}</h1>
             <p class="price" style="font-size:1.5rem;">${p.price} ₽</p>
             <p style="color:var(--text-muted);">${escapeHtml(p.category)} · ${escapeHtml(p.location || '')}</p>
             <p style="margin-top:1rem;">${escapeHtml(p.description || '')}</p>
-            <p style="margin-top:1rem;">${escapeHtml(sellerLabel)}: <strong>${escapeHtml(p.seller_name || p.seller_email)}</strong></p>
+            <p style="margin-top:1rem;">${escapeHtml(sellerLabel)}: <a href="profile.html?user=${p.seller_id}">${escapeHtml(p.seller_name || p.seller_email)}</a>${(p.seller_verified ? ' <span class="verified-badge">✓ ' + (t('verifiedBadge') || 'Verified') + '</span>' : '')}</p>
             ${token ? `<p style="margin-top:1rem;"><a href="conversation.html?userId=${p.seller_id}&productId=${p.id}" class="btn btn-primary">${escapeHtml(contactBtn)}</a></p>` : '<p style="margin-top:1rem;"><a href="login.html">' + escapeHtml(signInToContact) + '</a></p>'}
           </div>
         </div>
+        ${isService ? '<section class="slots-section" style="margin-top:2rem;"><h2>' + (t('slotsTitle') || 'Available slots') + '</h2><div id="slotsList"></div><div id="slotsAdd" style="display:none;"></div></section>' : ''}
+        ${(p.is_subscription === 1 || p.is_subscription === true) ? '<section class="closed-content-section" style="margin-top:2rem;"><h2>' + (t('closedContentTitle') || 'Closed content') + '</h2><div id="closedContentBlock"></div></section>' : ''}
       `;
+      if (isService) {
+        var slotsList = document.getElementById('slotsList');
+        var slotsAdd = document.getElementById('slotsAdd');
+        function fmtSlot(slotAt) {
+          var d = new Date(slotAt * 1000);
+          return d.toLocaleString(undefined, { dateStyle: 'short', timeStyle: 'short' });
+        }
+        function renderSlots(slots) {
+          var free = (slots || []).filter(function(s) { return s.status === 'free'; });
+          var booked = (slots || []).filter(function(s) { return s.status === 'booked'; });
+          var html = '';
+          if (free.length) {
+            html += '<ul class="slots-list">';
+            free.forEach(function(s) {
+              html += '<li>' + escapeHtml(fmtSlot(s.slot_at)) + (token && !isOwner ? ' <button type="button" class="btn btn-primary btn-sm slot-book" data-slot-id="' + s.id + '">' + (t('slotBook') || 'Book') + '</button>' : '') + '</li>';
+            });
+            html += '</ul>';
+          }
+          if (isOwner && booked.length) {
+            html += '<p class="slots-booked">' + (t('slotsBooked') || 'Booked') + ': ' + booked.map(function(s) { return fmtSlot(s.slot_at); }).join(', ') + '</p>';
+          }
+          if (!html) html = '<p class="text-muted">' + (t('slotsNone') || 'No slots yet.') + '</p>';
+          slotsList.innerHTML = html;
+          if (token && isOwner) {
+            slotsAdd.style.display = 'block';
+            slotsAdd.innerHTML = '<form id="addSlotForm" class="slots-add-form"><label>' + (t('slotAddLabel') || 'Date & time') + '</label><input type="datetime-local" name="slot_at" required><button type="submit" class="btn btn-primary">' + (t('slotAddBtn') || 'Add slot') + '</button></form>';
+            document.getElementById('addSlotForm').onsubmit = async function(e) {
+              e.preventDefault();
+              var val = this.slot_at.value;
+              var slotAt = Math.floor(new Date(val).getTime() / 1000);
+              try {
+                await api.products.addSlot(id, slotAt);
+                var list = await api.products.slots(id);
+                renderSlots(list);
+                this.reset();
+              } catch (err) {
+                alert(err.data && err.data.error ? err.data.error : 'Failed');
+              }
+            };
+          }
+          root.querySelectorAll('.slot-book').forEach(function(btn) {
+            btn.onclick = async function() {
+              var sid = this.getAttribute('data-slot-id');
+              this.disabled = true;
+              try {
+                var res = await api.products.bookSlot(id, sid);
+                var orderId = (res.order && res.order.id != null) ? res.order.id : '';
+                slotsList.innerHTML = '<p class="success">' + (t('slotBookedSuccess') || 'Booked!') + ' ' + (orderId ? 'Order #' + orderId + '. ' : '') + (t('slotSellerNotified') || 'Seller notified.') + ' <a href="orders.html">' + (t('navOrders') || 'Orders') + '</a> <a href="mail.html">' + (t('navMail') || 'Mail') + '</a></p>';
+              } catch (err) {
+                alert(err.data && err.data.error ? err.data.error : 'Failed');
+                this.disabled = false;
+              }
+            };
+          });
+        }
+        try {
+          var slots = await api.products.slots(id);
+          renderSlots(slots);
+        } catch (_) {
+          slotsList.innerHTML = '<p class="text-muted">' + (t('slotsLoadFailed') || 'Could not load slots.') + '</p>';
+        }
+      }
+      var isSubscription = p.is_subscription === 1 || p.is_subscription === true;
+      if (isSubscription) {
+        var closedBlock = document.getElementById('closedContentBlock');
+        if (closedBlock) {
+          if (!token) {
+            closedBlock.innerHTML = '<p class="text-muted">' + (t('closedContentSignIn') || 'Sign in to access closed content.') + ' <a href="login.html">' + escapeHtml(t('signIn')) + '</a></p>';
+          } else {
+            try {
+              var cc = await api.products.closedContent(id);
+              var url = cc && cc.url ? cc.url.trim() : '';
+              if (url) {
+                closedBlock.innerHTML = '<p><a href="closed-content.html?product=' + encodeURIComponent(id) + '" class="btn btn-primary" target="_blank" rel="noopener">' + (t('closedContentViewLink') || 'View closed content') + '</a></p>';
+              } else {
+                closedBlock.innerHTML = '<p class="text-muted">' + (t('closedContentNone') || 'No closed content set by creator.') + '</p>';
+              }
+            } catch (err) {
+              if (err.status === 403 || (err.data && err.data.error && err.data.error.indexOf('Subscribe') >= 0)) {
+                closedBlock.innerHTML = '<p class="text-muted">' + (t('closedContentSubscribeRequired') || 'Subscribe to access this content.') + ' <a href="profile.html?user=' + p.seller_id + '">' + escapeHtml(t('subscribeBtn') || 'Subscribe') + '</a></p>';
+              } else if (err.status === 400) {
+                closedBlock.innerHTML = '<p class="text-muted">' + (t('closedContentNone') || 'No closed content.') + '</p>';
+              } else {
+                closedBlock.innerHTML = '<p class="text-muted">' + (t('loadFailed') || 'Could not load.') + '</p>';
+              }
+            }
+          }
+        }
+      }
     })();
     if (window.i18n) i18n.apply();
   </script>

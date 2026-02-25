@@ -76,19 +76,25 @@
     if (typeof api === 'undefined' || !api.getToken || !api.getToken()) { location.href = 'login.html'; return; }
     document.getElementById('navLogout').onclick = () => { api.auth.logout(); location.href = '../index.html'; };
 
+    var t = function(k) { return (typeof i18n !== 'undefined' && i18n.t) ? i18n.t(k) : k; };
     function renderOrderCard(o, role) {
       const img = o.image_path ? (window.API_URL + '/uploads/' + o.image_path) : '';
       const date = o.created_at ? new Date(o.created_at * 1000).toLocaleDateString(undefined, { dateStyle: 'medium' }) : '';
       const other = o.seller_name || o.buyer_name || '';
       const statusClass = (o.status || '').toLowerCase();
+      const installRequested = (o.installment_plan || '') === 'requested';
+      const installBtn = (role === 'buyer' && !installRequested)
+        ? `<button type="button" class="btn btn-sm btn-installment" data-order-id="${o.id}">${t('installmentRequestBtn') || 'Request installments'}</button>`
+        : (installRequested ? `<span class="installment-requested">${t('installmentRequested') || 'Installments requested (coming via Trade)'}</span>` : '');
       return `
-        <article class="order-card">
+        <article class="order-card" data-order-id="${o.id}">
           ${img ? `<img src="${img}" alt="" class="order-card-img">` : ''}
           <div class="order-card-body">
             <h3 class="order-card-title">${escapeHtml(o.title || '')}</h3>
             <p class="order-card-meta">${escapeHtml(other)} · ${date}</p>
             <p class="order-card-price">${typeof o.price === 'number' ? o.price.toFixed(2) : o.price}</p>
             <span class="order-status order-status-${statusClass}">${escapeHtml(o.status || '')}</span>
+            ${installBtn ? '<p class="order-installment">' + installBtn + '</p>' : ''}
           </div>
         </article>
       `;
@@ -105,6 +111,19 @@
         document.getElementById('asSellerList').innerHTML = asSeller.length
           ? '<div class="orders-grid">' + asSeller.map(o => renderOrderCard(o, 'seller')).join('') + '</div>'
           : '<p class="orders-empty" data-i18n="noOrders">No orders yet.</p>';
+        document.querySelectorAll('.btn-installment').forEach(function(btn) {
+          btn.onclick = async function() {
+            var orderId = this.getAttribute('data-order-id');
+            this.disabled = true;
+            try {
+              await api.orders.update(orderId, { installment_plan: 'requested' });
+              this.outerHTML = '<span class="installment-requested">' + (t('installmentRequested') || 'Installments requested (coming via Trade)') + '</span>';
+            } catch (err) {
+              alert(err.data && err.data.error ? err.data.error : 'Failed');
+              this.disabled = false;
+            }
+          };
+        });
         if (typeof i18n !== 'undefined') i18n.apply();
       } catch (e) {
         document.getElementById('asBuyerList').innerHTML = '<p class="error">Failed to load orders.</p>';

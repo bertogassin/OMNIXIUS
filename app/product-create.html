@@ -70,6 +70,10 @@
         <datalist id="cats"></datalist>
         <label>City / location</label>
         <input type="text" name="location">
+        <label class="form-checkbox"><input type="checkbox" name="is_service" value="1"> <span data-i18n="productIsService">This is a service</span></label>
+        <label class="form-checkbox"><input type="checkbox" name="is_subscription" value="1"> <span data-i18n="productIsSubscription">Subscription (price per month)</span></label>
+        <label data-i18n="closedContentUrlLabel">Closed content URL (for subscribers)</label>
+        <input type="url" name="closed_content_url" data-i18n-placeholder="closedContentUrlPlaceholder" placeholder="https://… (optional)">
         <label>Photo</label>
         <input type="file" name="image" accept="image/jpeg,image/png,image/webp">
         <button type="submit" class="btn btn-primary">Publish</button>
@@ -98,6 +102,7 @@
         err.style.display = 'block';
       }
     };
+    if (window.i18n) i18n.apply();
   </script>
   <script src="../js/main.js"></script>
 </body>

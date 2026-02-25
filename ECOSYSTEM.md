@@ -67,7 +67,7 @@ Additional projects and verticals plug into the same ecosystem so everything sta
 
 ## 5. Other directions (to expand)
 
-*Add your other projects below; keep one line each and the platform(s) they use.*
+*Full architecture for the 10 new directions: ARCHITECTURE.md §6.*
 
 | Direction | Platforms | Note |
 |-----------|-----------|------|
@@ -75,7 +75,18 @@ Additional projects and verticals plug into the same ecosystem so everything sta
 | Marketplace & Shop (live) | Connect | Listings, orders, contact seller. |
 | Learning / Courses | Connect, Trade, Repositorium | Experts, payments, storage. |
 | Startups / IXI launchpad | Blockchain, Trade, Connect | Tokens, fundraising, community. |
-| *… add more* | *…* | *…* |
+| Media / Content | Connect, Trade, Repositorium | Creators, subscriptions, storage. |
+| Rewards / Loyalty | Connect, Trade, Blockchain | Activity, referrals, IXI payouts. |
+| **ESG / Green** | Trade, Connect | Carbon footprint, offsets, green assets. |
+| **Health / Telemedicine** | Connect, Repositorium, Trade | Appointments, health data, payments. |
+| **SSI / Decentralized identity** | IXI, Connect | Verifiable credentials, one passport. |
+| **Embedded finance** | Trade, Connect | Microloans, insurance, installments. |
+| **Gig / Local services** | Connect, Trade | Bookings, payments, ratings. |
+| **Creator economy** | Connect, Trade, Repositorium | Subscriptions, tips, exclusive content. |
+| **AI agents** | AI, Connect, Trade | Actions: book, pay, summarize. |
+| **Privacy-first analytics** | Repositorium, Spark | Business insights without PII. |
+| **Cross-border / Remittances** | Trade, IXI | Low-fee transfers, stablecoins. |
+| **Education credentials** | IXI, Connect, Learning | Verifiable diplomas, badges on-chain. |
 
 ---
 

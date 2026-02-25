@@ -85,8 +85,13 @@
     },
     users: {
       me: () => api.request('/api/users/me'),
+      get: (id) => api.request('/api/users/' + id),
       updateMe: (data) => api.request('/api/users/me', { method: 'PATCH', body: data }),
       myOrders: () => api.request('/api/users/me/orders'),
+    },
+    subscriptions: {
+      create: (product_id) => api.request('/api/subscriptions', { method: 'POST', body: { product_id } }),
+      my: () => api.request('/api/subscriptions/my'),
     },
     products: {
       list: (params) => api.request('/api/products?' + new URLSearchParams(params || {}).toString()),
@@ -95,11 +100,15 @@
       create: (formData) => api.request('/api/products', { method: 'POST', body: formData, headers: {} }),
       update: (id, formData) => api.request('/api/products/' + id, { method: 'PATCH', body: formData, headers: {} }),
       delete: (id) => api.request('/api/products/' + id, { method: 'DELETE' }),
+      slots: (productId) => api.request('/api/products/' + productId + '/slots'),
+      addSlot: (productId, slot_at) => api.request('/api/products/' + productId + '/slots', { method: 'POST', body: { slot_at } }),
+      bookSlot: (productId, slotId) => api.request('/api/products/' + productId + '/slots/' + slotId + '/book', { method: 'POST' }),
+      closedContent: (productId) => api.request('/api/products/' + productId + '/closed-content'),
     },
     orders: {
       my: () => api.request('/api/orders/my'),
-      create: (product_id) => api.request('/api/orders', { method: 'POST', body: { product_id } }),
-      update: (id, status) => api.request('/api/orders/' + id, { method: 'PATCH', body: { status } }),
+      create: (product_id, data) => api.request('/api/orders', { method: 'POST', body: Object.assign({ product_id }, data || {}) }),
+      update: (id, data) => api.request('/api/orders/' + id, { method: 'PATCH', body: typeof data === 'string' ? { status: data } : (data || {}) }),
     },
     conversations: {
       list: () => api.request('/api/conversations'),

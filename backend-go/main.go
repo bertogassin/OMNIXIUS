@@ -84,9 +84,17 @@ func main() {
 	api.GET("/products", handleProductsList)
 	api.GET("/products/categories", handleProductsCategories)
 	api.GET("/products/:id", handleProductGet)
+	auth.GET("/products/:id/closed-content", handleProductClosedContent)
 	auth.POST("/products", handleProductCreate)
 	auth.PATCH("/products/:id", handleProductUpdate)
 	auth.DELETE("/products/:id", handleProductDelete)
+	api.GET("/products/:id/slots", handleSlotsList)
+	auth.POST("/products/:id/slots", handleSlotsAdd)
+	auth.POST("/products/:id/slots/:sid/book", handleSlotBook)
+
+	api.GET("/users/:id", handleUserPublic)
+	auth.POST("/subscriptions", handleSubscriptionCreate)
+	auth.GET("/subscriptions/my", handleSubscriptionsMy)
 
 	auth.GET("/orders/my", handleOrdersMy)
 	auth.POST("/orders", handleOrderCreate)
@@ -218,6 +226,28 @@ func getUserID(c *gin.Context) int64 {
 		return id
 	}
 	return 0
+}
+
+// getOptionalUserID returns user ID if valid Bearer token present; otherwise 0 (for optional-auth routes).
+func getOptionalUserID(c *gin.Context) int64 {
+	if v, _ := c.Get("userID"); v != nil {
+		if id, ok := v.(int64); ok {
+			return id
+		}
+	}
+	tok := strings.TrimPrefix(c.GetHeader("Authorization"), "Bearer ")
+	if tok == "" {
+		return 0
+	}
+	uid, _, err := pqc.VerifyToken(cfg.PQCPublicKey, tok)
+	if err != nil {
+		return 0
+	}
+	var n int
+	if db.DB.QueryRow("SELECT 1 FROM users WHERE id = ?", uid).Scan(&n) != nil {
+		return 0
+	}
+	return uid
 }
 
 func getLoginLimiter(ip string) *rate.Limiter {
@@ -629,12 +659,13 @@ func handleUserMe(c *gin.Context) {
 	id := getUserID(c)
 	var email, role, name string
 	var avatar sql.NullString
-	var verified int
-	if db.DB.QueryRow("SELECT email, role, name, avatar_path, email_verified FROM users WHERE id = ?", id).Scan(&email, &role, &name, &avatar, &verified) != nil {
+	var emailVerified, phoneVerified int
+	if db.DB.QueryRow("SELECT email, role, name, avatar_path, COALESCE(email_verified, 0), COALESCE(phone_verified, 0) FROM users WHERE id = ?", id).Scan(&email, &role, &name, &avatar, &emailVerified, &phoneVerified) != nil {
 		c.JSON(404, gin.H{"error": "User not found"})
 		return
 	}
-	c.JSON(200, gin.H{"id": id, "email": email, "role": role, "name": name, "avatar_path": avatar.String, "email_verified": verified == 1})
+	verified := emailVerified == 1 || phoneVerified == 1
+	c.JSON(200, gin.H{"id": id, "email": email, "role": role, "name": name, "avatar_path": avatar.String, "email_verified": emailVerified == 1, "phone_verified": phoneVerified == 1, "verified": verified})
 }
 
 func handleUserUpdate(c *gin.Context) {
@@ -702,9 +733,9 @@ func handleUserDelete(c *gin.Context) {
 func handleUserOrders(c *gin.Context) {
 	id := getUserID(c)
 	// asBuyer
-	rows, _ := db.DB.Query(`SELECT o.id, o.status, o.created_at, p.title, p.price, p.image_path, u.name FROM orders o JOIN products p ON p.id = o.product_id JOIN users u ON u.id = o.seller_id WHERE o.buyer_id = ? ORDER BY o.created_at DESC`, id)
+	rows, _ := db.DB.Query(`SELECT o.id, o.status, o.created_at, COALESCE(o.installment_plan, ''), p.title, p.price, p.image_path, u.name FROM orders o JOIN products p ON p.id = o.product_id JOIN users u ON u.id = o.seller_id WHERE o.buyer_id = ? ORDER BY o.created_at DESC`, id)
 	asBuyer := rowsToOrderList(rows)
-	rows, _ = db.DB.Query(`SELECT o.id, o.status, o.created_at, p.title, p.price, p.image_path, u.name FROM orders o JOIN products p ON p.id = o.product_id JOIN users u ON u.id = o.buyer_id WHERE o.seller_id = ? ORDER BY o.created_at DESC`, id)
+	rows, _ = db.DB.Query(`SELECT o.id, o.status, o.created_at, COALESCE(o.installment_plan, ''), p.title, p.price, p.image_path, u.name FROM orders o JOIN products p ON p.id = o.product_id JOIN users u ON u.id = o.buyer_id WHERE o.seller_id = ? ORDER BY o.created_at DESC`, id)
 	asSeller := rowsToOrderList(rows)
 	c.JSON(200, gin.H{"asBuyer": asBuyer, "asSeller": asSeller})
 }
@@ -717,11 +748,11 @@ func rowsToOrderList(rows *sql.Rows) []gin.H {
 	defer rows.Close()
 	for rows.Next() {
 		var id, created int64
-		var status, title string
+		var status, installmentPlan, title string
 		var price float64
 		var imagePath, name sql.NullString
-		rows.Scan(&id, &status, &created, &title, &price, &imagePath, &name)
-		out = append(out, gin.H{"id": id, "status": status, "created_at": created, "title": title, "price": price, "image_path": imagePath.String, "seller_name": name.String})
+		rows.Scan(&id, &status, &created, &installmentPlan, &title, &price, &imagePath, &name)
+		out = append(out, gin.H{"id": id, "status": status, "created_at": created, "installment_plan": installmentPlan, "title": title, "price": price, "image_path": imagePath.String, "seller_name": name.String})
 	}
 	return out
 }
@@ -764,8 +795,14 @@ func handleProductsList(c *gin.Context) {
 			offset = n
 		}
 	}
-	qry := `SELECT p.id, p.title, p.price, p.category, p.location, p.image_path, p.created_at, u.id, u.name FROM products p JOIN users u ON u.id = p.user_id WHERE 1=1`
+	qry := `SELECT p.id, p.title, p.price, p.category, p.location, p.image_path, COALESCE(p.is_service, 0), COALESCE(p.is_subscription, 0), p.created_at, u.id, u.name FROM products p JOIN users u ON u.id = p.user_id WHERE 1=1`
 	args := []interface{}{}
+	if uid := c.Query("user_id"); uid != "" {
+		if uidNum, err := strconv.ParseInt(uid, 10, 64); err == nil {
+			qry += ` AND p.user_id = ?`
+			args = append(args, uidNum)
+		}
+	}
 	if q != "" {
 		qry += ` AND (p.title LIKE ? OR p.description LIKE ?)`
 		args = append(args, "%"+q+"%", "%"+q+"%")
@@ -790,6 +827,12 @@ func handleProductsList(c *gin.Context) {
 			args = append(args, f)
 		}
 	}
+	if v := c.Query("service"); v == "1" || v == "true" {
+		qry += ` AND COALESCE(p.is_service, 0) = 1`
+	}
+	if v := c.Query("subscription"); v == "1" || v == "true" {
+		qry += ` AND COALESCE(p.is_subscription, 0) = 1`
+	}
 	qry += ` ORDER BY p.created_at DESC LIMIT ? OFFSET ?`
 	args = append(args, limit, offset)
 	rows, _ := db.DB.Query(qry, args...)
@@ -801,9 +844,10 @@ func handleProductsList(c *gin.Context) {
 			var title, category, location string
 			var price float64
 			var imagePath, sellerName sql.NullString
+			var isService, isSubscription int64
 			var sellerID int64
-			rows.Scan(&id, &title, &price, &category, &location, &imagePath, &created, &sellerID, &sellerName)
-			list = append(list, gin.H{"id": id, "title": title, "price": price, "category": category, "location": location, "image_path": imagePath.String, "created_at": created, "seller_id": sellerID, "seller_name": sellerName.String})
+			rows.Scan(&id, &title, &price, &category, &location, &imagePath, &isService, &isSubscription, &created, &sellerID, &sellerName)
+			list = append(list, gin.H{"id": id, "title": title, "price": price, "category": category, "location": location, "image_path": imagePath.String, "is_service": isService, "is_subscription": isSubscription, "created_at": created, "seller_id": sellerID, "seller_name": sellerName.String})
 		}
 	}
 	c.JSON(200, list)
@@ -834,6 +878,34 @@ func handleProductGet(c *gin.Context) {
 		return
 	}
 	c.JSON(200, h)
+}
+
+func handleProductClosedContent(c *gin.Context) {
+	idStr := c.Param("id")
+	url, ownerID, isSub, err := ProductClosedContent(idStr)
+	if err != nil {
+		if errors.Is(err, ErrProductNotFound) {
+			c.JSON(404, gin.H{"error": "Product not found"})
+			return
+		}
+		c.JSON(500, gin.H{"error": "Failed"})
+		return
+	}
+	uid := getUserID(c)
+	if uid == 0 {
+		c.JSON(401, gin.H{"error": "Sign in to access closed content"})
+		return
+	}
+	pid, _ := strconv.ParseInt(idStr, 10, 64)
+	if ownerID == uid || IsSubscribed(pid, uid) {
+		c.JSON(200, gin.H{"url": url})
+		return
+	}
+	if isSub != 1 {
+		c.JSON(400, gin.H{"error": "This listing has no closed content"})
+		return
+	}
+	c.JSON(403, gin.H{"error": "Subscribe to access this content"})
 }
 
 func handleProductCreate(c *gin.Context) {
@@ -872,7 +944,16 @@ func handleProductCreate(c *gin.Context) {
 			imagePath = rel
 		}
 	}
-	h, err := ProductCreate(getUserID(c), title, desc, category, location, imagePath, price)
+	isService := 0
+	if v := c.PostForm("is_service"); v == "1" || v == "on" || v == "true" {
+		isService = 1
+	}
+	isSubscription := 0
+	if v := c.PostForm("is_subscription"); v == "1" || v == "on" || v == "true" {
+		isSubscription = 1
+	}
+	closedContentURL := strings.TrimSpace(c.PostForm("closed_content_url"))
+	h, err := ProductCreate(getUserID(c), title, desc, category, location, imagePath, price, isService, isSubscription, closedContentURL)
 	if err != nil {
 		c.JSON(500, gin.H{"error": "Create failed"})
 		return
@@ -910,6 +991,27 @@ func handleProductUpdate(c *gin.Context) {
 		db.DB.Exec("UPDATE products SET category = ? WHERE id = ?", category, id)
 	}
 	db.DB.Exec("UPDATE products SET location = ?, updated_at = unixepoch() WHERE id = ?", nullStr(location), id)
+	if v := c.PostForm("is_service"); v != "" {
+		isService := 0
+		if v == "1" || v == "on" || v == "true" {
+			isService = 1
+		}
+		db.DB.Exec("UPDATE products SET is_service = ? WHERE id = ?", isService, id)
+	}
+	if v := c.PostForm("is_subscription"); v != "" {
+		isSub := 0
+		if v == "1" || v == "on" || v == "true" {
+			isSub = 1
+		}
+		db.DB.Exec("UPDATE products SET is_subscription = ? WHERE id = ?", isSub, id)
+	}
+	if closedURL, ok := c.GetPostForm("closed_content_url"); ok {
+		u := strings.TrimSpace(closedURL)
+		if len(u) > 2048 {
+			u = u[:2048]
+		}
+		db.DB.Exec("UPDATE products SET closed_content_url = ? WHERE id = ?", nullStr(u), id)
+	}
 	if file, err := c.FormFile("image"); err == nil {
 		rel := filepath.Join("products", strconv.FormatInt(time.Now().Unix(), 10)+".jpg")
 		dst := filepath.Join(cfg.UploadDir, rel)
@@ -935,6 +1037,125 @@ func handleProductDelete(c *gin.Context) {
 	c.Status(204)
 }
 
+func handleSlotsList(c *gin.Context) {
+	id := c.Param("id")
+	list, err := SlotsList(id, getOptionalUserID(c))
+	if err != nil {
+		if errors.Is(err, ErrSlotProductNotFound) {
+			c.JSON(404, gin.H{"error": "Product not found"})
+			return
+		}
+		c.JSON(500, gin.H{"error": "Failed"})
+		return
+	}
+	c.JSON(200, list)
+}
+
+func handleSlotsAdd(c *gin.Context) {
+	id := c.Param("id")
+	var body struct {
+		SlotAt int64 `json:"slot_at"`
+	}
+	c.ShouldBindJSON(&body)
+	if body.SlotAt <= 0 {
+		body.SlotAt = time.Now().Unix()
+	}
+	h, err := SlotsAdd(id, getUserID(c), body.SlotAt)
+	if err != nil {
+		if errors.Is(err, ErrSlotProductNotFound) {
+			c.JSON(404, gin.H{"error": "Product not found"})
+			return
+		}
+		if errors.Is(err, ErrSlotForbidden) {
+			c.JSON(403, gin.H{"error": "Only the product owner can add slots"})
+			return
+		}
+		c.JSON(500, gin.H{"error": "Failed"})
+		return
+	}
+	c.JSON(201, h)
+}
+
+func handleSlotBook(c *gin.Context) {
+	productID := c.Param("id")
+	slotID := c.Param("sid")
+	h, err := SlotBook(productID, slotID, getUserID(c))
+	if err != nil {
+		if errors.Is(err, ErrSlotProductNotFound) || errors.Is(err, ErrSlotNotFound) {
+			c.JSON(404, gin.H{"error": "Not found"})
+			return
+		}
+		if errors.Is(err, ErrSlotNotFree) {
+			c.JSON(400, gin.H{"error": "Slot already booked"})
+			return
+		}
+		if errors.Is(err, ErrSlotNotService) {
+			c.JSON(400, gin.H{"error": "Booking is only for service listings"})
+			return
+		}
+		if errors.Is(err, ErrOrderOwnProduct) {
+			c.JSON(400, gin.H{"error": "Cannot book your own service"})
+			return
+		}
+		c.JSON(500, gin.H{"error": "Failed"})
+		return
+	}
+	c.JSON(201, h)
+}
+
+func handleUserPublic(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil || id <= 0 {
+		c.JSON(404, gin.H{"error": "User not found"})
+		return
+	}
+	var name, avatarPath sql.NullString
+	var emailVerified, phoneVerified int
+	if db.DB.QueryRow("SELECT name, avatar_path, COALESCE(email_verified, 0), COALESCE(phone_verified, 0) FROM users WHERE id = ?", id).Scan(&name, &avatarPath, &emailVerified, &phoneVerified) != nil {
+		c.JSON(404, gin.H{"error": "User not found"})
+		return
+	}
+	verified := emailVerified == 1 || phoneVerified == 1
+	c.JSON(200, gin.H{"id": id, "name": name.String, "avatar_path": avatarPath.String, "verified": verified})
+}
+
+func handleSubscriptionCreate(c *gin.Context) {
+	var body struct {
+		ProductID int64 `json:"product_id"`
+	}
+	if c.ShouldBindJSON(&body) != nil || body.ProductID == 0 {
+		c.JSON(400, gin.H{"error": "product_id required"})
+		return
+	}
+	h, err := Subscribe(strconv.FormatInt(body.ProductID, 10), getUserID(c))
+	if err != nil {
+		if errors.Is(err, ErrSubProductNotFound) {
+			c.JSON(404, gin.H{"error": "Product not found"})
+			return
+		}
+		if errors.Is(err, ErrSubNotSubscription) {
+			c.JSON(400, gin.H{"error": "Product is not a subscription listing"})
+			return
+		}
+		if errors.Is(err, ErrSubOwnProduct) {
+			c.JSON(400, gin.H{"error": "Cannot subscribe to your own listing"})
+			return
+		}
+		if errors.Is(err, ErrSubAlreadySubscribed) {
+			c.JSON(400, gin.H{"error": "Already subscribed"})
+			return
+		}
+		c.JSON(500, gin.H{"error": "Failed"})
+		return
+	}
+	c.JSON(201, h)
+}
+
+func handleSubscriptionsMy(c *gin.Context) {
+	c.JSON(200, SubscriptionsMy(getUserID(c)))
+}
+
 func handleOrdersMy(c *gin.Context) {
 	c.JSON(200, OrdersMy(getUserID(c)))
 }
@@ -945,13 +1166,18 @@ func handleOrderCreate(c *gin.Context) {
 		return
 	}
 	var body struct {
-		ProductID int64 `json:"product_id"`
+		ProductID       int64  `json:"product_id"`
+		InstallmentPlan string `json:"installment_plan"`
 	}
 	if c.ShouldBindJSON(&body) != nil || body.ProductID == 0 {
 		c.JSON(400, gin.H{"error": "product_id required"})
 		return
 	}
-	h, err := OrderCreate(getUserID(c), body.ProductID)
+	installmentPlan := ""
+	if body.InstallmentPlan == "requested" || body.InstallmentPlan == "installments" {
+		installmentPlan = "requested"
+	}
+	h, err := OrderCreate(getUserID(c), body.ProductID, installmentPlan)
 	if err != nil {
 		switch {
 		case errors.Is(err, ErrOrderProductNotFound):
@@ -969,13 +1195,10 @@ func handleOrderCreate(c *gin.Context) {
 func handleOrderUpdate(c *gin.Context) {
 	id := c.Param("id")
 	var body struct {
-		Status string `json:"status"`
+		Status          string `json:"status"`
+		InstallmentPlan string `json:"installment_plan"`
 	}
 	c.ShouldBindJSON(&body)
-	if body.Status != "pending" && body.Status != "confirmed" && body.Status != "completed" && body.Status != "cancelled" {
-		c.JSON(400, gin.H{"error": "Invalid status"})
-		return
-	}
 	var buyer, seller int64
 	if db.DB.QueryRow("SELECT buyer_id, seller_id FROM orders WHERE id = ?", id).Scan(&buyer, &seller) != nil {
 		c.JSON(404, gin.H{"error": "Order not found"})
@@ -986,8 +1209,24 @@ func handleOrderUpdate(c *gin.Context) {
 		c.JSON(403, gin.H{"error": "Forbidden"})
 		return
 	}
-	db.DB.Exec("UPDATE orders SET status = ?, updated_at = unixepoch() WHERE id = ?", body.Status, id)
-	c.JSON(200, gin.H{"id": id, "status": body.Status})
+	if body.Status != "" {
+		if body.Status != "pending" && body.Status != "confirmed" && body.Status != "completed" && body.Status != "cancelled" {
+			c.JSON(400, gin.H{"error": "Invalid status"})
+			return
+		}
+		db.DB.Exec("UPDATE orders SET status = ?, updated_at = unixepoch() WHERE id = ?", body.Status, id)
+	}
+	if body.InstallmentPlan == "requested" || body.InstallmentPlan == "installments" {
+		db.DB.Exec("UPDATE orders SET installment_plan = 'requested', updated_at = unixepoch() WHERE id = ?", id)
+	}
+	out := gin.H{"id": id}
+	if body.Status != "" {
+		out["status"] = body.Status
+	}
+	if body.InstallmentPlan != "" {
+		out["installment_plan"] = "requested"
+	}
+	c.JSON(200, out)
 }
 
 func handleConversationsList(c *gin.Context) {

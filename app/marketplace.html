@@ -61,6 +61,8 @@
         <input type="text" name="q" data-i18n-placeholder="searchPlaceholder" placeholder="Search">
         <input type="text" name="location" data-i18n-placeholder="cityPlaceholder" placeholder="City">
         <select name="category"><option value="" data-i18n="allCategories">All</option></select>
+        <label class="filter-checkbox"><input type="checkbox" name="service" value="1"> <span data-i18n="filterServicesOnly">Services only</span></label>
+        <label class="filter-checkbox"><input type="checkbox" name="subscription" value="1"> <span data-i18n="filterSubscriptionsOnly">Subscriptions only</span></label>
         <input type="number" name="minPrice" data-i18n-placeholder="priceFrom" placeholder="From" min="0" step="0.01">
         <input type="number" name="maxPrice" data-i18n-placeholder="priceTo" placeholder="To" min="0" step="0.01">
         <button type="submit" class="btn btn-primary" data-i18n="searchBtn">Search</button>
@@ -95,8 +97,10 @@
         var noPhoto = window.i18n ? i18n.t('noPhoto') : 'No photo';
         var noResults = window.i18n ? i18n.t('noResults') : 'No results';
         var noResultsHint = window.i18n ? i18n.t('noResultsHint') : 'Try different filters or add your own listing.';
+        var serviceLabel = window.i18n ? i18n.t('filterServiceBadge') : 'Service';
+        var subLabel = window.i18n ? i18n.t('filterSubscriptionBadge') : 'Subscription';
         listEl.innerHTML = data.length
-          ? data.map(p => '<a href="product.html?id=' + p.id + '" class="app-card"><img src="' + (p.image_path ? (window.API_URL + '/uploads/' + p.image_path) : 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22260%22 height=%22180%22><rect fill=%22%23222%22 width=%22260%22 height=%22180%22/><text x=%2250%25%22 y=%2250%25%22 fill=%23666%22 text-anchor=%22middle%22 dy=%22.3em%22>' + encodeURIComponent(noPhoto) + '</text></svg>') + '" alt=""><div class="body"><h3>' + escapeHtml(p.title) + '</h3><p class="price">' + p.price + '</p><p class="meta">' + escapeHtml(p.category) + (p.location ? ' · ' + escapeHtml(p.location) : '') + '</p></div></a>').join('')
+          ? data.map(p => { var badges = ''; if (p.is_service === 1 || p.is_service === true) badges += '<span class="card-badge card-badge-service">' + serviceLabel + '</span>'; if (p.is_subscription === 1 || p.is_subscription === true) badges += '<span class="card-badge card-badge-subscription">' + subLabel + '</span>'; return '<a href="product.html?id=' + p.id + '" class="app-card">' + badges + '<img src="' + (p.image_path ? (window.API_URL + '/uploads/' + p.image_path) : 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22260%22 height=%22180%22><rect fill=%22%23222%22 width=%22260%22 height=%22180%22/><text x=%2250%25%22 y=%2250%25%22 fill=%23666%22 text-anchor=%22middle%22 dy=%22.3em%22>' + encodeURIComponent(noPhoto) + '</text></svg>') + '" alt=""><div class="body"><h3>' + escapeHtml(p.title) + '</h3><p class="price">' + p.price + '</p><p class="meta">' + escapeHtml(p.category) + (p.location ? ' · ' + escapeHtml(p.location) : '') + '</p></div></a>'; }).join('')
           : '<div class="empty-state"><p class="empty-state-title">' + noResults + '</p><p class="empty-state-text">' + noResultsHint + '</p></div>';
       } catch (e) {
         var loadFailed = window.i18n ? i18n.t('loadFailed') : 'Failed to load. Try again.';

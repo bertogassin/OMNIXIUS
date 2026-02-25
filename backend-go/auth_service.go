@@ -51,17 +51,18 @@ func AuthLogin(email, password string) (user gin.H, token string, err error) {
 	var hash string
 	var role, name string
 	var avatar sql.NullString
-	var verified int
+	var emailVerified, phoneVerified int
 	err = db.DB.QueryRow(
-		"SELECT id, password_hash, role, name, avatar_path, email_verified FROM users WHERE email = ?",
+		"SELECT id, password_hash, role, name, avatar_path, COALESCE(email_verified, 0), COALESCE(phone_verified, 0) FROM users WHERE email = ?",
 		email,
-	).Scan(&id, &hash, &role, &name, &avatar, &verified)
+	).Scan(&id, &hash, &role, &name, &avatar, &emailVerified, &phoneVerified)
 	if err != nil || !checkPassword(hash, password) {
 		return nil, "", ErrInvalidCredentials
 	}
+	verified := emailVerified == 1 || phoneVerified == 1
 	user = gin.H{
 		"id": id, "email": email, "role": role, "name": name,
-		"avatar_path": avatar.String, "email_verified": verified == 1,
+		"avatar_path": avatar.String, "email_verified": emailVerified == 1, "phone_verified": phoneVerified == 1, "verified": verified,
 	}
 	token, _ = pqc.SignToken(cfg.PQCPrivateKey, id, time.Now().Add(7*24*time.Hour))
 	return user, token, nil
