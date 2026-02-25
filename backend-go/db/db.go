@@ -83,7 +83,7 @@ func RunMigrations() error {
 }
 
 func InitUploadDirs(uploadDir string) {
-	dirs := []string{uploadDir, filepath.Join(uploadDir, "products"), filepath.Join(uploadDir, "avatars")}
+	dirs := []string{uploadDir, filepath.Join(uploadDir, "products"), filepath.Join(uploadDir, "avatars"), filepath.Join(uploadDir, "vault")}
 	for _, d := range dirs {
 		os.MkdirAll(d, 0755)
 	}

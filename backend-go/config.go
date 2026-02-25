@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/base64"
 	"log"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -26,6 +27,10 @@ type Config struct {
 	// Dilithium3 (post-quantum auth tokens)
 	PQCPublicKey  []byte
 	PQCPrivateKey []byte
+	// WebAuthn (Passkeys)
+	WebAuthnRPID          string   // e.g. localhost or omnixius.com
+	WebAuthnRPDisplayName string   // e.g. OMNIXIUS
+	WebAuthnRPOrigins    []string // e.g. https://localhost:3000
 }
 
 func LoadConfig() Config {
@@ -72,6 +77,22 @@ func LoadConfig() Config {
 		cfg.PQCPrivateKey = priv
 		cfg.PQCPublicKey = pub
 		log.Print("PQC: DILITHIUM_PUBLIC_KEY/DILITHIUM_PRIVATE_KEY not set; ephemeral keys generated (tokens invalid after restart). Set env in production.")
+	}
+	// WebAuthn: derive from AppURL if not set
+	if cfg.WebAuthnRPID == "" || len(cfg.WebAuthnRPOrigins) == 0 {
+		u, _ := url.Parse(cfg.AppURL)
+		if u != nil && u.Host != "" {
+			cfg.WebAuthnRPID = u.Hostname()
+			if cfg.WebAuthnRPDisplayName == "" {
+				cfg.WebAuthnRPDisplayName = "OMNIXIUS"
+			}
+			origin := u.Scheme + "://" + u.Host
+			cfg.WebAuthnRPOrigins = []string{origin}
+		} else {
+			cfg.WebAuthnRPID = "localhost"
+			cfg.WebAuthnRPDisplayName = "OMNIXIUS"
+			cfg.WebAuthnRPOrigins = []string{"http://localhost:" + cfg.Port, "http://127.0.0.1:" + cfg.Port}
+		}
 	}
 	return cfg
 }

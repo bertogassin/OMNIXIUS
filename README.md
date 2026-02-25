@@ -23,9 +23,11 @@ https://bertogassin.github.io/OMNIXIUS/
 https://bertogassin.github.io/OMNIXIUS/app/marketplace.html  
 https://bertogassin.github.io/OMNIXIUS/app/ai.html (ИИ)
 
-**Документация:** ARCHITECTURE.md (видение и стек) · PLATFORM.md (что в проде) · ECOSYSTEM.md (карта направлений) · ROADMAP.md (фазы) · API.md (эндпоинты) · PLATFORM_INFRASTRUCTURE.md (Docker, K8s, CI/CD) · OMNIXIUS_CHECKLIST.md (проверка всего в репо).
+**Документация:** ARCHITECTURE.md (видение и стек) · **ARCHITECTURE-V4.md** (полная исполнительная архитектура v4) · **IMPLEMENTATION-V4.md** (план реализации по v4) · PLATFORM.md · ECOSYSTEM.md · ROADMAP.md · API.md · PLATFORM_INFRASTRUCTURE.md · OMNIXIUS_CHECKLIST.md.
 
 Деплой: push в репозиторий → GitHub Pages обновляет сайт сам.
+
+**Свой домен:** в корне лежит файл **CNAME** — в нём одна строка с твоим доменом (например `www.omnixius.com`). После push в настройках GitHub Pages укажи custom domain и при необходимости DNS у регистратора.
 
 ---
 

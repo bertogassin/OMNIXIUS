@@ -18,7 +18,7 @@ func TestGenerateKey(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	uid, exp, err := VerifyToken(pk, tok)
+	uid, exp, _, err := VerifyToken(pk, tok)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -38,7 +38,7 @@ func TestSignToken_InvalidKey(t *testing.T) {
 }
 
 func TestVerifyToken_InvalidKey(t *testing.T) {
-	_, _, err := VerifyToken([]byte("short"), "payload.sig")
+	_, _, _, err := VerifyToken([]byte("short"), "payload.sig")
 	if err == nil {
 		t.Error("expected error for invalid key size")
 	}
@@ -46,7 +46,7 @@ func TestVerifyToken_InvalidKey(t *testing.T) {
 
 func TestVerifyToken_InvalidFormat(t *testing.T) {
 	_, pk, _ := GenerateKey()
-	_, _, err := VerifyToken(pk, "no-dot")
+	_, _, _, err := VerifyToken(pk, "no-dot")
 	if err == nil {
 		t.Error("expected error for invalid token format")
 	}
@@ -55,7 +55,7 @@ func TestVerifyToken_InvalidFormat(t *testing.T) {
 func TestVerifyToken_Expired(t *testing.T) {
 	sk, pk, _ := GenerateKey()
 	tok, _ := SignToken(sk, 1, time.Now().Add(-time.Second))
-	_, _, err := VerifyToken(pk, tok)
+	_, _, _, err := VerifyToken(pk, tok)
 	if err == nil {
 		t.Error("expected error for expired token")
 	}
@@ -72,7 +72,7 @@ func TestVerifyToken_Tampered(t *testing.T) {
 			break
 		}
 	}
-	_, _, err := VerifyToken(pk, string(b))
+	_, _, _, err := VerifyToken(pk, string(b))
 	if err == nil {
 		t.Error("expected error for tampered token")
 	}

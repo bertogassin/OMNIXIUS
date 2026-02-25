@@ -117,6 +117,47 @@ The AI chat can perform actions on behalf of the signed-in user when the fronten
 
 ---
 
+## Vault API v1
+
+Prefix: `/api/v1/vault`. All require auth.
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/v1/vault/folders` | List folders. Query: `parent_id` (optional). |
+| POST | `/api/v1/vault/folders` | Create folder. Body: `name`, `parent_id` (optional). |
+| DELETE | `/api/v1/vault/folders/:id` | Delete folder (files move to root). |
+| GET | `/api/v1/vault/files` | List files. Query: `folder_id` (optional). |
+| POST | `/api/v1/vault/files` | Upload file. Form: `file`, `folder_id` (optional). |
+| GET | `/api/v1/vault/files/:id` | Get file metadata. |
+| GET | `/api/v1/vault/files/:id/download` | Download file (attachment). |
+| DELETE | `/api/v1/vault/files/:id` | Delete file. |
+| POST | `/api/v1/vault/files/upload-url` | Pre-signed upload URL. 501 (for future S3). |
+| POST | `/api/v1/vault/files/:id/complete` | Confirm pre-signed upload. 501. |
+| GET | `/api/v1/vault/files/:id/download-url` | Pre-signed download URL. 501. |
+
+## Passkeys (WebAuthn)
+
+| Method | Path | Description |
+|--------|------|-------------|
+| POST | `/api/auth/register/begin` | Body: `{ "email", "name" }`. Creates user, returns `{ "session_id", "options" }` (CredentialCreationOptions). Client calls `navigator.credentials.create(options)`, then POST to complete with body = response and header `X-WebAuthn-Session: <session_id>`. |
+| POST | `/api/auth/register/complete` | Header `X-WebAuthn-Session` or query `session_id`. Body = raw PublicKeyCredential JSON from `credentials.create()`. Returns `{ "user", "token" }`. |
+| POST | `/api/auth/login/begin` | Body: `{ "email" }`. Returns `{ "session_id", "options" }` (CredentialRequestOptions). Client calls `navigator.credentials.get(options)`, then POST to complete. |
+| POST | `/api/auth/login/complete` | Header `X-WebAuthn-Session` or query `session_id`. Body = raw assertion response. Returns `{ "user", "token" }`. |
+
+### Sessions, devices, recovery (§1.1 doc v4.0) — auth required except verify/restore
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/auth/sessions` | List my sessions. Returns `{ "sessions": [{ "id", "device_name", "created_at", "expires_at" }] }`. |
+| DELETE | `/api/auth/sessions/:id` | Revoke session (log out that device). |
+| GET | `/api/auth/devices` | List my devices. Returns `{ "devices": [{ "id", "name", "last_used", "created_at" }] }`. |
+| DELETE | `/api/auth/devices/:id` | Remove device. |
+| POST | `/api/auth/recovery/generate` | **Auth.** Store recovery hash. Body: `{ "recoveryHash": "..." }`. |
+| POST | `/api/auth/recovery/verify` | **No auth.** Body: `{ "recoveryHash": "..." }`. Returns `{ "valid": true, "userId": ... }` or 400. |
+| POST | `/api/auth/recovery/restore` | **No auth.** Body: `{ "recoveryHash": "..." }`. Invalidates all sessions, creates new session, returns `{ "token", "user_id" }`. |
+
+---
+
 ## Env (backend)
 
 `PORT`, `DB_PATH`, `ALLOWED_ORIGINS`, `DILITHIUM_PUBLIC_KEY`, `DILITHIUM_PRIVATE_KEY`, `ARGON2_MEMORY`. See `backend-go/.env.example`.

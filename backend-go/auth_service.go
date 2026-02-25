@@ -15,6 +15,20 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// createSession inserts a session row and returns (sessionID, expiresAt). Caller uses SignTokenWithSession.
+func createSession(userID int64, deviceName string) (sessionID int64, expiresAt time.Time) {
+	exp := time.Now().Add(7 * 24 * time.Hour)
+	res, err := db.DB.Exec(
+		"INSERT INTO sessions (user_id, device_name, expires_at) VALUES (?, ?, ?)",
+		userID, deviceName, exp.Unix(),
+	)
+	if err != nil {
+		return 0, exp
+	}
+	sid, _ := res.LastInsertId()
+	return sid, exp
+}
+
 var (
 	ErrEmailExists         = errors.New("email already registered")
 	ErrInvalidCredentials  = errors.New("invalid email or password")
@@ -39,7 +53,8 @@ func AuthRegister(email, password, name string) (user gin.H, token string, err e
 		return nil, "", ErrRegistrationFailed
 	}
 	id, _ = res.LastInsertId()
-	token, _ = pqc.SignToken(cfg.PQCPrivateKey, id, time.Now().Add(7*24*time.Hour))
+	sessionID, exp := createSession(id, "web")
+	token, _ = pqc.SignTokenWithSession(cfg.PQCPrivateKey, id, sessionID, exp)
 	user = gin.H{"id": id, "email": email, "role": "user", "name": name}
 	return user, token, nil
 }
@@ -64,6 +79,7 @@ func AuthLogin(email, password string) (user gin.H, token string, err error) {
 		"id": id, "email": email, "role": role, "name": name,
 		"avatar_path": avatar.String, "email_verified": emailVerified == 1, "phone_verified": phoneVerified == 1, "verified": verified,
 	}
-	token, _ = pqc.SignToken(cfg.PQCPrivateKey, id, time.Now().Add(7*24*time.Hour))
+	sessionID, exp := createSession(id, "web")
+	token, _ = pqc.SignTokenWithSession(cfg.PQCPrivateKey, id, sessionID, exp)
 	return user, token, nil
 }

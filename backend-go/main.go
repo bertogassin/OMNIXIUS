@@ -23,6 +23,7 @@ import (
 	"omnixius-api/pqc"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"golang.org/x/crypto/argon2"
 	"golang.org/x/crypto/bcrypt"
 	"golang.org/x/time/rate"
@@ -49,6 +50,9 @@ func main() {
 		panic(err)
 	}
 	db.InitUploadDirs(cfg.UploadDir)
+	if err := initWebAuthn(); err != nil {
+		log.Printf("WebAuthn init skipped: %v (Passkeys endpoints will return 503)", err)
+	}
 
 	r := gin.New()
 	r.Use(securityHeaders())
@@ -73,15 +77,26 @@ func main() {
 	api := r.Group("/api")
 	api.POST("/auth/register", handleRegister)
 	api.POST("/auth/login", handleLogin)
+	api.POST("/auth/register/begin", handlePasskeyRegisterBegin)
+	api.POST("/auth/register/complete", handlePasskeyRegisterComplete)
+	api.POST("/auth/login/begin", handlePasskeyLoginBegin)
+	api.POST("/auth/login/complete", handlePasskeyLoginComplete)
 	api.GET("/auth/confirm-email", handleConfirmEmail)
 	api.POST("/auth/forgot-password", handleForgotPassword)
 	api.POST("/auth/reset-password", handleResetPassword)
+	api.POST("/auth/recovery/verify", handleRecoveryVerify)
+	api.POST("/auth/recovery/restore", handleRecoveryRestore)
 
 	auth := api.Group("")
 	auth.Use(authRequired())
 	auth.GET("/users/me", handleUserMe)
 	auth.PATCH("/users/me", handleUserUpdate)
 	auth.DELETE("/users/me", handleUserDelete)
+	auth.GET("/auth/sessions", handleAuthSessionsList)
+	auth.DELETE("/auth/sessions/:id", handleAuthSessionDelete)
+	auth.GET("/auth/devices", handleAuthDevicesList)
+	auth.DELETE("/auth/devices/:id", handleAuthDeviceDelete)
+	auth.POST("/auth/recovery/generate", handleRecoveryGenerate)
 	auth.POST("/auth/change-password", handleChangePassword)
 	auth.GET("/users/me/orders", handleUserOrders)
 	auth.GET("/users/me/balance", handleBalanceGet)
@@ -117,6 +132,20 @@ func main() {
 	auth.GET("/messages/conversation/:id", handleMessagesList)
 	auth.POST("/messages/conversation/:id", handleMessageSend)
 	auth.POST("/messages/:id/read", handleMessageRead)
+
+	// Vault API v1 (ARCHITECTURE-V4)
+	vault := api.Group("/v1/vault", authRequired())
+	vault.POST("/files/upload-url", handleVaultUploadURL)       // 501, for future S3 pre-signed
+	vault.POST("/files/:id/complete", handleVaultCompleteUpload) // 501
+	vault.GET("/files/:id/download-url", handleVaultDownloadURL) // 501
+	vault.POST("/files", handleVaultUploadFile)
+	vault.GET("/files", handleVaultListFiles)
+	vault.GET("/files/:id", handleVaultGetFile)
+	vault.GET("/files/:id/download", handleVaultDownloadFile)
+	vault.DELETE("/files/:id", handleVaultDeleteFile)
+	vault.POST("/folders", handleVaultCreateFolder)
+	vault.GET("/folders", handleVaultListFolders)
+	vault.DELETE("/folders/:id", handleVaultDeleteFolder)
 
 	r.NoRoute(staticSiteHandler(cfg.SiteRoot))
 
@@ -179,6 +208,9 @@ func securityHeaders() gin.HandlerFunc {
 
 func requestLogger() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		requestID := uuid.New().String()
+		c.Set("request_id", requestID)
+		c.Header("X-Request-ID", requestID)
 		start := time.Now()
 		path := c.Request.URL.Path
 		method := c.Request.Method
@@ -193,13 +225,18 @@ func requestLogger() gin.HandlerFunc {
 			level = "warn"
 		}
 		entry := map[string]interface{}{
-			"level": level, "method": method, "path": path,
-			"status": status, "ip": clientIP, "latency_ms": latencyMs,
+			"request_id": requestID, "level": level, "method": method, "path": path,
+			"status": status, "ip": clientIP, "duration_ms": latencyMs,
+		}
+		if uid, ok := c.Get("userID"); ok && uid != nil {
+			if id, ok := uid.(int64); ok {
+				entry["user_id"] = id
+			}
 		}
 		if b, err := json.Marshal(entry); err == nil {
 			log.Println(string(b))
 		} else {
-			log.Printf("[%s] %d %s %s", method, status, path, clientIP)
+			log.Printf("[%s] %s %d %s %s", requestID, method, status, path, clientIP)
 		}
 	}
 }
@@ -252,11 +289,19 @@ func authRequired() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-		uid, _, err := pqc.VerifyToken(cfg.PQCPublicKey, tok)
+		uid, _, sessionID, err := pqc.VerifyToken(cfg.PQCPublicKey, tok)
 		if err != nil {
 			c.JSON(401, gin.H{"error": "Invalid token"})
 			c.Abort()
 			return
+		}
+		if sessionID != 0 {
+			var n int
+			if db.DB.QueryRow("SELECT 1 FROM sessions WHERE id = ? AND user_id = ? AND expires_at > ?", sessionID, uid, time.Now().Unix()).Scan(&n) != nil || n == 0 {
+				c.JSON(401, gin.H{"error": "Session invalid or expired"})
+				c.Abort()
+				return
+			}
 		}
 		var email, role string
 		var name, avatar sql.NullString
@@ -294,9 +339,15 @@ func getOptionalUserID(c *gin.Context) int64 {
 	if tok == "" {
 		return 0
 	}
-	uid, _, err := pqc.VerifyToken(cfg.PQCPublicKey, tok)
+	uid, _, sessionID, err := pqc.VerifyToken(cfg.PQCPublicKey, tok)
 	if err != nil {
 		return 0
+	}
+	if sessionID != 0 {
+		var n int
+		if db.DB.QueryRow("SELECT 1 FROM sessions WHERE id = ? AND user_id = ? AND expires_at > ?", sessionID, uid, time.Now().Unix()).Scan(&n) != nil || n == 0 {
+			return 0
+		}
 	}
 	var n int
 	if db.DB.QueryRow("SELECT 1 FROM users WHERE id = ?", uid).Scan(&n) != nil {
@@ -1490,6 +1541,424 @@ func handleMessageRead(c *gin.Context) {
 		return
 	}
 	c.JSON(200, gin.H{"ok": true})
+}
+
+// Vault API v1 (ARCHITECTURE-V4)
+func handleVaultUploadURL(c *gin.Context) {
+	c.JSON(http.StatusNotImplemented, gin.H{"error": "Use POST /api/v1/vault/files with multipart for now; pre-signed URLs in Phase 3"})
+}
+
+func handleVaultCompleteUpload(c *gin.Context) {
+	c.JSON(http.StatusNotImplemented, gin.H{"error": "Pre-signed flow not implemented yet"})
+}
+
+func handleVaultDownloadURL(c *gin.Context) {
+	c.JSON(http.StatusNotImplemented, gin.H{"error": "Use GET /api/v1/vault/files/:id/download for now"})
+}
+
+func handleVaultListFiles(c *gin.Context) {
+	uid := getUserID(c)
+	folderID := c.Query("folder_id")
+	var rows *sql.Rows
+	var err error
+	if folderID == "" {
+		rows, err = db.DB.Query("SELECT id, name, size_bytes, mime_type, folder_id, created_at, updated_at FROM vault_files WHERE user_id = ? ORDER BY updated_at DESC", uid)
+	} else {
+		fid, _ := strconv.ParseInt(folderID, 10, 64)
+		if fid == 0 {
+			rows, err = db.DB.Query("SELECT id, name, size_bytes, mime_type, folder_id, created_at, updated_at FROM vault_files WHERE user_id = ? AND folder_id IS NULL ORDER BY updated_at DESC", uid)
+		} else {
+			rows, err = db.DB.Query("SELECT id, name, size_bytes, mime_type, folder_id, created_at, updated_at FROM vault_files WHERE user_id = ? AND folder_id = ? ORDER BY updated_at DESC", uid, fid)
+		}
+	}
+	if err != nil {
+		c.JSON(500, gin.H{"error": "Failed to list files"})
+		return
+	}
+	defer rows.Close()
+	var files []gin.H
+	for rows.Next() {
+		var id, sizeBytes int64
+		var name, mimeType sql.NullString
+		var folderIDNull sql.NullInt64
+		var createdAt, updatedAt int64
+		if err := rows.Scan(&id, &name, &sizeBytes, &mimeType, &folderIDNull, &createdAt, &updatedAt); err != nil {
+			continue
+		}
+		f := gin.H{"id": id, "name": nullStrToString(name), "size_bytes": sizeBytes, "mime_type": nullStrToString(mimeType), "created_at": createdAt, "updated_at": updatedAt}
+		if folderIDNull.Valid {
+			f["folder_id"] = folderIDNull.Int64
+		} else {
+			f["folder_id"] = nil
+		}
+		files = append(files, f)
+	}
+	c.JSON(200, gin.H{"files": files})
+}
+
+func handleVaultListFolders(c *gin.Context) {
+	uid := getUserID(c)
+	parentID := c.Query("parent_id")
+	var rows *sql.Rows
+	var err error
+	if parentID == "" {
+		rows, err = db.DB.Query("SELECT id, name, parent_id, created_at, updated_at FROM vault_folders WHERE user_id = ? ORDER BY name", uid)
+	} else {
+		pid, _ := strconv.ParseInt(parentID, 10, 64)
+		if pid == 0 {
+			rows, err = db.DB.Query("SELECT id, name, parent_id, created_at, updated_at FROM vault_folders WHERE user_id = ? AND parent_id IS NULL ORDER BY name", uid)
+		} else {
+			rows, err = db.DB.Query("SELECT id, name, parent_id, created_at, updated_at FROM vault_folders WHERE user_id = ? AND parent_id = ? ORDER BY name", uid, pid)
+		}
+	}
+	if err != nil {
+		c.JSON(500, gin.H{"error": "Failed to list folders"})
+		return
+	}
+	defer rows.Close()
+	var folders []gin.H
+	for rows.Next() {
+		var id int64
+		var name string
+		var parentIDNull sql.NullInt64
+		var createdAt, updatedAt int64
+		if err := rows.Scan(&id, &name, &parentIDNull, &createdAt, &updatedAt); err != nil {
+			continue
+		}
+		f := gin.H{"id": id, "name": name, "created_at": createdAt, "updated_at": updatedAt}
+		if parentIDNull.Valid {
+			f["parent_id"] = parentIDNull.Int64
+		} else {
+			f["parent_id"] = nil
+		}
+		folders = append(folders, f)
+	}
+	c.JSON(200, gin.H{"folders": folders})
+}
+
+func handleVaultCreateFolder(c *gin.Context) {
+	uid := getUserID(c)
+	var body struct {
+		Name     string `json:"name"`
+		ParentID *int64 `json:"parent_id"`
+	}
+	if err := c.ShouldBindJSON(&body); err != nil || body.Name == "" {
+		c.JSON(400, gin.H{"error": "name required"})
+		return
+	}
+	var parentID interface{}
+	if body.ParentID != nil && *body.ParentID > 0 {
+		var exists int
+		if db.DB.QueryRow("SELECT 1 FROM vault_folders WHERE id = ? AND user_id = ?", *body.ParentID, uid).Scan(&exists) != nil {
+			c.JSON(400, gin.H{"error": "parent folder not found"})
+			return
+		}
+		parentID = *body.ParentID
+	}
+	res, err := db.DB.Exec("INSERT INTO vault_folders (user_id, name, parent_id, created_at, updated_at) VALUES (?, ?, ?, unixepoch(), unixepoch())", uid, body.Name, parentID)
+	if err != nil {
+		c.JSON(500, gin.H{"error": "Failed to create folder"})
+		return
+	}
+	id, _ := res.LastInsertId()
+	c.JSON(201, gin.H{"id": id, "name": body.Name, "parent_id": body.ParentID, "created_at": time.Now().Unix(), "updated_at": time.Now().Unix()})
+}
+
+func handleVaultDeleteFolder(c *gin.Context) {
+	uid := getUserID(c)
+	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(400, gin.H{"error": "invalid id"})
+		return
+	}
+	res, err := db.DB.Exec("DELETE FROM vault_folders WHERE id = ? AND user_id = ?", id, uid)
+	if err != nil {
+		c.JSON(500, gin.H{"error": "Failed to delete folder"})
+		return
+	}
+	aff, _ := res.RowsAffected()
+	if aff == 0 {
+		c.JSON(404, gin.H{"error": "Folder not found"})
+		return
+	}
+	// Orphan files in this folder (set folder_id = NULL)
+	db.DB.Exec("UPDATE vault_files SET folder_id = NULL, updated_at = unixepoch() WHERE folder_id = ? AND user_id = ?", id, uid)
+	c.JSON(200, gin.H{"ok": true})
+}
+
+func handleVaultUploadFile(c *gin.Context) {
+	uid := getUserID(c)
+	form, err := c.MultipartForm()
+	if err != nil {
+		c.JSON(400, gin.H{"error": "multipart form required"})
+		return
+	}
+	files := form.File["file"]
+	if len(files) == 0 {
+		files = form.File["files"]
+	}
+	if len(files) == 0 {
+		c.JSON(400, gin.H{"error": "file required"})
+		return
+	}
+	fh := files[0]
+	if fh.Size > cfg.MaxFileSize {
+		c.JSON(400, gin.H{"error": "file too large"})
+		return
+	}
+	folderIDRaw := form.Value["folder_id"]
+	var folderID interface{}
+	if len(folderIDRaw) > 0 && folderIDRaw[0] != "" {
+		if fid, err := strconv.ParseInt(folderIDRaw[0], 10, 64); err == nil && fid > 0 {
+			var exists int
+			if db.DB.QueryRow("SELECT 1 FROM vault_folders WHERE id = ? AND user_id = ?", fid, uid).Scan(&exists) == nil {
+				folderID = fid
+			}
+		}
+	}
+	// storage: uploads/vault/{user_id}/{file_id}
+	res, err := db.DB.Exec("INSERT INTO vault_files (user_id, name, size_bytes, mime_type, storage_path, folder_id, created_at, updated_at) VALUES (?, ?, ?, ?, '', ?, unixepoch(), unixepoch())", uid, fh.Filename, fh.Size, fh.Header.Get("Content-Type"), folderID)
+	if err != nil {
+		c.JSON(500, gin.H{"error": "Failed to create file record"})
+		return
+	}
+	fileID, _ := res.LastInsertId()
+	storagePath := filepath.Join(cfg.UploadDir, "vault", strconv.FormatInt(uid, 10), strconv.FormatInt(fileID, 10))
+	if err := os.MkdirAll(filepath.Dir(storagePath), 0755); err != nil {
+		db.DB.Exec("DELETE FROM vault_files WHERE id = ?", fileID)
+		c.JSON(500, gin.H{"error": "Failed to create storage dir"})
+		return
+	}
+	if err := c.SaveUploadedFile(fh, storagePath); err != nil {
+		db.DB.Exec("DELETE FROM vault_files WHERE id = ?", fileID)
+		c.JSON(500, gin.H{"error": "Failed to save file"})
+		return
+	}
+	db.DB.Exec("UPDATE vault_files SET storage_path = ? WHERE id = ?", storagePath, fileID)
+	c.JSON(201, gin.H{"id": fileID, "name": fh.Filename, "size_bytes": fh.Size, "mime_type": fh.Header.Get("Content-Type"), "folder_id": folderID, "created_at": time.Now().Unix(), "updated_at": time.Now().Unix()})
+}
+
+func handleVaultGetFile(c *gin.Context) {
+	uid := getUserID(c)
+	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(400, gin.H{"error": "invalid id"})
+		return
+	}
+	var name, mimeType, storagePath string
+	var sizeBytes, createdAt, updatedAt int64
+	var folderIDNull sql.NullInt64
+	err = db.DB.QueryRow("SELECT name, size_bytes, mime_type, storage_path, folder_id, created_at, updated_at FROM vault_files WHERE id = ? AND user_id = ?", id, uid).Scan(&name, &sizeBytes, &mimeType, &storagePath, &folderIDNull, &createdAt, &updatedAt)
+	if err != nil {
+		c.JSON(404, gin.H{"error": "File not found"})
+		return
+	}
+	out := gin.H{"id": id, "name": name, "size_bytes": sizeBytes, "mime_type": mimeType, "created_at": createdAt, "updated_at": updatedAt}
+	if folderIDNull.Valid {
+		out["folder_id"] = folderIDNull.Int64
+	} else {
+		out["folder_id"] = nil
+	}
+	c.JSON(200, out)
+}
+
+func handleVaultDownloadFile(c *gin.Context) {
+	uid := getUserID(c)
+	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(400, gin.H{"error": "invalid id"})
+		return
+	}
+	var name, storagePath string
+	err = db.DB.QueryRow("SELECT name, storage_path FROM vault_files WHERE id = ? AND user_id = ?", id, uid).Scan(&name, &storagePath)
+	if err != nil {
+		c.JSON(404, gin.H{"error": "File not found"})
+		return
+	}
+	if _, err := os.Stat(storagePath); err != nil {
+		c.JSON(404, gin.H{"error": "File not found on disk"})
+		return
+	}
+	c.Header("Content-Disposition", "attachment; filename=\""+name+"\"")
+	c.File(storagePath)
+}
+
+func handleVaultDeleteFile(c *gin.Context) {
+	uid := getUserID(c)
+	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(400, gin.H{"error": "invalid id"})
+		return
+	}
+	var storagePath string
+	if db.DB.QueryRow("SELECT storage_path FROM vault_files WHERE id = ? AND user_id = ?", id, uid).Scan(&storagePath) != nil {
+		c.JSON(404, gin.H{"error": "File not found"})
+		return
+	}
+	db.DB.Exec("DELETE FROM vault_files WHERE id = ?", id)
+	os.Remove(storagePath)
+	c.JSON(200, gin.H{"ok": true})
+}
+
+// --- §1.1 Auth: sessions, devices; §1.2 recovery; §1.9 audit ---
+func auditLog(userID int64, action, resource, resourceID, oldVal, newVal string, c *gin.Context) {
+	ip := c.ClientIP()
+	ua := c.GetHeader("User-Agent")
+	db.DB.Exec(
+		"INSERT INTO audit_log (user_id, action, resource, resource_id, old_value, new_value, ip, user_agent) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+		userID, action, resource, resourceID, nullStr(oldVal), nullStr(newVal), ip, ua,
+	)
+}
+
+func handleAuthSessionsList(c *gin.Context) {
+	uid := getUserID(c)
+	rows, err := db.DB.Query("SELECT id, device_name, created_at, expires_at FROM sessions WHERE user_id = ? AND expires_at > ? ORDER BY created_at DESC", uid, time.Now().Unix())
+	if err != nil {
+		c.JSON(500, gin.H{"error": "failed to list sessions"})
+		return
+	}
+	defer rows.Close()
+	var list []gin.H
+	for rows.Next() {
+		var id int64
+		var deviceName string
+		var createdAt, expiresAt int64
+		if rows.Scan(&id, &deviceName, &createdAt, &expiresAt) != nil {
+			continue
+		}
+		list = append(list, gin.H{"id": id, "device_name": deviceName, "created_at": createdAt, "expires_at": expiresAt})
+	}
+	c.JSON(200, gin.H{"sessions": list})
+}
+
+func handleAuthSessionDelete(c *gin.Context) {
+	uid := getUserID(c)
+	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(400, gin.H{"error": "invalid id"})
+		return
+	}
+	res, err := db.DB.Exec("DELETE FROM sessions WHERE id = ? AND user_id = ?", id, uid)
+	if err != nil {
+		c.JSON(500, gin.H{"error": "failed to delete"})
+		return
+	}
+	if n, _ := res.RowsAffected(); n == 0 {
+		c.JSON(404, gin.H{"error": "session not found"})
+		return
+	}
+	auditLog(uid, "session.revoked", "session", strconv.FormatInt(id, 10), "", "", c)
+	c.JSON(200, gin.H{"ok": true})
+}
+
+func handleAuthDevicesList(c *gin.Context) {
+	uid := getUserID(c)
+	rows, err := db.DB.Query("SELECT id, name, last_used, created_at FROM devices WHERE user_id = ? ORDER BY created_at DESC", uid)
+	if err != nil {
+		c.JSON(500, gin.H{"error": "failed to list devices"})
+		return
+	}
+	defer rows.Close()
+	var list []gin.H
+	for rows.Next() {
+		var id int64
+		var name string
+		var lastUsed sql.NullInt64
+		var createdAt int64
+		if rows.Scan(&id, &name, &lastUsed, &createdAt) != nil {
+			continue
+		}
+		lu := interface{}(nil)
+		if lastUsed.Valid {
+			lu = lastUsed.Int64
+		}
+		list = append(list, gin.H{"id": id, "name": name, "last_used": lu, "created_at": createdAt})
+	}
+	c.JSON(200, gin.H{"devices": list})
+}
+
+func handleAuthDeviceDelete(c *gin.Context) {
+	uid := getUserID(c)
+	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(400, gin.H{"error": "invalid id"})
+		return
+	}
+	res, err := db.DB.Exec("DELETE FROM devices WHERE id = ? AND user_id = ?", id, uid)
+	if err != nil {
+		c.JSON(500, gin.H{"error": "failed to delete"})
+		return
+	}
+	if n, _ := res.RowsAffected(); n == 0 {
+		c.JSON(404, gin.H{"error": "device not found"})
+		return
+	}
+	auditLog(uid, "device.removed", "device", strconv.FormatInt(id, 10), "", "", c)
+	c.JSON(200, gin.H{"ok": true})
+}
+
+func handleRecoveryGenerate(c *gin.Context) {
+	uid := getUserID(c)
+	var body struct {
+		RecoveryHash string `json:"recoveryHash"`
+	}
+	if err := c.ShouldBindJSON(&body); err != nil || body.RecoveryHash == "" {
+		c.JSON(400, gin.H{"error": "recoveryHash required"})
+		return
+	}
+	_, err := db.DB.Exec(
+		"INSERT OR REPLACE INTO user_recovery (user_id, recovery_hash, created_at) VALUES (?, ?, ?)",
+		uid, body.RecoveryHash, time.Now().Unix(),
+	)
+	if err != nil {
+		c.JSON(500, gin.H{"error": "failed to save recovery"})
+		return
+	}
+	auditLog(uid, "recovery.generated", "user_recovery", "", "", "", c)
+	c.JSON(200, gin.H{"ok": true})
+}
+
+func handleRecoveryVerify(c *gin.Context) {
+	var body struct {
+		RecoveryHash string `json:"recoveryHash"`
+	}
+	if err := c.ShouldBindJSON(&body); err != nil || body.RecoveryHash == "" {
+		c.JSON(400, gin.H{"error": "recoveryHash required"})
+		return
+	}
+	var userID int64
+	if db.DB.QueryRow("SELECT user_id FROM user_recovery WHERE recovery_hash = ?", body.RecoveryHash).Scan(&userID) != nil {
+		c.JSON(400, gin.H{"error": "invalid recovery phrase"})
+		return
+	}
+	c.JSON(200, gin.H{"valid": true, "userId": userID})
+}
+
+func handleRecoveryRestore(c *gin.Context) {
+	var body struct {
+		RecoveryHash string `json:"recoveryHash"`
+	}
+	if err := c.ShouldBindJSON(&body); err != nil || body.RecoveryHash == "" {
+		c.JSON(400, gin.H{"error": "recoveryHash required"})
+		return
+	}
+	var userID int64
+	if db.DB.QueryRow("SELECT user_id FROM user_recovery WHERE recovery_hash = ?", body.RecoveryHash).Scan(&userID) != nil {
+		c.JSON(400, gin.H{"error": "invalid recovery phrase"})
+		return
+	}
+	db.DB.Exec("DELETE FROM sessions WHERE user_id = ?", userID)
+	sessionID, exp := createSession(userID, "recovery")
+	token, _ := pqc.SignTokenWithSession(cfg.PQCPrivateKey, userID, sessionID, exp)
+	auditLog(userID, "recovery.restore", "user_recovery", "", "", "", c)
+	c.JSON(200, gin.H{"token": token, "user_id": userID})
+}
+
+func nullStrToString(s sql.NullString) string {
+	if s.Valid {
+		return s.String
+	}
+	return ""
 }
 
 func nullStr(s string) interface{} {
