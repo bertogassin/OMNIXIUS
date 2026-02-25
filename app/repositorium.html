@@ -61,14 +61,49 @@
   </header>
   <main class="app-page">
     <div class="container">
-      <p class="status-done">СДЕЛАНО: место создано. Дальше: узлы хранения, награды, аренда compute.</p>
-      <h1>OMNIXIUS REPOSITORIUM</h1>
-      <p class="about-text">Decentralized cloud: home servers, rewards for storage and compute. IPFS + AI encryption, blockchain access control. Compute rental, referral programs.</p>
-      <p style="margin-top:1.5rem; padding:1rem; background:var(--bg-card); border:1px solid var(--border); border-radius:10px; color:var(--text-muted);"><strong>Place ready.</strong> Develop from here: storage nodes, rewards, compute rental MVP. Stack: Rust/C++, Spark.</p>
+      <section class="repo-hero">
+        <h1 class="repo-title" data-i18n="cardRepositorium">OMNIXIUS REPOSITORIUM</h1>
+        <p class="repo-tagline" data-i18n="cardRepositoriumDesc">Decentralized storage and compute. Data and infrastructure.</p>
+        <p class="repo-intro" data-i18n="repoIntro">Decentralized cloud: home servers, rewards for storage and compute. IPFS + AI encryption, blockchain access control. Compute rental, referral programs.</p>
+      </section>
+
+      <section class="repo-features">
+        <div class="repo-features-grid">
+          <article class="repo-card card">
+            <h3 class="repo-card-title" data-i18n="repoStorage">Storage</h3>
+            <p class="repo-card-desc" data-i18n="repoStorageDesc">Server nodes at users' homes. Global cloud without centralized data centers. Backups and recovery.</p>
+          </article>
+          <article class="repo-card card">
+            <h3 class="repo-card-title" data-i18n="repoCompute">Compute</h3>
+            <p class="repo-card-desc" data-i18n="repoComputeDesc">Rental for companies and startups. Run workloads on the distributed network.</p>
+          </article>
+          <article class="repo-card card">
+            <h3 class="repo-card-title" data-i18n="repoRewards">Rewards</h3>
+            <p class="repo-card-desc" data-i18n="repoRewardsDesc">Earn for providing storage and compute. Referral programs.</p>
+          </article>
+          <article class="repo-card card">
+            <h3 class="repo-card-title" data-i18n="repoSecurity">Security</h3>
+            <p class="repo-card-desc" data-i18n="repoSecurityDesc">IPFS + AI encryption. Blockchain-based access control. Your data, your keys.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="repo-next">
+        <div class="repo-next-card card">
+          <h3 class="repo-next-title" data-i18n="repoNextTitle">Next steps</h3>
+          <p class="repo-next-text" data-i18n="repoNextText">Storage nodes, rewards, compute rental MVP. Stack: Rust/C++, Spark.</p>
+        </div>
+      </section>
+
+      <nav class="repo-links">
+        <a href="../ecosystem.html" class="quick-link" data-i18n="repoLinkEcosystem">Ecosystem map</a>
+        <a href="../architecture.html#arch3" class="quick-link" data-i18n="repoLinkArch">Architecture</a>
+      </nav>
     </div>
   </main>
   <script src="config.js"></script>
   <script src="js/api.js"></script>
+  <script src="js/i18n.js"></script>
   <script src="../js/main.js"></script>
   <script>
     (function(){ var t = localStorage.getItem('omnixius_token'); document.getElementById('navLogin').style.display = t ? 'none' : ''; document.getElementById('navLogout').style.display = t ? '' : 'none'; })();

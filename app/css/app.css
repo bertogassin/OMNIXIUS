@@ -1,11 +1,18 @@
 /* App: формы и списки */
 :root {
-  --bg: #0c0c0f;
-  --bg-card: #14141a;
-  --text: #e8e6e3;
-  --text-muted: #8a8a8a;
-  --accent: #00d4aa;
-  --border: #2a2a32;
+  --bg: #0a0a0d;
+  --bg-card: #14141c;
+  --bg-card-hover: #1a1a24;
+  --text: #ecebe8;
+  --text-muted: #9090a0;
+  --accent: #00d9b4;
+  --accent-soft: #00b899;
+  --accent-dim: rgba(0, 217, 180, 0.12);
+  --border: #252530;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.3);
+  --shadow-hover: 0 8px 28px rgba(0, 217, 180, 0.08);
   --bp-sm: 360px;
   --bp-md: 640px;
   --bp-lg: 768px;
@@ -31,6 +38,8 @@
   border: 1px solid var(--border);
   border-radius: 16px;
   box-sizing: border-box;
+  box-shadow: var(--shadow-card);
+  border-top: 3px solid var(--accent);
 }
 .auth-title { text-align: center; margin-bottom: 1.25rem; font-size: 1.5rem; }
 .auth-link { text-align: center; margin-top: 1rem; }
@@ -72,7 +81,8 @@
 .app-form .btn-block:active { transform: scale(0.98); opacity: 0.95; }
 .app-form .btn-block:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .app-form input:focus, .app-form textarea:focus { border-color: var(--accent); outline: none; }
-.app-form input:focus-visible, .app-form textarea:focus-visible { box-shadow: 0 0 0 2px rgba(0,212,170,0.3); }
+.app-form input:focus-visible, .app-form textarea:focus-visible { box-shadow: 0 0 0 3px rgba(0,217,180,0.25); }
+.app-form input, .app-form textarea { transition: border-color 0.2s, box-shadow 0.2s; }
 .app-form .error { color: #e74c3c; margin-bottom: 0.5rem; font-size: 0.9rem; word-break: break-word; }
 .app-form .link { margin-top: 1rem; text-align: center; }
 .app-form .link a { color: var(--accent); }
@@ -139,15 +149,24 @@
   position: relative;
   background: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--radius);
   overflow: hidden;
-  transition: border-color 0.2s, transform 0.1s, opacity 0.1s;
+  transition: border-color 0.25s, transform 0.2s ease, box-shadow 0.25s, background 0.2s;
+  text-decoration: none;
+  color: inherit;
+  display: block;
 }
-.app-card:hover { border-color: var(--accent); }
-.app-card:active { transform: scale(0.99); opacity: 0.95; }
-.app-card:focus-within { border-color: var(--accent); }
-.app-card img { width: 100%; height: 180px; object-fit: cover; }
-.app-card .body { padding: 1rem; }
+.app-card:hover {
+  border-color: var(--accent);
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-3px);
+  background: var(--bg-card-hover);
+}
+.app-card:active { transform: translateY(-1px) scale(0.99); opacity: 0.98; }
+.app-card:focus-within { border-color: var(--accent); outline: none; }
+.app-card img { width: 100%; height: 180px; object-fit: cover; transition: transform 0.3s ease; }
+.app-card:hover img { transform: scale(1.03); }
+.app-card .body { padding: 1.1rem; }
 .card-badge {
   position: absolute;
   top: 0.5rem;
@@ -189,6 +208,19 @@
 .app-card .price { color: var(--accent); font-weight: 600; }
 .app-card .meta { font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem; }
 
+.mail-vision {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  border-left: 3px solid var(--accent);
+}
+.mail-vision-title { font-size: 1.1rem; font-weight: 600; margin: 0 0 0.5rem; color: var(--text); }
+.mail-vision-intro { font-size: 0.95rem; color: var(--text-muted); line-height: 1.6; margin: 0 0 1rem; }
+.mail-vision-pillars { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.6rem; }
+.mail-vision-pillars li { font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; }
+.mail-vision-pillars strong { color: var(--accent); font-weight: 600; margin-right: 0.35rem; }
 .mail-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
 .mail-header h1 { margin: 0; }
 .mail-header .btn-sm { padding: 0.4rem 0.75rem; font-size: 0.9rem; }
@@ -234,12 +266,13 @@
 .section-title:first-of-type { margin-top: 0; }
 .quick-links-grid { display: flex; flex-wrap: wrap; gap: 0.75rem; }
 .quick-link {
-  display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.25rem;
-  background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px;
-  color: var(--text); text-decoration: none; font-weight: 500; transition: border-color 0.2s, transform 0.1s, opacity 0.1s;
+  display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.85rem 1.35rem;
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
+  color: var(--text); text-decoration: none; font-weight: 500;
+  transition: border-color 0.2s, transform 0.2s ease, background 0.2s, color 0.2s;
 }
-.quick-link:hover { border-color: var(--accent); color: var(--accent); }
-.quick-link:active { transform: scale(0.97); opacity: 0.9; }
+.quick-link:hover { border-color: var(--accent); color: var(--accent); background: var(--bg-card-hover); transform: translateY(-2px); }
+.quick-link:active { transform: translateY(0) scale(0.98); }
 .quick-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .quick-link-icon { font-size: 1.2rem; opacity: 0.9; }
 
@@ -248,8 +281,10 @@
 .orders-section h2 { font-size: 1.1rem; margin-bottom: 1rem; color: var(--text-muted); }
 .orders-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
 .order-card {
-  display: flex; gap: 1rem; padding: 1rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px;
+  display: flex; gap: 1rem; padding: 1.1rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
+.order-card:hover { border-color: var(--border); box-shadow: 0 2px 12px rgba(0,0,0,0.2); }
 .order-card-img { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; }
 .order-card-body { flex: 1; min-width: 0; }
 .order-card-title { font-size: 1rem; margin-bottom: 0.25rem; }
@@ -262,10 +297,45 @@
 .order-status-cancelled { background: rgba(244,67,54,0.2); color: #f44336; }
 .orders-empty { color: var(--text-muted); }
 
-.loading-state { color: var(--text-muted); text-align: center; padding: 2rem; }
-.empty-state { text-align: center; padding: 2.5rem 1rem; }
-.empty-state-title { font-size: 1.1rem; margin-bottom: 0.5rem; color: var(--text-muted); }
-.empty-state-text { color: var(--text-muted); font-size: 0.95rem; }
+.loading-state {
+  color: var(--text-muted);
+  text-align: center;
+  padding: 2.5rem 2rem;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+.loading-state::before {
+  content: '';
+  display: block;
+  width: 32px;
+  height: 32px;
+  margin: 0 auto 1rem;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.empty-state { text-align: center; padding: 3rem 1.5rem; border-radius: var(--radius); background: var(--bg-card); border: 1px dashed var(--border); }
+.empty-state-title { font-size: 1.15rem; margin-bottom: 0.5rem; color: var(--text); font-weight: 600; }
+.empty-state-text { color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; }
+
+/* ——— Repositorium page ——— */
+.repo-hero { margin-bottom: 2.5rem; }
+.repo-title { font-size: clamp(1.75rem, 4vw, 2.25rem); font-weight: 700; margin-bottom: 0.5rem; color: var(--text); }
+.repo-tagline { font-size: 1.1rem; color: var(--accent); margin-bottom: 1rem; font-weight: 500; }
+.repo-intro { color: var(--text-muted); line-height: 1.7; max-width: 56ch; }
+.repo-features { margin-bottom: 2rem; }
+.repo-features-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1.25rem; }
+.repo-card { padding: 1.35rem; }
+.repo-card-title { font-size: 1.05rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text); }
+.repo-card-desc { font-size: 0.9rem; color: var(--text-muted); line-height: 1.55; margin: 0; }
+.repo-next { margin-bottom: 2rem; }
+.repo-next-card { padding: 1.25rem 1.5rem; border-left: 3px solid var(--accent); }
+.repo-next-title { font-size: 1rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--text); }
+.repo-next-text { font-size: 0.95rem; color: var(--text-muted); margin: 0; line-height: 1.5; }
+.repo-links { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+.repo-links .quick-link { margin: 0; }
 
 .api-url-hint { background: rgba(255,193,7,0.1); border: 1px solid rgba(255,193,7,0.3); border-radius: 8px; padding: 1rem; margin-bottom: 1rem; font-size: 0.9rem; }
 .api-url-hint a { color: var(--accent); }
