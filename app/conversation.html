@@ -61,9 +61,14 @@
   </header>
   <main class="app-page">
     <div class="container">
-      <p class="status-done">СДЕЛАНО: работает (Live). Диалог с пользователем.</p>
-      <p style="margin-bottom:1rem;"><a href="mail.html" id="backToMail">← Mail</a></p>
-      <div id="root"></div>
+      <div class="conversation-header">
+        <p style="margin-bottom:0.5rem;"><a href="mail.html" id="backToMail" data-i18n="backToMail">← Mail</a></p>
+        <h2 class="conversation-title" id="conversationTitle"></h2>
+        <p class="conversation-about" id="conversationAbout" style="display:none;"></p>
+      </div>
+      <div class="thread-wrap" id="threadWrap">
+        <div id="root"></div>
+      </div>
       <div class="thread-send" id="sendForm" style="display:none;">
         <input type="text" id="msgInput" placeholder="Message" aria-label="Message text">
         <button type="button" class="btn btn-primary" id="sendBtn">Send</button>
@@ -89,7 +94,18 @@
 
     async function loadOrCreate() {
       if (conversationId) {
-        const messages = await api.messages.list(conversationId);
+        const [meta, messages] = await Promise.all([api.conversations.get(conversationId), api.messages.list(conversationId)]);
+        await markConversationRead(messages);
+        var other = meta.other || {};
+        var otherName = other.name || other.email || 'User';
+        document.getElementById('conversationTitle').textContent = (t('chatWith') || 'Chat with') + ' ' + otherName;
+        var aboutEl = document.getElementById('conversationAbout');
+        if (meta.product_id && (meta.product_title || meta.product_id)) {
+          aboutEl.style.display = '';
+          aboutEl.innerHTML = (t('aboutProduct') || 'About') + ': <a href="product.html?id=' + meta.product_id + '">' + escapeHtml(meta.product_title || ('#' + meta.product_id)) + '</a>';
+        } else {
+          aboutEl.style.display = 'none';
+        }
         render(messages);
         document.getElementById('sendForm').style.display = 'flex';
         document.getElementById('msgInput').placeholder = t('messagePlaceholder');
@@ -101,6 +117,17 @@
         const conv = await api.conversations.create(userId, productId || undefined);
         conversationId = conv.id;
         history.replaceState(null, '', 'conversation.html?id=' + conv.id);
+        try {
+          var meta = await api.conversations.get(conversationId);
+          var other = meta.other || {};
+          var otherName = other.name || other.email || 'User';
+          document.getElementById('conversationTitle').textContent = (t('chatWith') || 'Chat with') + ' ' + otherName;
+          var aboutEl = document.getElementById('conversationAbout');
+          if (meta.product_id && (meta.product_title || meta.product_id)) {
+            aboutEl.style.display = '';
+            aboutEl.innerHTML = (t('aboutProduct') || 'About') + ': <a href="product.html?id=' + meta.product_id + '">' + escapeHtml(meta.product_title || ('#' + meta.product_id)) + '</a>';
+          }
+        } catch (_) {}
         document.getElementById('root').innerHTML = '<p style="color:var(--text-muted);">' + t('conversationCreated') + '</p>';
         document.getElementById('sendForm').style.display = 'flex';
         document.getElementById('msgInput').placeholder = t('messagePlaceholder');
@@ -111,30 +138,48 @@
       document.getElementById('root').innerHTML = '<p>' + t('specifyConvId') + '</p>';
     }
 
+    function scrollThreadBottom() {
+      var wrap = document.getElementById('threadWrap');
+      if (wrap) wrap.scrollTop = wrap.scrollHeight;
+    }
     function render(messages) {
       const me = api.user?.id;
       var html = messages.length === 0
         ? '<div class="empty-state"><p class="empty-state-text">' + t('noMessages') + '</p></div>'
         : `<div class="thread">
           ${messages.map(m => `
-            <div class="msg ${m.sender_id === me ? 'mine' : ''}">
+            <div class="msg ${m.sender_id === me ? 'mine' : ''}" data-msg-id="${m.id}">
               <div class="meta">${escapeHtml(m.sender_name)} · ${formatDate(m.created_at)}</div>
               <div>${escapeHtml(m.body)}</div>
             </div>
           `).join('')}
         </div>`;
       document.getElementById('root').innerHTML = html;
+      scrollThreadBottom();
+    }
+    async function markConversationRead(messages) {
+      const me = api.user?.id;
+      for (var i = 0; i < messages.length; i++) {
+        var m = messages[i];
+        if (m.sender_id !== me && !m.read_at) {
+          try { await api.messages.read(m.id); } catch (_) {}
+        }
+      }
     }
 
-    document.getElementById('sendBtn').onclick = async () => {
+    function doSend() {
       const input = document.getElementById('msgInput');
       const body = input.value.trim();
       if (!body || !conversationId) return;
-      await api.messages.send(conversationId, body);
-      input.value = '';
-      const messages = await api.messages.list(conversationId);
-      render(messages);
-    };
+      api.messages.send(conversationId, body).then(function () {
+        input.value = '';
+        return api.messages.list(conversationId);
+      }).then(render);
+    }
+    document.getElementById('sendBtn').onclick = doSend;
+    document.getElementById('msgInput').addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); doSend(); }
+    });
 
     loadOrCreate().then(function () { if (window.i18n) i18n.apply(); });
   </script>

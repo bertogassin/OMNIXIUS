@@ -8,6 +8,8 @@ REST API приложения OMNIXIUS. Реализация: **backend-go/** (G
 
 **Errors:** Ответы — HTTP-код и тело `{"error": "message"}`.
 
+**AI intents (A1/A2):** Приложение передаёт в AI-сервис (`ai/`, Python) `api_token` и `api_url`. По фразам пользователя в чате AI вызывает backend-go и возвращает текст: **мои заказы** → `GET /api/orders/my`; **создать заказ** (например «order product 5») → `POST /api/orders`; **сводка по письмам** → `GET /api/conversations`. Полный каталог интентов: **ai/README.md**.
+
 ---
 
 ## Public (no auth)
@@ -81,8 +83,9 @@ All below require header: `Authorization: Bearer <token>`.
 
 | Method | Path | Description |
 |--------|------|-------------|
-| GET | `/api/conversations` | List my conversations. Each: `id`, `product_id`, `updated_at`, `last_message`, `other`, `unread`. |
+| GET | `/api/conversations` | List my conversations. Each: `id`, `product_id`, `product_title`, `updated_at`, `last_message`, `other`, `unread`. |
 | GET | `/api/conversations/unread-count` | `{"unread": N}` total unread messages. |
+| GET | `/api/conversations/:id` | One conversation meta (participant only): `other` (id, name, email), `product_id`, `product_title`. For header in chat. |
 | POST | `/api/conversations` | Create or get conversation. Body: `user_id`, `product_id` (optional). Returns `id`, `product_id`. |
 | GET | `/api/messages/conversation/:id` | List messages in conversation. Participant only. |
 | POST | `/api/messages/conversation/:id` | Send message. Body: `body`. |

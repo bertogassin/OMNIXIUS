@@ -80,6 +80,32 @@ func ConversationsList(uid int64) []gin.H {
 			unreadByConv[cid] = n
 		}
 	}
+	// Product titles for conversations that have product_id
+	productIDs := make([]int64, 0)
+	for _, c := range convs {
+		if c.productID > 0 {
+			productIDs = append(productIDs, c.productID)
+		}
+	}
+	productTitleByID := make(map[int64]string)
+	if len(productIDs) > 0 {
+		idList := make([]interface{}, len(productIDs))
+		for i, pid := range productIDs {
+			idList[i] = pid
+		}
+		ph := strings.Repeat("?,", len(idList))
+		ph = ph[:len(ph)-1]
+		prodRows, _ := db.DB.Query("SELECT id, title FROM products WHERE id IN ("+ph+")", idList...)
+		if prodRows != nil {
+			defer prodRows.Close()
+			for prodRows.Next() {
+				var pid int64
+				var title sql.NullString
+				prodRows.Scan(&pid, &title)
+				productTitleByID[pid] = title.String
+			}
+		}
+	}
 	list := make([]gin.H, 0, len(convs))
 	for _, c := range convs {
 		other := otherByConv[c.id]
@@ -87,9 +113,41 @@ func ConversationsList(uid int64) []gin.H {
 			other = gin.H{"id": int64(0), "name": "", "email": ""}
 		}
 		unread := unreadByConv[c.id]
-		list = append(list, gin.H{"id": c.id, "product_id": c.productID, "updated_at": c.updated, "last_message": lastByConv[c.id], "other": other, "unread": unread > 0})
+		productTitle := ""
+		if c.productID > 0 {
+			productTitle = productTitleByID[c.productID]
+		}
+		list = append(list, gin.H{"id": c.id, "product_id": c.productID, "product_title": productTitle, "updated_at": c.updated, "last_message": lastByConv[c.id], "other": other, "unread": unread > 0})
 	}
 	return list
+}
+
+// ConversationGet returns one conversation's meta (other user, product_id, product_title) for the participant. Returns nil, ErrConvForbidden if not a participant.
+func ConversationGet(convID int64, uid int64) (gin.H, error) {
+	var ok int
+	if db.DB.QueryRow("SELECT 1 FROM conversation_participants WHERE conversation_id = ? AND user_id = ?", convID, uid).Scan(&ok) != nil {
+		return nil, ErrConvForbidden
+	}
+	var productIDNull sql.NullInt64
+	db.DB.QueryRow("SELECT product_id FROM conversations WHERE id = ?", convID).Scan(&productIDNull)
+	productID := int64(0)
+	if productIDNull.Valid {
+		productID = productIDNull.Int64
+	}
+	otherRows, _ := db.DB.Query("SELECT u.id, u.name, u.email FROM conversation_participants cp JOIN users u ON u.id = cp.user_id WHERE cp.conversation_id = ? AND cp.user_id != ?", convID, uid)
+	var otherID int64
+	var name, email sql.NullString
+	if otherRows != nil {
+		defer otherRows.Close()
+		if otherRows.Next() {
+			otherRows.Scan(&otherID, &name, &email)
+		}
+	}
+	var productTitle sql.NullString
+	if productID > 0 {
+		db.DB.QueryRow("SELECT title FROM products WHERE id = ?", productID).Scan(&productTitle)
+	}
+	return gin.H{"id": convID, "other": gin.H{"id": otherID, "name": name.String, "email": email.String}, "product_id": productID, "product_title": productTitle.String}, nil
 }
 
 // UnreadCount returns total count of unread messages for the user (messages from others, not yet read).

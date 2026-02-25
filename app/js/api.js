@@ -118,6 +118,7 @@
     },
     conversations: {
       list: () => api.request('/api/conversations'),
+      get: (id) => api.request('/api/conversations/' + id),
       unreadCount: () => api.request('/api/conversations/unread-count'),
       create: (user_id, product_id) => api.request('/api/conversations', { method: 'POST', body: { user_id, product_id } }),
     },

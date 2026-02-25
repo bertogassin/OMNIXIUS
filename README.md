@@ -16,6 +16,8 @@ http://localhost:3000
 http://localhost:3000/app/login.html  
 http://localhost:3000/app/dashboard.html  
 
+**AI (опционально):** запусти **`start-ai.bat`** или в папке `ai`: `python -m uvicorn main:app --reload --port 8000`. Тогда чат на сайте будет звать AI по http://localhost:8000. Если pip падает при установке — см. **ai/README.md** (установка с `--user` и запуск через `python -m uvicorn`).
+
 **Production:**  
 https://bertogassin.github.io/OMNIXIUS/  
 https://bertogassin.github.io/OMNIXIUS/app/marketplace.html  

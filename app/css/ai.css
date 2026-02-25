@@ -490,6 +490,26 @@
 .panel-chat .ai-msg.loading { opacity: 0.9; }
 @keyframes ai-typing { 0%, 60%, 100% { opacity: 0.35; } 30% { opacity: 1; } }
 
+.panel-chat .ai-quick-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-top: 1px solid var(--border);
+  background: rgba(0, 212, 170, 0.04);
+}
+.panel-chat .ai-quick-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-right: 0.25rem;
+}
+.panel-chat .ai-quick-actions .btn-sm {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.82rem;
+  border-radius: 8px;
+}
+
 .panel-chat .ai-send {
   display: flex;
   gap: 0.5rem;

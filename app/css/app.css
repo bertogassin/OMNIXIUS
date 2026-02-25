@@ -184,23 +184,37 @@
 .balance-unit { font-size: 0.9rem; color: var(--text-muted); font-weight: normal; }
 .balance-stub { margin-top: 0.5rem; }
 .verified-badge { font-size: 0.85rem; color: var(--accent); font-weight: 600; margin-left: 0.25rem; }
+.app-card .meta .verified-badge.card-verified { font-size: 0.75rem; margin-left: 0.35rem; }
 .app-card h3 { font-size: 1rem; margin-bottom: 0.25rem; }
 .app-card .price { color: var(--accent); font-weight: 600; }
 .app-card .meta { font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem; }
 
-.mail-list { list-style: none; }
+.mail-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+.mail-header h1 { margin: 0; }
+.mail-header .btn-sm { padding: 0.4rem 0.75rem; font-size: 0.9rem; }
+.mail-preview { font-size: 0.9rem; color: var(--text-muted); }
+.mail-date { font-size: 0.85rem; color: var(--text-muted); white-space: nowrap; flex-shrink: 0; margin-left: 1rem; }
+.mail-product { font-size: 0.9rem; color: var(--text-muted); font-weight: normal; }
+.mail-list { list-style: none; padding: 0; margin: 0; }
 .mail-list li {
   padding: 1rem;
   border-bottom: 1px solid var(--border);
   display: flex; justify-content: space-between; align-items: center;
 }
 .mail-list li.unread { background: rgba(0,212,170,0.05); }
-.mail-list a { color: inherit; text-decoration: none; display: block; transition: background 0.15s, opacity 0.15s; }
+.mail-list a { color: inherit; text-decoration: none; display: block; flex: 1; min-width: 0; transition: background 0.15s, opacity 0.15s; }
 .mail-list a:hover { background: rgba(0,212,170,0.08); }
 .mail-list a:active { background: rgba(0,212,170,0.12); opacity: 0.9; }
 .mail-list a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.thread { max-width: 640px; margin: 0 auto; }
-.thread .msg { padding: 0.75rem; border-bottom: 1px solid var(--border); }
+.conversation-header { margin-bottom: 1rem; }
+.conversation-title { font-size: 1.15rem; font-weight: 600; margin: 0 0 0.25rem; }
+.conversation-about { font-size: 0.9rem; color: var(--text-muted); margin: 0; }
+.conversation-about a { color: var(--accent); text-decoration: none; }
+.conversation-about a:hover { text-decoration: underline; }
+.thread-wrap { max-height: 60vh; overflow-y: auto; margin-bottom: 0.5rem; border: 1px solid var(--border); border-radius: 8px; background: var(--bg-card); }
+.thread { max-width: 640px; margin: 0 auto; padding: 0.5rem 0; }
+.thread .msg { padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); }
+.thread .msg:last-child { border-bottom: none; }
 .thread .msg.mine { background: rgba(0,212,170,0.08); }
 .thread .msg .meta { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.25rem; }
 .thread-send { display: flex; gap: 0.5rem; margin-top: 1rem; }

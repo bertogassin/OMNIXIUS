@@ -97,6 +97,11 @@
             <div class="chat-head" data-i18n="aiChatLabel">Chat</div>
             <div class="ai-messages" id="messages-code"></div>
             <div class="ai-offline" data-offline="code" style="display:none;" data-i18n="aiOfflineLong">AI not reachable.</div>
+            <div class="ai-quick-actions" data-chat="code">
+              <span class="ai-quick-label" data-i18n="aiQuickActions">Actions:</span>
+              <button type="button" class="btn btn-sm ai-quick-action" data-chat="code" data-msg="Show my orders" data-i18n="aiActionMyOrders">My orders</button>
+              <button type="button" class="btn btn-sm ai-quick-action" data-chat="code" data-msg="My messages summary" data-i18n="aiActionMailSummary">Mail summary</button>
+            </div>
             <div class="ai-send" data-send="code">
               <input type="text" data-input="code" data-i18n-placeholder="aiMessagePlaceholder" placeholder="Message…" autocomplete="off">
               <button type="button" class="btn btn-primary" data-sendbtn="code" data-i18n="aiSend">Send</button>
@@ -163,6 +168,11 @@
             <div class="chat-head" data-i18n="aiChatLabel">Chat</div>
             <div class="ai-messages" id="messages-content"></div>
             <div class="ai-offline" data-offline="content" style="display:none;" data-i18n="aiOfflineShort">AI not reachable.</div>
+            <div class="ai-quick-actions" data-chat="content">
+              <span class="ai-quick-label" data-i18n="aiQuickActions">Actions:</span>
+              <button type="button" class="btn btn-sm ai-quick-action" data-chat="content" data-msg="Show my orders" data-i18n="aiActionMyOrders">My orders</button>
+              <button type="button" class="btn btn-sm ai-quick-action" data-chat="content" data-msg="My messages summary" data-i18n="aiActionMailSummary">Mail summary</button>
+            </div>
             <div class="ai-send" data-send="content">
               <input type="text" data-input="content" data-i18n-placeholder="aiMessagePlaceholder" placeholder="Message…" autocomplete="off">
               <button type="button" class="btn btn-primary" data-sendbtn="content" data-i18n="aiSend">Send</button>
@@ -205,6 +215,11 @@
             <div class="chat-head" data-i18n="aiChatLabel">Chat</div>
             <div class="ai-messages" id="messages-knowledge"></div>
             <div class="ai-offline" data-offline="knowledge" style="display:none;" data-i18n="aiOfflineShort">AI not reachable.</div>
+            <div class="ai-quick-actions" data-chat="knowledge">
+              <span class="ai-quick-label" data-i18n="aiQuickActions">Actions:</span>
+              <button type="button" class="btn btn-sm ai-quick-action" data-chat="knowledge" data-msg="Show my orders" data-i18n="aiActionMyOrders">My orders</button>
+              <button type="button" class="btn btn-sm ai-quick-action" data-chat="knowledge" data-msg="My messages summary" data-i18n="aiActionMailSummary">Mail summary</button>
+            </div>
             <div class="ai-send" data-send="knowledge">
               <input type="text" data-input="knowledge" data-i18n-placeholder="aiMessagePlaceholder" placeholder="Message…" autocomplete="off">
               <button type="button" class="btn btn-primary" data-sendbtn="knowledge" data-i18n="aiSend">Send</button>
@@ -357,6 +372,15 @@
         btn.addEventListener('click', function () { sendMessage(m); });
         input.addEventListener('keydown', function (e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(m); } });
       }
+    });
+    document.querySelectorAll('.ai-quick-action').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var mod = btn.getAttribute('data-chat');
+        var msg = (btn.getAttribute('data-msg') || '').trim();
+        if (!mod || !msg) return;
+        var input = document.querySelector('.panel-chat[data-chat="' + mod + '"] input[data-input="' + mod + '"]');
+        if (input) { input.value = msg; sendMessage(mod); }
+      });
     });
 
     function aiSingleRequest(moduleId, payload, resultElId) {

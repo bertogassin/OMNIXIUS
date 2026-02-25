@@ -112,6 +112,7 @@ func main() {
 
 	auth.GET("/conversations", handleConversationsList)
 	auth.GET("/conversations/unread-count", handleConversationsUnreadCount)
+	auth.GET("/conversations/:id", handleConversationGet)
 	auth.POST("/conversations", handleConversationCreate)
 	auth.GET("/messages/conversation/:id", handleMessagesList)
 	auth.POST("/messages/conversation/:id", handleMessageSend)
@@ -880,7 +881,7 @@ func handleProductsList(c *gin.Context) {
 			offset = n
 		}
 	}
-	qry := `SELECT p.id, p.title, p.price, p.category, p.location, p.image_path, COALESCE(p.is_service, 0), COALESCE(p.is_subscription, 0), p.created_at, u.id, u.name FROM products p JOIN users u ON u.id = p.user_id WHERE 1=1`
+	qry := `SELECT p.id, p.title, p.price, p.category, p.location, p.image_path, COALESCE(p.is_service, 0), COALESCE(p.is_subscription, 0), p.created_at, u.id, u.name, COALESCE(u.email_verified, 0), COALESCE(u.phone_verified, 0) FROM products p JOIN users u ON u.id = p.user_id WHERE 1=1`
 	args := []interface{}{}
 	if uid := c.Query("user_id"); uid != "" {
 		if uidNum, err := strconv.ParseInt(uid, 10, 64); err == nil {
@@ -931,8 +932,10 @@ func handleProductsList(c *gin.Context) {
 			var imagePath, sellerName sql.NullString
 			var isService, isSubscription int64
 			var sellerID int64
-			rows.Scan(&id, &title, &price, &category, &location, &imagePath, &isService, &isSubscription, &created, &sellerID, &sellerName)
-			list = append(list, gin.H{"id": id, "title": title, "price": price, "category": category, "location": location, "image_path": imagePath.String, "is_service": isService, "is_subscription": isSubscription, "created_at": created, "seller_id": sellerID, "seller_name": sellerName.String})
+			var emailVerified, phoneVerified int64
+			rows.Scan(&id, &title, &price, &category, &location, &imagePath, &isService, &isSubscription, &created, &sellerID, &sellerName, &emailVerified, &phoneVerified)
+			sellerVerified := emailVerified == 1 || phoneVerified == 1
+			list = append(list, gin.H{"id": id, "title": title, "price": price, "category": category, "location": location, "image_path": imagePath.String, "is_service": isService, "is_subscription": isSubscription, "created_at": created, "seller_id": sellerID, "seller_name": sellerName.String, "seller_verified": sellerVerified})
 		}
 	}
 	c.JSON(200, list)
@@ -1369,6 +1372,29 @@ func handleConversationsList(c *gin.Context) {
 func handleConversationsUnreadCount(c *gin.Context) {
 	n := UnreadCount(getUserID(c))
 	c.JSON(200, gin.H{"unread": n})
+}
+
+func handleConversationGet(c *gin.Context) {
+	idStr := c.Param("id")
+	if idStr == "unread-count" {
+		c.JSON(404, gin.H{"error": "Not found"})
+		return
+	}
+	cid, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		c.JSON(400, gin.H{"error": "Invalid conversation id"})
+		return
+	}
+	h, err := ConversationGet(cid, getUserID(c))
+	if err != nil {
+		if errors.Is(err, ErrConvForbidden) {
+			c.JSON(403, gin.H{"error": "Forbidden"})
+			return
+		}
+		c.JSON(500, gin.H{"error": "Failed"})
+		return
+	}
+	c.JSON(200, h)
 }
 
 func handleConversationCreate(c *gin.Context) {

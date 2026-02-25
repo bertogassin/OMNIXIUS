@@ -105,8 +105,16 @@
         var noResultsHint = window.i18n ? i18n.t('noResultsHint') : 'Try different filters or add your own listing.';
         var serviceLabel = window.i18n ? i18n.t('filterServiceBadge') : 'Service';
         var subLabel = window.i18n ? i18n.t('filterSubscriptionBadge') : 'Subscription';
+        var verifiedLabel = window.i18n ? i18n.t('verifiedBadge') : 'Verified';
         listEl.innerHTML = data.length
-          ? data.map(p => { var badges = ''; if (p.is_service === 1 || p.is_service === true) badges += '<span class="card-badge card-badge-service">' + serviceLabel + '</span>'; if (p.is_subscription === 1 || p.is_subscription === true) badges += '<span class="card-badge card-badge-subscription">' + subLabel + '</span>'; return '<a href="product.html?id=' + p.id + '" class="app-card">' + badges + '<img src="' + (p.image_path ? (window.API_URL + '/uploads/' + p.image_path) : 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22260%22 height=%22180%22><rect fill=%22%23222%22 width=%22260%22 height=%22180%22/><text x=%2250%25%22 y=%2250%25%22 fill=%23666%22 text-anchor=%22middle%22 dy=%22.3em%22>' + encodeURIComponent(noPhoto) + '</text></svg>') + '" alt=""><div class="body"><h3>' + escapeHtml(p.title) + '</h3><p class="price">' + p.price + '</p><p class="meta">' + escapeHtml(p.category) + (p.location ? ' · ' + escapeHtml(p.location) : '') + '</p></div></a>'; }).join('')
+          ? data.map(p => {
+            var badges = '';
+            if (p.is_service === 1 || p.is_service === true) badges += '<span class="card-badge card-badge-service">' + serviceLabel + '</span>';
+            if (p.is_subscription === 1 || p.is_subscription === true) badges += '<span class="card-badge card-badge-subscription">' + subLabel + '</span>';
+            var verifiedBadge = (p.seller_verified ? ' <span class="verified-badge card-verified">✓ ' + verifiedLabel + '</span>' : '');
+            var meta = escapeHtml(p.category) + (p.location ? ' · ' + escapeHtml(p.location) : '') + verifiedBadge;
+            return '<a href="product.html?id=' + p.id + '" class="app-card">' + badges + '<img src="' + (p.image_path ? (window.API_URL + '/uploads/' + p.image_path) : 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22260%22 height=%22180%22><rect fill=%22%23222%22 width=%22260%22 height=%22180%22/><text x=%2250%25%22 y=%2250%25%22 fill=%23666%22 text-anchor=%22middle%22 dy=%22.3em%22>' + encodeURIComponent(noPhoto) + '</text></svg>') + '" alt=""><div class="body"><h3>' + escapeHtml(p.title) + '</h3><p class="price">' + p.price + '</p><p class="meta">' + meta + '</p></div></a>';
+          }).join('')
           : '<div class="empty-state"><p class="empty-state-title">' + noResults + '</p><p class="empty-state-text">' + noResultsHint + '</p></div>';
       } catch (e) {
         var loadFailed = window.i18n ? i18n.t('loadFailed') : 'Failed to load. Try again.';

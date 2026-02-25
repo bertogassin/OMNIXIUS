@@ -61,8 +61,10 @@
   </header>
   <main class="app-page">
     <div class="container">
-      <p class="status-done">СДЕЛАНО: работает (Live). Дальше: уведомления, доработка диалогов.</p>
-      <h1 data-i18n="mailTitle">Mail</h1>
+      <div class="mail-header">
+        <h1 data-i18n="mailTitle">Mail</h1>
+        <button type="button" class="btn btn-outline btn-sm" id="mailRefresh" aria-label="Refresh" title="Refresh">↻</button>
+      </div>
       <ul class="mail-list" id="list"></ul>
     </div>
   </main>
@@ -81,24 +83,31 @@
       try {
         const list = await api.conversations.list();
         if (list.length === 0) {
-          listEl.innerHTML = '<div class="empty-state"><p class="empty-state-title">' + t('noConversations') + '</p><p class="empty-state-text">' + t('noConversationsHint') + '</p></div>';
+          listEl.innerHTML = '<div class="empty-state"><p class="empty-state-title">' + t('noConversations') + '</p><p class="empty-state-text">' + t('noConversationsHint') + '</p><p><a href="marketplace.html" class="btn btn-primary">' + t('navMarketplace') + '</a></p></div>';
         } else {
-          listEl.innerHTML = list.map(c => `
-            <li class="${c.unread ? 'unread' : ''}">
-              <a href="conversation.html?id=${c.id}">
-                <strong>${escapeHtml(c.other?.name || c.other?.email || 'User')}</strong>
-                ${c.product ? ` · ${escapeHtml(c.product.title)}` : ''}
-                <br><span style="font-size:0.9rem; color:var(--text-muted);">${(c.last_message || '').slice(0, 60)}...</span>
+          listEl.innerHTML = list.map(c => {
+            const preview = (c.last_message || '').trim();
+            const short = preview.length > 60 ? preview.slice(0, 60) + '…' : preview;
+            const otherName = escapeHtml(c.other?.name || c.other?.email || 'User');
+            const productTitle = (c.product_title || '').trim();
+            const productPart = productTitle ? ' · <span class="mail-product">' + escapeHtml(productTitle) + '</span>' : '';
+            return `<li class="${c.unread ? 'unread' : ''}">
+              <a href="conversation.html?id=${c.id}" class="mail-list-link">
+                <strong>${otherName}</strong>${productPart}
+                ${short ? `<br><span class="mail-preview">${escapeHtml(short)}</span>` : ''}
               </a>
-              <span style="font-size:0.85rem; color:var(--text-muted);">${formatDate(c.updated_at)}</span>
-            </li>
-          `).join('');
+              <span class="mail-date">${formatDate(c.updated_at)}</span>
+            </li>`;
+          }).join('');
         }
       } catch (e) {
         listEl.innerHTML = '<p class="error">' + t('loadFailed') + '</p><button type="button" class="btn btn-primary" id="mailRetry">' + t('retry') + '</button>';
         document.getElementById('mailRetry').onclick = function () { location.reload(); };
       }
     })();
+    function loadMail() { location.reload(); }
+    var refreshBtn = document.getElementById('mailRefresh');
+    if (refreshBtn) refreshBtn.onclick = loadMail;
     if (window.i18n) i18n.apply();
   </script>
   <script src="../js/main.js"></script>

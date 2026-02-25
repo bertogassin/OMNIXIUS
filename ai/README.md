@@ -4,12 +4,27 @@
 
 **Уровень:** начало. Страница чата в браузере: `app/ai.html`; бэкенд здесь.
 
-```bash
-pip install -r requirements.txt
-uvicorn main:app --reload --port 8000
-# http://localhost:8000/docs  — Swagger
-# http://localhost:8000/health
+## Запуск
+
+**Проще всего:** из корня репо дважды кликни **`start-ai.bat`** или в PowerShell:
+```powershell
+.\start-ai.ps1
 ```
+Скрипты запускают сервер через `python -m uvicorn` (не требуют `uvicorn.exe` в PATH).
+
+**Вручную:**
+```bash
+cd ai
+pip install -r requirements.txt
+python -m uvicorn main:app --reload --port 8000
+```
+- **http://localhost:8000** — API
+- **http://localhost:8000/docs** — Swagger
+- **http://localhost:8000/health** — проверка
+
+**Если pip падает с ошибкой записи в `Scripts` (WinError 2):**
+1. Установи в папку пользователя: `pip install --user -r requirements.txt`
+2. Запускай только так: `python -m uvicorn main:app --reload --port 8000` (из папки `ai`) или используй `start-ai.bat`.
 
 ---
 
