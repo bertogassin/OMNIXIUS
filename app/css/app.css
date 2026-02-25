@@ -180,6 +180,9 @@
 .order-installment { margin-top: 0.5rem; }
 .btn-installment { font-size: 0.85rem; padding: 0.35rem 0.6rem; }
 .installment-requested { font-size: 0.85rem; color: var(--text-muted); }
+.balance-amount { font-size: 1.25rem; font-weight: 600; color: var(--accent); }
+.balance-unit { font-size: 0.9rem; color: var(--text-muted); font-weight: normal; }
+.balance-stub { margin-top: 0.5rem; }
 .verified-badge { font-size: 0.85rem; color: var(--accent); font-weight: 600; margin-left: 0.25rem; }
 .app-card h3 { font-size: 1rem; margin-bottom: 0.25rem; }
 .app-card .price { color: var(--accent); font-weight: 600; }

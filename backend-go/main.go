@@ -79,6 +79,8 @@ func main() {
 	auth.DELETE("/users/me", handleUserDelete)
 	auth.POST("/auth/change-password", handleChangePassword)
 	auth.GET("/users/me/orders", handleUserOrders)
+	auth.GET("/users/me/balance", handleBalanceGet)
+	auth.POST("/users/me/balance/credit", handleBalanceCredit)
 	auth.POST("/users/me/avatar", handleUserAvatar)
 
 	api.GET("/products", handleProductsList)
@@ -728,6 +730,30 @@ func handleUserDelete(c *gin.Context) {
 		return
 	}
 	c.JSON(200, gin.H{"ok": true})
+}
+
+func handleBalanceGet(c *gin.Context) {
+	c.JSON(200, BalanceGet(getUserID(c)))
+}
+
+func handleBalanceCredit(c *gin.Context) {
+	var body struct {
+		Amount float64 `json:"amount"`
+	}
+	if c.ShouldBindJSON(&body) != nil || body.Amount <= 0 {
+		c.JSON(400, gin.H{"error": "amount required (positive number)"})
+		return
+	}
+	if body.Amount > 1e9 {
+		c.JSON(400, gin.H{"error": "amount too large"})
+		return
+	}
+	h, err := BalanceCredit(getUserID(c), body.Amount)
+	if err != nil {
+		c.JSON(500, gin.H{"error": "Failed"})
+		return
+	}
+	c.JSON(200, h)
 }
 
 func handleUserOrders(c *gin.Context) {

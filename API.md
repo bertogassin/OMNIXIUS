@@ -39,7 +39,9 @@ All below require header: `Authorization: Bearer <token>`.
 | GET | `/api/users/me` | Current user: `id`, `email`, `role`, `name`, `avatar_path`, `email_verified`, `phone_verified`, `verified` (true if either verified). |
 | PATCH | `/api/users/me` | Update profile. Body: `name` (optional). |
 | DELETE | `/api/users/me` | Delete account and related data. |
-| GET | `/api/users/me/orders` | Alias for `GET /api/orders/my`. |
+| GET | `/api/users/me/orders` | My orders as `asBuyer`, `asSeller`. |
+| GET | `/api/users/me/balance` | My balance (internal units). Returns `{ balance }`. Stub for Trade. |
+| POST | `/api/users/me/balance/credit` | Add to balance (stub: test credit). Body: `amount` (positive number). Returns `{ balance, credited }`. |
 | POST | `/api/users/me/avatar` | Upload avatar. Form: `avatar` (file). |
 
 ### Products

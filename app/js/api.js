@@ -88,6 +88,8 @@
       get: (id) => api.request('/api/users/' + id),
       updateMe: (data) => api.request('/api/users/me', { method: 'PATCH', body: data }),
       myOrders: () => api.request('/api/users/me/orders'),
+      balance: () => api.request('/api/users/me/balance'),
+      balanceCredit: (amount) => api.request('/api/users/me/balance/credit', { method: 'POST', body: { amount } }),
     },
     subscriptions: {
       create: (product_id) => api.request('/api/subscriptions', { method: 'POST', body: { product_id } }),
