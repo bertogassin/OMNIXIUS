@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"log"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -12,6 +13,7 @@ import (
 
 type Config struct {
 	Port             string
+	SiteRoot         string // directory with index.html, app/, css/ (default: parent of backend-go)
 	AppURL           string // frontend app base URL for redirect after register (e.g. https://bertogassin.github.io/OMNIXIUS)
 	AllowedOrigins   string // comma-separated; empty = "*" (dev)
 	MaxLoginAttempts int
@@ -38,8 +40,14 @@ func LoadConfig() Config {
 		}
 	}
 	appURL := strings.TrimSuffix(os.Getenv("APP_URL"), "/")
+	siteRoot := os.Getenv("SITE_ROOT")
+	if siteRoot == "" {
+		siteRoot = ".." // from backend-go/ run dir = project root
+	}
+	siteRoot = filepath.Clean(siteRoot)
 	cfg := Config{
 		Port:             port,
+		SiteRoot:         siteRoot,
 		AppURL:           appURL,
 		AllowedOrigins:   os.Getenv("ALLOWED_ORIGINS"), // e.g. "https://bertogassin.github.io,https://omnixius.com"
 		MaxLoginAttempts: 5,

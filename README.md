@@ -11,6 +11,11 @@
 **Структура репо:**  
 `backend-go/` — единственный API (Go); `app/` — веб-приложение (HTML/JS); `web/` — заготовка React+TypeScript; `services/rust/`, `analytics/spark/` — Rust и Spark; `mobile/ios/`, `mobile/android/` — Swift и Kotlin; `ai/` — ИИ (Python); `infra/` — Docker, K8s, Terraform, мониторинг, cache, Kafka.
 
+**Локально (после запуска `start-backend.bat`):**  
+http://localhost:3000  
+http://localhost:3000/app/login.html  
+http://localhost:3000/app/dashboard.html  
+
 **Production:**  
 https://bertogassin.github.io/OMNIXIUS/  
 https://bertogassin.github.io/OMNIXIUS/app/marketplace.html  

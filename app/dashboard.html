@@ -132,7 +132,7 @@
         ? '<ul class="mail-list">' + list.map(function(o) { return '<li><span>' + o.title + ' — ' + o.status + '</span><span>' + new Date(o.created_at * 1000).toLocaleDateString() + '</span></li>'; }).join('') + '</ul>'
         : '<p style="color:var(--text-muted);">No orders yet. <a href="marketplace.html">Go to Marketplace</a></p>';
       try {
-        var remittances = await api.remittances.my();
+        var remittances = (api.remittances && typeof api.remittances.my === 'function') ? await api.remittances.my() : [];
         var rList = Array.isArray(remittances) ? remittances : [];
         var remTitle = (window.i18n && i18n.t('remittancesTitle')) ? i18n.t('remittancesTitle') : 'My remittances';
         var remTo = (window.i18n && i18n.t('remittancesTo')) ? i18n.t('remittancesTo') : 'To';

@@ -2,7 +2,7 @@
 
 REST API приложения OMNIXIUS. Реализация: **backend-go/** (Go). Base URL: `https://your-api.example.com` в проде или `http://localhost:3000` в разработке.
 
-**Quick start:** В папке `backend-go` выполни `go run .` → API на порту 3000. На фронте задай `API_URL` (локально подставляется сам для localhost/file). Проверка: `GET /health`, затем регистрация/логин через приложение.
+**Quick start:** Из корня репо запусти `start-backend.bat` или в папке `backend-go` выполни `go run .` → сайт и API на **http://localhost:3000** (главная `/`, приложение `/app/*`). Проверка: `GET /health`, затем открой в браузере http://localhost:3000 или регистрация/логин через приложение.
 
 **Auth:** Большинство эндпоинтов требуют заголовок `Authorization: Bearer <token>`. Токен возвращают `POST /api/auth/register` и `POST /api/auth/login`.
 

@@ -1,0 +1,3 @@
+http://localhost:3000
+
+Запусти start-backend.bat, затем открой эту ссылку в браузере.

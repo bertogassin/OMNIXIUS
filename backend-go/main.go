@@ -36,6 +36,11 @@ var loginLimiters = make(map[string]*rate.Limiter)
 
 func main() {
 	cfg = LoadConfig()
+	if !filepath.IsAbs(cfg.SiteRoot) {
+		cfg.SiteRoot, _ = filepath.Abs(cfg.SiteRoot)
+	}
+	cfg.SiteRoot = filepath.Clean(cfg.SiteRoot)
+	log.Printf("Site root: %s", cfg.SiteRoot)
 	dbPath := os.Getenv("DB_PATH")
 	if dbPath == "" {
 		dbPath = filepath.Join("db", "omnixius.db")
@@ -112,9 +117,53 @@ func main() {
 	auth.POST("/messages/conversation/:id", handleMessageSend)
 	auth.POST("/messages/:id/read", handleMessageRead)
 
+	r.NoRoute(staticSiteHandler(cfg.SiteRoot))
+
 	port := ":" + cfg.Port
 	if err := r.Run(port); err != nil {
 		panic(err)
+	}
+}
+
+func staticSiteHandler(siteRoot string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if c.Request.Method != http.MethodGet && c.Request.Method != http.MethodHead {
+			c.AbortWithStatus(http.StatusMethodNotAllowed)
+			return
+		}
+		path := c.Request.URL.Path
+		if strings.HasPrefix(path, "/api") || strings.HasPrefix(path, "/uploads") {
+			c.AbortWithStatus(http.StatusNotFound)
+			return
+		}
+		if path == "/" {
+			path = "index.html"
+		} else {
+			path = strings.TrimPrefix(path, "/")
+		}
+		cleanPath := filepath.Clean(filepath.FromSlash(path))
+		if cleanPath == "" || cleanPath == "." || strings.HasPrefix(cleanPath, "..") {
+			c.AbortWithStatus(http.StatusNotFound)
+			return
+		}
+		fullPath := filepath.Join(siteRoot, cleanPath)
+		absRoot, _ := filepath.Abs(siteRoot)
+		absFull, err := filepath.Abs(fullPath)
+		if err != nil {
+			c.AbortWithStatus(http.StatusNotFound)
+			return
+		}
+		prefix := absRoot + string(filepath.Separator)
+		if absFull != absRoot && !strings.HasPrefix(absFull, prefix) {
+			c.AbortWithStatus(http.StatusNotFound)
+			return
+		}
+		info, err := os.Stat(fullPath)
+		if err != nil || info.IsDir() {
+			c.AbortWithStatus(http.StatusNotFound)
+			return
+		}
+		c.File(fullPath)
 	}
 }
 

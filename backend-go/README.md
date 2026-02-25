@@ -11,7 +11,7 @@ go build -o omnixius-api .
 # or: go run .
 ```
 
-API: `http://localhost:3000`
+Сайт и API: **http://localhost:3000** (запуск: из корня репо `start-backend.bat` или `cd backend-go` → `go run .`).
 
 **Register / login via Go (no JS):** Open `http://localhost:3000/register` or `http://localhost:3000/login`. Submit the form; if `APP_URL` is set (e.g. your GitHub Pages URL), you are redirected to the app with token and API URL saved.
 

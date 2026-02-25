@@ -1995,7 +1995,6 @@
     if (strings[lang]) {
       localStorage.setItem(STORAGE_KEY, lang);
       document.documentElement.lang = lang;
-      document.documentElement.dir = (lang === 'ar') ? 'rtl' : 'ltr';
       if (typeof apply === 'function') apply();
       return true;
     }
@@ -2039,7 +2038,6 @@
   };
   var cur = getLang();
   document.documentElement.lang = cur;
-  document.documentElement.dir = (cur === 'ar') ? 'rtl' : 'ltr';
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function () {
       apply();
