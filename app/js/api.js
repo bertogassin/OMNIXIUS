@@ -112,6 +112,10 @@
       create: (product_id, data) => api.request('/api/orders', { method: 'POST', body: Object.assign({ product_id }, data || {}) }),
       update: (id, data) => api.request('/api/orders/' + id, { method: 'PATCH', body: typeof data === 'string' ? { status: data } : (data || {}) }),
     },
+    remittances: {
+      my: () => api.request('/api/remittances/my'),
+      create: (to_identifier, amount, currency) => api.request('/api/remittances', { method: 'POST', body: { to_identifier, amount, currency: currency || 'USD' } }),
+    },
     conversations: {
       list: () => api.request('/api/conversations'),
       unreadCount: () => api.request('/api/conversations/unread-count'),

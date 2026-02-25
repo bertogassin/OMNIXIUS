@@ -1,0 +1,558 @@
+/* OMNIXIUS AI — дизайн по разделам: удобно и по назначению */
+
+/* —— Страница —— */
+.ai-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem 3rem;
+  box-sizing: border-box;
+}
+
+/* —— Шапка —— */
+.ai-header {
+  text-align: center;
+  margin-bottom: 1.75rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+.ai-header h1 {
+  font-size: 1.85rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0;
+  background: linear-gradient(135deg, var(--text) 0%, var(--accent) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.ai-header p {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  margin-top: 0.5rem;
+  max-width: 480px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.45;
+}
+
+/* —— Выбор модуля: карточки по смыслу —— */
+.ai-modules {
+  margin-bottom: 1.5rem;
+}
+.ai-modules-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.75rem;
+  color: var(--text-muted);
+}
+.ai-modules-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 0.5rem;
+}
+.ai-module-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0.75rem 1rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  text-decoration: none;
+  font-size: 0.85rem;
+  transition: border-color 0.2s, background 0.2s, transform 0.15s;
+  cursor: pointer;
+  box-sizing: border-box;
+  text-align: left;
+}
+.ai-module-card:hover {
+  border-color: var(--accent);
+  background: rgba(0, 212, 170, 0.06);
+  transform: translateY(-1px);
+}
+.ai-module-card.active {
+  border-color: var(--accent);
+  background: rgba(0, 212, 170, 0.12);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+.ai-module-card strong {
+  display: block;
+  margin-bottom: 0.2rem;
+  font-size: 0.9rem;
+}
+.ai-module-card span {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.35;
+}
+/* Цветовая полоска по типу модуля */
+.ai-module-card[data-module="code"]   { border-left: 3px solid #6ee7b7; }
+.ai-module-card[data-module="data"]   { border-left: 3px solid #93c5fd; }
+.ai-module-card[data-module="tasks"]  { border-left: 3px solid #fcd34d; }
+.ai-module-card[data-module="content"]{ border-left: 3px solid #c4b5fd; }
+.ai-module-card[data-module="media"]  { border-left: 3px solid #f9a8d4; }
+.ai-module-card[data-module="knowledge"] { border-left: 3px solid #67e8f9; }
+
+/* —— Панели —— */
+.ai-panels { display: block; }
+.ai-panel {
+  display: none;
+  min-height: 420px;
+  animation: ai-panel-in 0.2s ease;
+}
+@keyframes ai-panel-in {
+  from { opacity: 0.97; }
+  to { opacity: 1; }
+}
+.ai-panel.active { display: block; }
+.ai-panel.has-chat.active {
+  display: grid;
+  grid-template-columns: 1fr minmax(300px, 380px);
+  grid-template-rows: 1fr;
+  gap: 1.25rem;
+  align-items: stretch;
+}
+@media (max-width: 900px) {
+  .ai-panel.has-chat.active {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr auto;
+  }
+}
+
+/* Заголовок панели (рабочая зона) */
+.panel-workspace .panel-head {
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.panel-workspace[data-module="code"] .panel-head    { border-left: 3px solid #6ee7b7; }
+.panel-workspace[data-module="data"] .panel-head    { border-left: 3px solid #93c5fd; }
+.panel-workspace[data-module="tasks"] .panel-head   { border-left: 3px solid #fcd34d; }
+.panel-workspace[data-module="content"] .panel-head { border-left: 3px solid #c4b5fd; }
+.panel-workspace[data-module="media"] .panel-head   { border-left: 3px solid #f9a8d4; }
+.panel-workspace[data-module="knowledge"] .panel-head { border-left: 3px solid #67e8f9; }
+
+/* Рабочая зона */
+.panel-workspace {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  min-height: 380px;
+  overflow: hidden;
+}
+.panel-workspace .toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+}
+.panel-workspace .toolbar .btn {
+  padding: 0.45rem 0.85rem;
+  font-size: 0.85rem;
+  border-radius: 8px;
+}
+.panel-workspace .toolbar .btn-primary {
+  font-weight: 600;
+}
+.panel-workspace .body {
+  flex: 1;
+  padding: 1rem;
+  overflow: auto;
+  min-height: 0;
+}
+
+/* Текстовые области */
+.panel-workspace textarea {
+  width: 100%;
+  min-height: 200px;
+  padding: 1rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  resize: vertical;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+.panel-workspace textarea:focus {
+  border-color: var(--accent);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 212, 170, 0.2);
+}
+.panel-workspace textarea.code {
+  font-family: 'Consolas', 'Monaco', 'Menlo', monospace;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+/* Code — редактор кода */
+#workspace-code { min-height: 260px; }
+
+/* Data — зона данных и таблица */
+.panel-workspace .data-table-wrap {
+  overflow: auto;
+  max-height: 280px;
+  margin-top: 0.75rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+.panel-workspace table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+.panel-workspace table th,
+.panel-workspace table td {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border);
+  text-align: left;
+}
+.panel-workspace table th {
+  background: var(--bg);
+  color: var(--text-muted);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.panel-workspace table tr:hover td { background: rgba(0, 212, 170, 0.04); }
+
+/* Tasks — задачи и заметки */
+.panel-workspace .list-add {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+}
+.panel-workspace .list-add input {
+  flex: 1;
+  min-width: 120px;
+  padding: 0.55rem 0.75rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 0.9rem;
+}
+.panel-workspace .list-add select {
+  padding: 0.55rem 0.75rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 0.85rem;
+}
+.panel-workspace .list-items {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+.panel-workspace .list-items li {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-card);
+}
+.panel-workspace .list-items li:last-child { border-bottom: none; }
+.panel-workspace .list-items li input[type="checkbox"] {
+  cursor: pointer;
+  accent-color: var(--accent);
+  width: 1.1rem;
+  height: 1.1rem;
+}
+.panel-workspace .list-items li .text { flex: 1; font-size: 0.9rem; }
+.panel-workspace .list-items li .task-status {
+  font-size: 0.7rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text-muted);
+  font-weight: 500;
+}
+.panel-workspace .list-items li .task-status.done {
+  color: var(--accent);
+  background: rgba(0, 212, 170, 0.15);
+}
+.panel-workspace .list-items li .task-status.progress {
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.15);
+}
+.panel-workspace .list-items li .del {
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1.2rem;
+  line-height: 1;
+  padding: 0.2rem;
+  border-radius: 4px;
+}
+.panel-workspace .list-items li .del:hover {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.15);
+}
+.panel-workspace .pomo-timer {
+  font-size: 1.75rem;
+  font-variant-numeric: tabular-nums;
+  margin: 0.25rem 0;
+  padding: 0.25rem 0.5rem;
+  border-radius: 8px;
+  background: var(--bg);
+  display: inline-block;
+}
+.panel-workspace .pomo-timer.work { color: var(--accent); }
+
+/* Content — счётчик слов */
+.panel-workspace .word-count {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 0.35rem;
+}
+
+/* Media — зона загрузки */
+.panel-workspace .drop-zone {
+  border: 2px dashed var(--border);
+  border-radius: 14px;
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  color: var(--text-muted);
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  transition: border-color 0.2s, background 0.2s;
+}
+.panel-workspace .drop-zone:hover,
+.panel-workspace .drop-zone.dragover {
+  border-color: var(--accent);
+  background: rgba(0, 212, 170, 0.06);
+  color: var(--text);
+}
+.panel-workspace .preview-area {
+  margin-top: 1rem;
+  min-height: 80px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+.panel-workspace .preview-area img {
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+.panel-workspace .media-prompt-row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+.panel-workspace .media-prompt-row input {
+  flex: 1;
+  min-width: 180px;
+  padding: 0.55rem 1rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-size: 0.9rem;
+}
+.panel-workspace .media-prompt-row input:focus {
+  border-color: var(--accent);
+  outline: none;
+}
+
+/* Результат ИИ (одиночный блок) */
+.panel-workspace .ai-single-result-wrap {
+  position: relative;
+  margin-top: 1rem;
+}
+.panel-workspace .ai-single-result {
+  padding: 1rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.panel-workspace .ai-single-result.loading { color: var(--text-muted); }
+.panel-workspace .ai-single-result-wrap .btn-copy-result {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  font-size: 0.75rem;
+  padding: 0.3rem 0.6rem;
+}
+
+/* Интеграции (подвал панели) */
+.panel-integrations {
+  margin-top: 1rem;
+  padding: 0.6rem 0.85rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.8rem;
+}
+.panel-integrations-label { color: var(--text-muted); margin-right: 0.4rem; }
+.panel-integrations-list .tag {
+  display: inline-block;
+  margin: 0.15rem 0.2rem 0.15rem 0;
+  padding: 0.25rem 0.5rem;
+  background: rgba(0, 212, 170, 0.15);
+  border-radius: 6px;
+  color: var(--accent);
+  font-size: 0.75rem;
+}
+
+/* —— Чат —— */
+.panel-chat {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  min-height: 380px;
+  overflow: hidden;
+}
+.panel-chat .chat-head {
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.panel-chat .ai-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  min-height: 0;
+}
+.panel-chat .ai-msg {
+  max-width: 88%;
+  padding: 0.7rem 1rem;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+.panel-chat .ai-msg.user {
+  align-self: flex-end;
+  background: var(--accent);
+  color: #0c0c0f;
+  border-bottom-right-radius: 4px;
+}
+.panel-chat .ai-msg.assistant {
+  align-self: flex-start;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-bottom-left-radius: 4px;
+}
+.panel-chat .ai-msg .meta {
+  font-size: 0.7rem;
+  opacity: 0.8;
+  margin-top: 0.3rem;
+}
+.panel-chat .ai-msg .msg-actions { margin-top: 0.4rem; }
+.panel-chat .ai-msg .msg-actions .btn-copy {
+  font-size: 0.72rem;
+  padding: 0.25rem 0.5rem;
+  color: var(--text-muted);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 6px;
+}
+.panel-chat .ai-msg .msg-actions .btn-copy:hover {
+  background: var(--border);
+  color: var(--text);
+}
+.panel-chat .ai-msg.loading { opacity: 0.9; }
+@keyframes ai-typing { 0%, 60%, 100% { opacity: 0.35; } 30% { opacity: 1; } }
+
+.panel-chat .ai-send {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid var(--border);
+  background: var(--bg);
+}
+.panel-chat .ai-send input {
+  flex: 1;
+  padding: 0.65rem 1rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-size: 0.95rem;
+  transition: border-color 0.15s;
+}
+.panel-chat .ai-send input:focus {
+  border-color: var(--accent);
+  outline: none;
+}
+.panel-chat .ai-send button {
+  padding: 0.65rem 1.1rem;
+  white-space: nowrap;
+  cursor: pointer;
+  font-size: 0.9rem;
+  border-radius: 10px;
+  font-weight: 500;
+}
+.panel-chat .ai-offline {
+  padding: 1rem;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  line-height: 1.45;
+}
+.panel-chat .ai-offline a { color: var(--accent); }
+
+/* Тостер */
+.ai-toast {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.6rem 1.25rem;
+  background: var(--bg-card);
+  border: 1px solid var(--accent);
+  border-radius: 10px;
+  color: var(--text);
+  font-size: 0.9rem;
+  z-index: 1000;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+  animation: ai-toast-in 0.25s ease;
+}
+@keyframes ai-toast-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+@media (max-width: 640px) {
+  .ai-modules-grid { grid-template-columns: 1fr 1fr; }
+  .ai-module-card { padding: 0.6rem 0.75rem; }
+  .ai-module-card strong { font-size: 0.82rem; }
+  .panel-workspace .body { padding: 0.75rem; }
+  .panel-chat .ai-msg { max-width: 95%; }
+}

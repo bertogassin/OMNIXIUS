@@ -102,6 +102,9 @@ func main() {
 	auth.POST("/orders", handleOrderCreate)
 	auth.PATCH("/orders/:id", handleOrderUpdate)
 
+	auth.GET("/remittances/my", handleRemittancesMy)
+	auth.POST("/remittances", handleRemittanceCreate)
+
 	auth.GET("/conversations", handleConversationsList)
 	auth.GET("/conversations/unread-count", handleConversationsUnreadCount)
 	auth.POST("/conversations", handleConversationCreate)
@@ -783,10 +786,17 @@ func rowsToOrderList(rows *sql.Rows) []gin.H {
 	return out
 }
 
+const maxAvatarBytes = 5 * 1024 * 1024   // 5 MB
+const maxProductImageBytes = 10 * 1024 * 1024 // 10 MB
+
 func handleUserAvatar(c *gin.Context) {
 	file, err := c.FormFile("avatar")
 	if err != nil {
 		c.JSON(400, gin.H{"error": "File required"})
+		return
+	}
+	if file.Size > maxAvatarBytes {
+		c.JSON(400, gin.H{"error": "File too large (max 5 MB)"})
 		return
 	}
 	ext := ".jpg"
@@ -958,6 +968,10 @@ func handleProductCreate(c *gin.Context) {
 	}
 	imagePath := ""
 	if file, err := c.FormFile("image"); err == nil {
+		if file.Size > maxProductImageBytes {
+			c.JSON(400, gin.H{"error": "Image too large (max 10 MB)"})
+			return
+		}
 		ext := ".jpg"
 		if strings.Contains(file.Header.Get("Content-Type"), "png") {
 			ext = ".png"
@@ -1253,6 +1267,50 @@ func handleOrderUpdate(c *gin.Context) {
 		out["installment_plan"] = "requested"
 	}
 	c.JSON(200, out)
+}
+
+func handleRemittanceCreate(c *gin.Context) {
+	var body struct {
+		ToIdentifier string  `json:"to_identifier"`
+		Amount       float64 `json:"amount"`
+		Currency     string  `json:"currency"`
+	}
+	if c.ShouldBindJSON(&body) != nil {
+		c.JSON(400, gin.H{"error": "to_identifier and amount required"})
+		return
+	}
+	toID := strings.TrimSpace(body.ToIdentifier)
+	if toID == "" {
+		c.JSON(400, gin.H{"error": "to_identifier required"})
+		return
+	}
+	if body.Amount <= 0 {
+		c.JSON(400, gin.H{"error": "amount must be positive"})
+		return
+	}
+	if body.Amount > 1e12 {
+		c.JSON(400, gin.H{"error": "amount too large"})
+		return
+	}
+	currency := strings.TrimSpace(body.Currency)
+	if len(currency) > 10 {
+		currency = currency[:10]
+	}
+	h, err := RemittanceCreate(getUserID(c), toID, body.Amount, currency)
+	if err != nil {
+		c.JSON(500, gin.H{"error": "Failed to create remittance request"})
+		return
+	}
+	c.JSON(201, h)
+}
+
+func handleRemittancesMy(c *gin.Context) {
+	list, err := RemittanceListMy(getUserID(c))
+	if err != nil {
+		c.JSON(500, gin.H{"error": "Failed to list remittances"})
+		return
+	}
+	c.JSON(200, list)
 }
 
 func handleConversationsList(c *gin.Context) {

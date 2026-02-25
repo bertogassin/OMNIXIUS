@@ -68,6 +68,15 @@ All below require header: `Authorization: Bearer <token>`.
 
 **Embedded finance (B2) — Installments stub:** Buyer can request installments for an order: set `installment_plan` to `"requested"` on create (POST) or later (PATCH). The value is stored and returned in order lists; actual installment flow (pay in parts) will be implemented via Trade later. UI: "Request installments" on order card → PATCH with `installment_plan: "requested"` → show "Installments requested (coming via Trade)".
 
+### Remittances (B4/B5 — Cross-border stub)
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/remittances/my` | List my remittance requests (sent by current user). Returns array of `{ id, from_user_id, to_identifier, amount, currency, status, created_at }`, newest first. |
+| POST | `/api/remittances` | Create remittance request (stub). Auth: sender = current user. Body: `to_identifier` (recipient: user id, wallet, email, etc.), `amount` (positive), `currency` (optional, default `USD`). Request is stored with `status: pending`; actual transfer via Trade/IXI later. Returns `{ id, from_user_id, to_identifier, amount, currency, status }`. |
+
+**Cross-border (B4/B5):** Remittance = request to send money to `to_identifier`. API validates and persists the request; no real transfer yet. Later: processing via Trade (wallets, KYC) and IXI (stablecoins, low fee). `to_identifier` can be internal user id, external wallet address, or other identifier depending on future design.
+
 ### Conversations & messages
 
 | Method | Path | Description |

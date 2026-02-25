@@ -49,6 +49,12 @@
         <a href="#" data-lang="en">EN</a>
         <a href="#" data-lang="ru">RU</a>
         <a href="#" data-lang="fr">FR</a>
+        <a href="#" data-lang="de">DE</a>
+        <a href="#" data-lang="es">ES</a>
+        <a href="#" data-lang="it">IT</a>
+        <a href="#" data-lang="ar">AR</a>
+        <a href="#" data-lang="zh">ZH</a>
+        <a href="#" data-lang="ja">JA</a>
       </div>
       <button class="menu-toggle" aria-label="Menu"><span></span></button>
     </div>
@@ -75,8 +81,9 @@
         <label data-i18n="closedContentUrlLabel">Closed content URL (for subscribers)</label>
         <input type="url" name="closed_content_url" data-i18n-placeholder="closedContentUrlPlaceholder" placeholder="https://… (optional)">
         <label>Photo</label>
-        <input type="file" name="image" accept="image/jpeg,image/png,image/webp">
-        <button type="submit" class="btn btn-primary">Publish</button>
+        <input type="file" name="image" accept="image/jpeg,image/png,image/webp" id="productImageInput">
+        <p class="form-hint" id="imageHint" style="font-size:0.8rem; color:var(--text-muted);"></p>
+        <button type="submit" class="btn btn-primary" id="productSubmitBtn">Publish</button>
       </form>
     </div>
   </main>
@@ -89,17 +96,43 @@
     api.products.categories().then(cats => {
       document.getElementById('cats').innerHTML = cats.map(c => `<option value="${c}">`).join('');
     });
+    var MAX_IMAGE_MB = 10;
+    document.getElementById('productImageInput').onchange = function () {
+      var f = this.files[0];
+      var hint = document.getElementById('imageHint');
+      if (!f) { hint.textContent = ''; return; }
+      if (f.size > MAX_IMAGE_MB * 1024 * 1024) {
+        hint.textContent = 'Max ' + MAX_IMAGE_MB + ' MB';
+        hint.style.color = '#e74c3c';
+        this.value = '';
+        return;
+      }
+      hint.textContent = f.name + ' (' + (f.size / 1024).toFixed(1) + ' KB)';
+      hint.style.color = '';
+    };
     document.getElementById('form').onsubmit = async (e) => {
       e.preventDefault();
       const err = document.getElementById('err');
+      const btn = document.getElementById('productSubmitBtn');
       err.style.display = 'none';
-      const fd = new FormData(e.target);
+      var file = e.target.image && e.target.image.files[0];
+      if (file && file.size > MAX_IMAGE_MB * 1024 * 1024) {
+        err.textContent = 'Image too large (max ' + MAX_IMAGE_MB + ' MB)';
+        err.style.display = 'block';
+        return;
+      }
+      btn.disabled = true;
+      btn.textContent = 'Publishing…';
       try {
+        const fd = new FormData(e.target);
         const r = await api.products.create(fd);
+        btn.textContent = 'Done';
         location.href = 'product.html?id=' + r.id;
       } catch (x) {
         err.textContent = x.data?.error || 'Error';
         err.style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = 'Publish';
       }
     };
     if (window.i18n) i18n.apply();

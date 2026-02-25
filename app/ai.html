@@ -6,74 +6,7 @@
   <title>OMNIXIUS AI</title>
   <link rel="stylesheet" href="../css/style.css">
   <link rel="stylesheet" href="css/app.css">
-  <style>
-    .ai-page { max-width: 1400px; margin: 0 auto; padding: 0 1rem; }
-    .ai-header { text-align: center; margin-bottom: 1rem; }
-    .ai-header h1 { font-size: 1.75rem; }
-    .ai-header p { color: var(--text-muted); font-size: 0.95rem; margin-top: 0.25rem; }
-    .ai-modules { margin-bottom: 1rem; }
-    .ai-modules-title { font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-muted); }
-    .ai-modules-grid { display: flex; flex-wrap: wrap; gap: 0.4rem; }
-    .ai-module-card { display: block; padding: 0.5rem 0.75rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; color: var(--text); text-decoration: none; font-size: 0.8rem; transition: border-color 0.15s, background 0.15s; cursor: pointer; }
-    .ai-module-card:hover { border-color: var(--accent); background: var(--bg); }
-    .ai-module-card.active { border-color: var(--accent); background: rgba(0, 212, 170, 0.12); }
-    .ai-module-card strong { display: block; margin-bottom: 0.1rem; }
-    .ai-module-card span { font-size: 0.7rem; color: var(--text-muted); }
-
-    .ai-panels { display: block; }
-    .ai-panel { display: none; min-height: 480px; }
-    .ai-panel.active { display: block; }
-    .ai-panel.has-chat.active { display: grid; grid-template-columns: 1fr minmax(300px, 360px); grid-template-rows: 1fr; gap: 1rem; align-items: stretch; }
-    @media (max-width: 900px) { .ai-panel.has-chat.active { grid-template-columns: 1fr; grid-template-rows: 1fr auto; } }
-
-    .panel-workspace { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; display: flex; flex-direction: column; min-height: 400px; }
-    .panel-workspace .toolbar { display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--border); }
-    .panel-workspace .toolbar .btn { padding: 0.4rem 0.75rem; font-size: 0.85rem; }
-    .panel-workspace .body { flex: 1; padding: 0.75rem; overflow: auto; }
-    .panel-workspace textarea { width: 100%; min-height: 200px; padding: 0.75rem; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: inherit; font-size: 0.9rem; resize: vertical; box-sizing: border-box; }
-    .panel-workspace textarea:focus { border-color: var(--accent); outline: none; }
-    .panel-workspace textarea.code { font-family: 'Consolas', 'Monaco', monospace; font-size: 0.85rem; }
-    .panel-workspace .drop-zone { border: 2px dashed var(--border); border-radius: 12px; padding: 2rem; text-align: center; color: var(--text-muted); min-height: 180px; display: flex; align-items: center; justify-content: center; }
-    .panel-workspace .drop-zone.dragover { border-color: var(--accent); background: rgba(0, 212, 170, 0.05); }
-    .panel-workspace .preview-area { margin-top: 0.75rem; min-height: 80px; font-size: 0.85rem; color: var(--text-muted); }
-    .panel-workspace .list-add { display: flex; gap: 0.5rem; margin-bottom: 0.5rem; }
-    .panel-workspace .list-add input { flex: 1; padding: 0.5rem; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); }
-    .panel-workspace .list-items { list-style: none; padding: 0; margin: 0; }
-    .panel-workspace .list-items li { display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem 0; border-bottom: 1px solid var(--border); }
-    .panel-workspace .list-items li input[type="checkbox"] { cursor: pointer; }
-    .panel-workspace .list-items li .text { flex: 1; }
-    .panel-workspace .list-items li .del { color: var(--text-muted); cursor: pointer; font-size: 1.1rem; }
-    .panel-workspace .list-items li .del:hover { color: #e74c3c; }
-    .panel-workspace table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-    .panel-workspace table th, .panel-workspace table td { padding: 0.4rem 0.5rem; border: 1px solid var(--border); text-align: left; }
-    .panel-workspace table th { background: var(--bg); color: var(--text-muted); }
-    .panel-workspace .data-table-wrap { overflow: auto; max-height: 280px; margin-top: 0.5rem; }
-    .panel-workspace .ai-single-result { margin-top: 0.75rem; padding: 0.75rem; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem; white-space: pre-wrap; }
-    .panel-workspace .ai-single-result.loading { color: var(--text-muted); }
-    .panel-workspace .task-status { font-size: 0.75rem; padding: 0.2rem 0.4rem; border-radius: 4px; background: var(--bg); color: var(--text-muted); }
-    .panel-workspace .task-status.done { color: var(--accent); }
-    .panel-workspace .task-status.progress { color: #f39c12; }
-    .panel-workspace .pomo-timer { font-size: 2rem; font-variant-numeric: tabular-nums; margin: 0.5rem 0; }
-    .panel-workspace .pomo-timer.work { color: var(--accent); }
-
-    .panel-integrations { margin-top: 0.75rem; padding: 0.5rem 0.75rem; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; font-size: 0.8rem; }
-    .panel-integrations-label { color: var(--text-muted); margin-right: 0.4rem; }
-    .panel-integrations-list { color: var(--text); }
-    .panel-integrations-list .tag { display: inline-block; margin: 0.15rem 0.2rem 0.15rem 0; padding: 0.2rem 0.45rem; background: rgba(0, 212, 170, 0.15); border-radius: 6px; color: var(--accent); font-size: 0.75rem; }
-
-    .panel-chat { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; display: flex; flex-direction: column; min-height: 400px; }
-    .panel-chat .ai-messages { flex: 1; overflow-y: auto; padding: 0.75rem; display: flex; flex-direction: column; gap: 0.5rem; min-height: 0; }
-    .panel-chat .ai-msg { max-width: 90%; padding: 0.6rem 0.75rem; border-radius: 10px; font-size: 0.9rem; line-height: 1.45; }
-    .panel-chat .ai-msg.user { align-self: flex-end; background: var(--accent); color: var(--bg); }
-    .panel-chat .ai-msg.assistant { align-self: flex-start; background: var(--border); color: var(--text); }
-    .panel-chat .ai-msg .meta { font-size: 0.7rem; opacity: 0.8; margin-top: 0.2rem; }
-    .panel-chat .ai-send { display: flex; gap: 0.4rem; padding: 0.6rem 0.75rem; border-top: 1px solid var(--border); }
-    .panel-chat .ai-send input { flex: 1; padding: 0.6rem 0.75rem; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 0.95rem; }
-    .panel-chat .ai-send input:focus { border-color: var(--accent); outline: none; }
-    .panel-chat .ai-send button { padding: 0.6rem 1rem; white-space: nowrap; cursor: pointer; font-size: 0.9rem; }
-    .panel-chat .ai-offline { padding: 0.75rem; text-align: center; color: var(--text-muted); font-size: 0.8rem; }
-    .panel-chat .ai-offline a { color: var(--accent); }
-  </style>
+  <link rel="stylesheet" href="css/ai.css">
 </head>
 <body>
   <header class="header">
@@ -117,6 +50,12 @@
         <a href="#" data-lang="en">EN</a>
         <a href="#" data-lang="ru">RU</a>
         <a href="#" data-lang="fr">FR</a>
+        <a href="#" data-lang="de">DE</a>
+        <a href="#" data-lang="es">ES</a>
+        <a href="#" data-lang="it">IT</a>
+        <a href="#" data-lang="ar">AR</a>
+        <a href="#" data-lang="zh">ZH</a>
+        <a href="#" data-lang="ja">JA</a>
       </div>
       <button class="menu-toggle" aria-label="Menu"><span></span></button>
     </div>
@@ -140,9 +79,10 @@
       </section>
 
       <div class="ai-panels">
-        <!-- 1. Code & Automation — среда: редактор кода + чат -->
+        <!-- 1. Code & Automation -->
         <div class="ai-panel has-chat active" id="panel-code" data-module="code">
-          <div class="panel-workspace">
+          <div class="panel-workspace" data-module="code">
+            <div class="panel-head" data-i18n="aiModule1">Code & Automation</div>
             <div class="toolbar">
               <button type="button" class="btn btn-primary ai-btn-run" data-i18n="aiRun">Run</button>
               <button type="button" class="btn ai-btn-save" data-i18n="aiSave">Save</button>
@@ -154,6 +94,7 @@
             </div>
           </div>
           <div class="panel-chat" data-chat="code">
+            <div class="chat-head" data-i18n="aiChatLabel">Chat</div>
             <div class="ai-messages" id="messages-code"></div>
             <div class="ai-offline" data-offline="code" style="display:none;" data-i18n="aiOfflineLong">AI not reachable.</div>
             <div class="ai-send" data-send="code">
@@ -163,9 +104,10 @@
           </div>
         </div>
 
-        <!-- 2. Data & Finance — среда: таблица, импорт/экспорт, одна кнопка «Анализ ИИ» (без чата) -->
+        <!-- 2. Data & Finance -->
         <div class="ai-panel" id="panel-data" data-module="data">
-          <div class="panel-workspace">
+          <div class="panel-workspace" data-module="data">
+            <div class="panel-head" data-i18n="aiModule2">Data & Finance</div>
             <div class="toolbar">
               <label class="btn" style="cursor:pointer;" data-i18n="aiImportCsv">Import CSV<input type="file" accept=".csv,.txt" id="data-import-csv" style="position:absolute;opacity:0;width:0;height:0;"></label>
               <button type="button" class="btn ai-btn-parse-data" data-i18n="aiParseToTable">Parse to table</button>
@@ -182,9 +124,10 @@
           </div>
         </div>
 
-        <!-- 3. Tasks & Productivity — среда: задачи со статусом, заметки, таймер, Summarize (без чата) -->
+        <!-- 3. Tasks & Productivity -->
         <div class="ai-panel" id="panel-tasks" data-module="tasks">
-          <div class="panel-workspace">
+          <div class="panel-workspace" data-module="tasks">
+            <div class="panel-head" data-i18n="aiModule3">Tasks & Productivity</div>
             <div class="toolbar">
               <button type="button" class="btn btn-primary ai-btn-add-task" data-i18n="aiAddTask">+ Task</button>
               <button type="button" class="btn ai-btn-summarize-notes" data-i18n="aiSummarizeNotes">Summarize notes with AI</button>
@@ -201,9 +144,10 @@
           </div>
         </div>
 
-        <!-- 4. Content, Writing & Messages — среда: редактор + Improve with AI + чат -->
+        <!-- 4. Content, Writing & Messages -->
         <div class="ai-panel has-chat" id="panel-content" data-module="content">
-          <div class="panel-workspace">
+          <div class="panel-workspace" data-module="content">
+            <div class="panel-head" data-i18n="aiModule4">Content, Writing & Messages</div>
             <div class="toolbar">
               <button type="button" class="btn btn-primary ai-btn-save" data-i18n="aiSave">Save</button>
               <button type="button" class="btn ai-btn-clear" data-i18n="aiClear">Clear</button>
@@ -216,6 +160,7 @@
             </div>
           </div>
           <div class="panel-chat" data-chat="content">
+            <div class="chat-head" data-i18n="aiChatLabel">Chat</div>
             <div class="ai-messages" id="messages-content"></div>
             <div class="ai-offline" data-offline="content" style="display:none;" data-i18n="aiOfflineShort">AI not reachable.</div>
             <div class="ai-send" data-send="content">
@@ -225,15 +170,16 @@
           </div>
         </div>
 
-        <!-- 5. Media & Design — среда: загрузка, превью, описание от ИИ (без чата) -->
+        <!-- 5. Media & Design -->
         <div class="ai-panel" id="panel-media" data-module="media">
-          <div class="panel-workspace">
+          <div class="panel-workspace" data-module="media">
+            <div class="panel-head" data-i18n="aiModule5">Media & Design</div>
             <div class="toolbar"><button type="button" class="btn ai-btn-clear" data-i18n="aiClear">Clear</button></div>
             <div class="body">
               <div class="drop-zone" id="drop-zone-media" data-i18n="aiDropImage">Drop image here or paste URL</div>
               <div class="preview-area" id="preview-media"></div>
-              <div style="margin-top:0.75rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
-                <input type="text" id="media-ai-prompt" data-i18n-placeholder="aiAskAiImage" placeholder="Ask AI about this image…" style="flex:1;min-width:180px;padding:0.5rem;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);">
+              <div class="media-prompt-row">
+                <input type="text" id="media-ai-prompt" data-i18n-placeholder="aiAskAiImage" placeholder="Ask AI about this image…">
                 <button type="button" class="btn btn-primary" id="media-ai-describe" data-i18n="aiDescribeAnalyze">Describe / Analyze</button>
               </div>
               <div class="ai-single-result" id="media-ai-result" style="display:none;"></div>
@@ -242,9 +188,10 @@
           </div>
         </div>
 
-        <!-- 6. Knowledge & Education — среда: заметки + чат -->
+        <!-- 6. Knowledge & Education -->
         <div class="ai-panel has-chat" id="panel-knowledge" data-module="knowledge">
-          <div class="panel-workspace">
+          <div class="panel-workspace" data-module="knowledge">
+            <div class="panel-head" data-i18n="aiModule6">Knowledge & Education</div>
             <div class="toolbar">
               <button type="button" class="btn btn-primary ai-btn-save" data-i18n="aiSave">Save</button>
               <button type="button" class="btn ai-btn-clear" data-i18n="aiClear">Clear</button>
@@ -255,6 +202,7 @@
             </div>
           </div>
           <div class="panel-chat" data-chat="knowledge">
+            <div class="chat-head" data-i18n="aiChatLabel">Chat</div>
             <div class="ai-messages" id="messages-knowledge"></div>
             <div class="ai-offline" data-offline="knowledge" style="display:none;" data-i18n="aiOfflineShort">AI not reachable.</div>
             <div class="ai-send" data-send="knowledge">
@@ -266,6 +214,7 @@
       </div>
     </div>
   </main>
+  <div id="ai-toast" class="ai-toast" role="status" aria-live="polite" style="display:none;"></div>
   <script src="config.js"></script>
   <script src="js/i18n.js"></script>
   <script src="js/api.js"></script>
@@ -281,6 +230,23 @@
       }
       if (typeof window.i18n !== 'undefined' && window.i18n.apply) i18n.apply();
     })();
+
+    function t(key) { return (typeof window.i18n !== 'undefined' && window.i18n.t && window.i18n.t(key)) || key; }
+    var toastTimer;
+    function showToast(msg) {
+      var el = document.getElementById('ai-toast');
+      if (!el) return;
+      el.textContent = msg;
+      el.style.display = 'block';
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(function () { el.style.display = 'none'; }, 2500);
+    }
+    function copyToClipboard(text, btn) {
+      if (!navigator.clipboard || !navigator.clipboard.writeText) {
+        try { var ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); } catch (e) { return; }
+      } else { navigator.clipboard.writeText(text).catch(function () {}); }
+      if (btn) { var orig = btn.textContent; btn.textContent = t('aiCopied'); setTimeout(function () { btn.textContent = orig; }, 1500); }
+    }
 
     var MODULES = ['code', 'data', 'tasks', 'content', 'media', 'knowledge'];
     var MODULES_WITH_CHAT = ['code', 'content', 'knowledge'];
@@ -315,15 +281,25 @@
     var chatState = {};
     MODULES.forEach(function (m) { chatState[m] = []; });
 
-    function appendMsg(moduleId, text, who, model) {
+    function appendMsg(moduleId, text, who, model, options) {
       var el = document.getElementById('messages-' + moduleId);
-      if (!el) return;
+      if (!el) return null;
       var div = document.createElement('div');
-      div.className = 'ai-msg ' + who;
-      div.innerHTML = '<span>' + (window.escapeHtml ? escapeHtml(text) : text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')) + '</span>' + (model ? '<div class="meta">' + (window.escapeHtml ? escapeHtml(model) : model) + '</div>' : '');
+      div.className = 'ai-msg ' + who + (options && options.loading ? ' loading' : '');
+      var escaped = (window.escapeHtml ? escapeHtml(text) : text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'));
+      var copyBtn = (who === 'assistant' && text && !options.loading) ? '<div class="msg-actions"><button type="button" class="btn-copy">' + t('aiCopy') + '</button></div>' : '';
+      div.innerHTML = '<span class="' + (options && options.loading ? 'typing-dots' : '') + '">' + (options && options.loading ? '…' : escaped) + '</span>' + (model ? '<div class="meta">' + (window.escapeHtml ? escapeHtml(model) : model) + '</div>' : '') + copyBtn;
+      if (copyBtn) {
+        var btn = div.querySelector('.btn-copy');
+        if (btn) btn.addEventListener('click', function () { copyToClipboard(text, btn); });
+      }
       el.appendChild(div);
       el.scrollTop = el.scrollHeight;
-      chatState[moduleId].push({ who: who, text: text, model: model });
+      if (!options || !options.loading) chatState[moduleId].push({ who: who, text: text, model: model });
+      return div;
+    }
+    function removeLoadingMsg(moduleId, loadingEl) {
+      if (loadingEl && loadingEl.parentNode) loadingEl.remove();
     }
 
     function setOffline(moduleId, show) {
@@ -341,7 +317,7 @@
       var base = (typeof AI_URL !== 'undefined' && AI_URL) ? AI_URL : '';
       if (!base) {
         setOffline(moduleId, true);
-        appendMsg(moduleId, 'AI service not reachable. Set AI URL or start server.', 'assistant');
+        appendMsg(moduleId, t('aiOfflineLong'), 'assistant');
         return;
       }
       setOffline(moduleId, false);
@@ -349,6 +325,8 @@
       appendMsg(moduleId, msg, 'user');
       var btn = document.querySelector('[data-sendbtn="' + moduleId + '"]');
       if (btn) btn.disabled = true;
+      var messagesEl = document.getElementById('messages-' + moduleId);
+      var loadingEl = appendMsg(moduleId, '…', 'assistant', null, { loading: true });
       var apiToken = (typeof api !== 'undefined' && api && api.getToken) ? api.getToken() : '';
       var apiUrl = (typeof window.API_URL !== 'undefined') ? (window.API_URL || '') : '';
       fetch(base.replace(/\/$/, '') + '/chat', {
@@ -359,12 +337,16 @@
         if (!r.ok) throw new Error(r.statusText);
         return r.json();
       }).then(function (data) {
+        removeLoadingMsg(moduleId, loadingEl);
         appendMsg(moduleId, data.reply || 'No reply.', 'assistant', data.model);
       }).catch(function () {
-        appendMsg(moduleId, 'Could not reach AI service.', 'assistant');
+        removeLoadingMsg(moduleId, loadingEl);
+        appendMsg(moduleId, t('aiErrorReach'), 'assistant');
         setOffline(moduleId, true);
       }).finally(function () {
         if (btn) btn.disabled = false;
+        var inp = document.querySelector('.panel-chat[data-chat="' + moduleId + '"] input[data-input="' + moduleId + '"]');
+        if (inp) inp.focus();
       });
     }
 
@@ -381,16 +363,28 @@
       var el = document.getElementById(resultElId);
       var base = (typeof AI_URL !== 'undefined' && AI_URL) ? AI_URL : '';
       if (!el) return Promise.reject();
-      if (!base) { el.style.display = 'block'; el.textContent = 'AI service not configured.'; el.classList.remove('loading'); return Promise.reject(); }
+      if (!base) { el.style.display = 'block'; el.textContent = t('aiNotConfigured'); el.classList.remove('loading'); return Promise.reject(); }
       el.style.display = 'block'; el.textContent = '…'; el.classList.add('loading');
+      var wrap = el.parentNode;
+      var copyBtn = null;
+      if (wrap && !wrap.classList.contains('ai-single-result-wrap')) {
+        var w = document.createElement('div'); w.className = 'ai-single-result-wrap';
+        wrap.insertBefore(w, el); w.appendChild(el);
+        copyBtn = document.createElement('button'); copyBtn.type = 'button'; copyBtn.className = 'btn btn-sm btn-copy-result'; copyBtn.textContent = t('aiCopy');
+        w.appendChild(copyBtn);
+      } else if (wrap && wrap.classList.contains('ai-single-result-wrap')) {
+        copyBtn = wrap.querySelector('.btn-copy-result');
+      }
       return fetch(base.replace(/\/$/, '') + '/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: payload.message || payload, module: moduleId, context: payload.context })
       }).then(function (r) { if (!r.ok) throw new Error(r.statusText); return r.json(); }).then(function (data) {
-        el.textContent = data.reply || ''; el.classList.remove('loading');
+        var txt = data.reply || '';
+        el.textContent = txt; el.classList.remove('loading');
+        if (copyBtn) { copyBtn.onclick = function () { copyToClipboard(txt, copyBtn); }; copyBtn.style.display = ''; }
       }).catch(function () {
-        el.textContent = 'Could not reach AI.'; el.classList.remove('loading');
+        el.textContent = t('aiErrorReach'); el.classList.remove('loading');
       });
     }
 
@@ -405,7 +399,7 @@
     (function initCodePanel() {
       var ta = document.getElementById('workspace-code');
       document.querySelector('#panel-code .ai-btn-save').addEventListener('click', function () {
-        if (ta) try { localStorage.setItem('ai_workspace_code', ta.value); alert('Saved'); } catch (e) {}
+        if (ta) try { localStorage.setItem('ai_workspace_code', ta.value); showToast(t('aiSaved')); } catch (e) {}
       });
       document.querySelector('#panel-code .ai-btn-clear').addEventListener('click', function () { if (ta) ta.value = ''; });
       if (ta && localStorage.getItem('ai_workspace_code')) ta.value = localStorage.getItem('ai_workspace_code');
@@ -426,7 +420,25 @@
       document.querySelector('#panel-data .ai-btn-parse-data').addEventListener('click', function () {
         if (!ta || !ta.value.trim() || !tbl || !wrap) return;
         var lines = ta.value.trim().split(/\r?\n/);
-        var rows = lines.map(function (l) { return l.split(',').map(function (c) { return c.replace(/^"|"$/g, '').trim(); }); });
+        function parseCsvLine(line) {
+          var out = [], i = 0;
+          while (i < line.length) {
+            if (line[i] === '"') {
+              var end = line.indexOf('"', i + 1);
+              var s = line.substring(i + 1, end === -1 ? line.length : end);
+              while (end !== -1 && line[end + 1] === '"') { s += '"'; end = line.indexOf('"', end + 2); }
+              out.push(s.trim());
+              i = end === -1 ? line.length : end + 1;
+              if (i < line.length && line[i] === ',') i++;
+            } else {
+              var comma = line.indexOf(',', i);
+              out.push((comma === -1 ? line.substring(i) : line.substring(i, comma)).trim());
+              i = comma === -1 ? line.length : comma + 1;
+            }
+          }
+          return out;
+        }
+        var rows = lines.map(function (l) { return parseCsvLine(l); });
         tbl.innerHTML = '';
         if (rows.length === 0) return;
         var thead = document.createElement('thead');
@@ -469,21 +481,39 @@
       var add = document.getElementById('tasks-task-add');
       var addRow = document.querySelector('#panel-tasks .list-add');
       var notesTa = document.getElementById('workspace-tasks');
+      var TASKS_KEY = 'ai_tasks_list';
+      function saveTasks() {
+        if (!list) return;
+        var items = [];
+        list.querySelectorAll('li').forEach(function (li) {
+          var chk = li.querySelector('input[type="checkbox"]');
+          var txt = li.querySelector('.text');
+          if (txt) items.push({ text: txt.textContent, status: chk && chk.checked ? 'done' : (li.querySelector('.task-status.progress') ? 'progress' : 'todo') });
+        });
+        try { localStorage.setItem(TASKS_KEY, JSON.stringify(items)); } catch (e) {}
+      }
       function addTask(text, status) {
         if (!text || !list) return;
         var st = status || (statusSel ? statusSel.value : 'todo');
         var lab = st === 'done' ? ' done' : (st === 'progress' ? ' progress' : '');
         var li = document.createElement('li');
         li.innerHTML = '<input type="checkbox" ' + (st === 'done' ? 'checked' : '') + '><span class="text">' + (window.escapeHtml ? escapeHtml(text) : text) + '</span><span class="task-status' + lab + '">' + st + '</span><span class="del">×</span>';
-        li.querySelector('.del').onclick = function () { li.remove(); };
+        li.querySelector('.del').onclick = function () { li.remove(); saveTasks(); };
+        var chk = li.querySelector('input[type="checkbox"]');
+        if (chk) chk.addEventListener('change', function () { var sp = li.querySelector('.task-status'); if (sp) { sp.className = 'task-status' + (chk.checked ? ' done' : ''); sp.textContent = chk.checked ? 'done' : 'todo'; } saveTasks(); });
         list.appendChild(li);
+        saveTasks();
       }
+      try {
+        var stored = localStorage.getItem(TASKS_KEY);
+        if (stored) { var arr = JSON.parse(stored); if (Array.isArray(arr)) arr.forEach(function (o) { addTask(o.text, o.status); }); }
+      } catch (e) {}
       if (addBtn && addRow) addBtn.addEventListener('click', function () { addRow.style.display = addRow.style.display === 'none' ? 'flex' : 'none'; });
       if (add && input) add.addEventListener('click', function () { addTask(input.value.trim(), statusSel ? statusSel.value : 'todo'); input.value = ''; });
       if (input) input.addEventListener('keydown', function (e) { if (e.key === 'Enter') { addTask(input.value.trim(), statusSel ? statusSel.value : 'todo'); input.value = ''; } });
       document.querySelector('#panel-tasks .ai-btn-summarize-notes').addEventListener('click', function () {
         var text = (notesTa && notesTa.value) ? notesTa.value.trim() : '';
-        if (!text) { var r = document.getElementById('tasks-ai-result'); if (r) { r.style.display = 'block'; r.textContent = 'Add notes first.'; } return; }
+        if (!text) { var r = document.getElementById('tasks-ai-result'); if (r) { r.style.display = 'block'; r.textContent = t('aiAddNotesFirst'); } return; }
         aiSingleRequest('tasks', { message: 'Summarize these notes in a few bullet points:\n' + text }, 'tasks-ai-result');
       });
       var pomoStart = document.getElementById('pomo-start');
@@ -517,7 +547,7 @@
       }
       if (ta) { ta.addEventListener('input', updateWordCount); updateWordCount(); }
       document.querySelector('#panel-content .ai-btn-save').addEventListener('click', function () {
-        if (ta) try { localStorage.setItem('ai_workspace_content', ta.value); alert('Saved'); } catch (e) {}
+        if (ta) try { localStorage.setItem('ai_workspace_content', ta.value); showToast(t('aiSaved')); } catch (e) {}
       });
       document.querySelector('#panel-content .ai-btn-clear').addEventListener('click', function () { if (ta) ta.value = ''; if (wc) wc.textContent = '0 words'; });
       var improveBtn = document.getElementById('content-improve-ai');
@@ -525,14 +555,14 @@
         var text = (ta.value || '').trim();
         if (!text) return;
         var base = (typeof AI_URL !== 'undefined' && AI_URL) ? AI_URL : '';
-        if (!base) { alert('AI service not configured.'); return; }
+        if (!base) { showToast(t('aiNotConfigured')); return; }
         fetch(base.replace(/\/$/, '') + '/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ message: 'Improve this message for clarity and tone. Reply only with the improved text, no preamble:\n\n' + text, module: 'content' })
         }).then(function (r) { if (!r.ok) throw new Error(r.statusText); return r.json(); }).then(function (data) {
           if (ta && data.reply) ta.value = data.reply.trim();
-        }).catch(function () { alert('Could not reach AI.'); });
+        }).catch(function () { showToast(t('aiErrorReach')); });
       });
       if (ta && localStorage.getItem('ai_workspace_content')) ta.value = localStorage.getItem('ai_workspace_content'); if (wc && ta) updateWordCount();
     })();
@@ -570,7 +600,7 @@
     (function initKnowledgePanel() {
       var ta = document.getElementById('workspace-knowledge');
       document.querySelector('#panel-knowledge .ai-btn-save').addEventListener('click', function () {
-        if (ta) try { localStorage.setItem('ai_workspace_knowledge', ta.value); alert('Saved'); } catch (e) {}
+        if (ta) try { localStorage.setItem('ai_workspace_knowledge', ta.value); showToast(t('aiSaved')); } catch (e) {}
       });
       document.querySelector('#panel-knowledge .ai-btn-clear').addEventListener('click', function () { if (ta) ta.value = ''; });
       if (ta && localStorage.getItem('ai_workspace_knowledge')) ta.value = localStorage.getItem('ai_workspace_knowledge');

@@ -71,8 +71,9 @@
 | B2 | Embedded finance | Рассрочка по заказу: поле installment_plan у заказа (boolean или enum: full / installments). В UI заказа — кнопка «Оформить рассрочку» → заглушка (модалка «Скоро через Trade» или запись намерения в БД). Документировать сценарий в API.md. | backend-go (orders), app (orders.html, checkout flow). |
 | B3 | Trade stub | Баланс пользователя (внутренние единицы): таблица user_balances или поле balance; GET /api/users/me/balance; заглушка пополнения (админ или тестовый кредит). Основа для подписок, наград, выплат. | backend-go (balances), API. |
 | B4 | Cross-border / Ремиты | Дизайн API ремитов: POST /api/remittances (from_user_id, to_identifier, amount, currency). Валидация и запись заявки в БД; реальный перевод — позже (Trade/IXI). Документировать в API.md. | backend-go (remittances stub), API.md. |
+| B5 | Cross-border / Ремиты | Список моих ремитов: GET /api/remittances/my; отображение в профиле или странице «Мои переводы» (статус, получатель, сумма). | backend-go (remittances), app (dashboard или remittances.html). |
 
-После B1–B2 пользователь получает «доверенный» профиль и задел под рассрочку; B3–B4 закладывают баланс и ремиты под Phase 2 (полноценный Trade/IXI).
+После B1–B2 пользователь получает «доверенный» профиль и задел под рассрочку; B3–B4 закладывают баланс и ремиты под Phase 2 (полноценный Trade/IXI); B5 — просмотр заявок на перевод.
 
 ### Phase C — Regulation & trust
 

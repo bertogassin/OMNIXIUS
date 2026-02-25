@@ -49,6 +49,12 @@
         <a href="#" data-lang="en">EN</a>
         <a href="#" data-lang="ru">RU</a>
         <a href="#" data-lang="fr">FR</a>
+        <a href="#" data-lang="de">DE</a>
+        <a href="#" data-lang="es">ES</a>
+        <a href="#" data-lang="it">IT</a>
+        <a href="#" data-lang="ar">AR</a>
+        <a href="#" data-lang="zh">ZH</a>
+        <a href="#" data-lang="ja">JA</a>
       </div>
       <button class="menu-toggle" aria-label="Menu"><span></span></button>
     </div>
@@ -64,6 +70,8 @@
       <div id="balanceBlock"><p class="loading-state">Loading…</p></div>
       <h2 class="section-title">My orders</h2>
       <div id="ordersList"><p class="loading-state">Loading…</p></div>
+      <h2 class="section-title" data-i18n="remittancesTitle">My remittances</h2>
+      <div id="remittancesList"><p class="loading-state">Loading…</p></div>
     </div>
   </main>
   <script src="config.js"></script>
@@ -123,6 +131,21 @@
       document.getElementById('ordersList').innerHTML = list.length
         ? '<ul class="mail-list">' + list.map(function(o) { return '<li><span>' + o.title + ' — ' + o.status + '</span><span>' + new Date(o.created_at * 1000).toLocaleDateString() + '</span></li>'; }).join('') + '</ul>'
         : '<p style="color:var(--text-muted);">No orders yet. <a href="marketplace.html">Go to Marketplace</a></p>';
+      try {
+        var remittances = await api.remittances.my();
+        var rList = Array.isArray(remittances) ? remittances : [];
+        var remTitle = (window.i18n && i18n.t('remittancesTitle')) ? i18n.t('remittancesTitle') : 'My remittances';
+        var remTo = (window.i18n && i18n.t('remittancesTo')) ? i18n.t('remittancesTo') : 'To';
+        var remStatus = (window.i18n && i18n.t('remittancesStatus')) ? i18n.t('remittancesStatus') : 'Status';
+        document.getElementById('remittancesList').innerHTML = rList.length
+          ? '<ul class="mail-list">' + rList.map(function(r) {
+              var date = r.created_at != null ? new Date(r.created_at * 1000).toLocaleDateString() : '—';
+              return '<li><span>' + (r.amount != null ? Number(r.amount).toFixed(2) : '') + ' ' + (r.currency || 'USD') + ' → ' + (r.to_identifier || '') + ' · ' + (r.status || 'pending') + '</span><span>' + date + '</span></li>';
+            }).join('') + '</ul><p class="text-muted">' + (remTitle) + ' (stub). Real transfers via Trade/IXI later.</p>'
+          : '<p style="color:var(--text-muted);">No remittances yet. Use API POST /api/remittances to create a request (stub).</p>';
+      } catch (_) {
+        document.getElementById('remittancesList').innerHTML = '<p class="text-muted">Could not load remittances.</p>';
+      }
     })().catch(function() { api.auth.logout(); location.href = 'login.html'; });
   </script>
   <script src="../js/main.js"></script>
