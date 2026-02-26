@@ -3,6 +3,7 @@ package main
 
 import (
 	"crypto/rand"
+	"crypto/sha256"
 	"crypto/subtle"
 	"database/sql"
 	"encoding/base64"
@@ -146,6 +147,42 @@ func main() {
 	vault.POST("/folders", handleVaultCreateFolder)
 	vault.GET("/folders", handleVaultListFolders)
 	vault.DELETE("/folders/:id", handleVaultDeleteFolder)
+	vault.POST("/search", handleVaultSearch)
+
+	// Wallet (§15)
+	auth.GET("/wallet/balances", handleWalletBalances)
+	auth.GET("/wallet/balances/:currency", handleWalletBalanceByCurrency)
+	auth.GET("/wallet/transactions", handleWalletTransactions)
+	auth.GET("/wallet/transactions/:id", handleWalletTransactionByID)
+	auth.POST("/wallet/transfer", handleWalletTransfer)
+	auth.POST("/wallet/transfer/verify", handleWalletTransferVerify)
+	auth.GET("/wallet/deposit/addresses", handleWalletDepositAddressesList)
+	auth.POST("/wallet/deposit/addresses", handleWalletDepositAddressCreate)
+	auth.POST("/wallet/hold", handleWalletHold)
+	auth.POST("/wallet/hold/:id/release", handleWalletHoldRelease)
+	auth.POST("/wallet/hold/:id/capture", handleWalletHoldCapture)
+
+	// Notifications (§16)
+	auth.GET("/notifications/settings", handleNotificationsSettingsGet)
+	auth.PATCH("/notifications/settings", handleNotificationsSettingsPatch)
+	auth.GET("/notifications/history", handleNotificationsHistory)
+	auth.GET("/notifications/history/:id", handleNotificationsHistoryByID)
+	auth.POST("/notifications/history/:id/read", handleNotificationsHistoryRead)
+	auth.POST("/notifications/push/tokens", handleNotificationsPushTokenCreate)
+	auth.DELETE("/notifications/push/tokens/:id", handleNotificationsPushTokenDelete)
+	auth.POST("/notifications/test", handleNotificationsTest)
+
+	// Admin (§18) — requires admin role
+	adminGroup := api.Group("/admin", authRequired(), adminRequired())
+	adminGroup.GET("/stats", handleAdminStats)
+	adminGroup.GET("/reports", handleAdminReportsList)
+	adminGroup.GET("/reports/:id", handleAdminReportGet)
+	adminGroup.POST("/reports/:id/assign", handleAdminReportAssign)
+	adminGroup.POST("/reports/:id/resolve", handleAdminReportResolve)
+	adminGroup.GET("/users/:id", handleAdminUserGet)
+	adminGroup.POST("/users/:id/ban", handleAdminUserBan)
+	adminGroup.POST("/users/:id/unban", handleAdminUserUnban)
+	api.POST("/reports", authRequired(), handleReportCreate)
 
 	r.NoRoute(staticSiteHandler(cfg.SiteRoot))
 
@@ -314,8 +351,21 @@ func authRequired() gin.HandlerFunc {
 			return
 		}
 		c.Set("userID", uid)
+		c.Set("userRole", role)
 		c.Set("userName", name)
 		c.Set("userAvatar", avatar)
+		c.Next()
+	}
+}
+
+func adminRequired() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		r, _ := c.Get("userRole")
+		if role, ok := r.(string); !ok || role != "admin" {
+			c.JSON(403, gin.H{"error": "Admin required"})
+			c.Abort()
+			return
+		}
 		c.Next()
 	}
 }
@@ -1735,7 +1785,31 @@ func handleVaultUploadFile(c *gin.Context) {
 		return
 	}
 	db.DB.Exec("UPDATE vault_files SET storage_path = ? WHERE id = ?", storagePath, fileID)
+	vaultSearchIndexInsert(uid, fileID, fh.Filename)
 	c.JSON(201, gin.H{"id": fileID, "name": fh.Filename, "size_bytes": fh.Size, "mime_type": fh.Header.Get("Content-Type"), "folder_id": folderID, "created_at": time.Now().Unix(), "updated_at": time.Now().Unix()})
+}
+
+func vaultSearchIndexInsert(userID, fileID int64, name string) {
+	name = strings.ToLower(name)
+	var buf []rune
+	for _, r := range name {
+		if (r >= 'a' && r <= 'z') || (r >= '0' && r <= '9') {
+			buf = append(buf, r)
+		} else if len(buf) >= 2 {
+			word := string(buf)
+			buf = nil
+			h := sha256.Sum256([]byte(word))
+			termHash := hex.EncodeToString(h[:])
+			db.DB.Exec("INSERT INTO vault_search_index (user_id, file_id, term_hash, weight) VALUES (?, ?, ?, 1)", userID, fileID, termHash)
+		} else {
+			buf = nil
+		}
+	}
+	if len(buf) >= 2 {
+		h := sha256.Sum256([]byte(string(buf)))
+		termHash := hex.EncodeToString(h[:])
+		db.DB.Exec("INSERT INTO vault_search_index (user_id, file_id, term_hash, weight) VALUES (?, ?, ?, 1)", userID, fileID, termHash)
+	}
 }
 
 func handleVaultGetFile(c *gin.Context) {

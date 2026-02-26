@@ -126,6 +126,7 @@ Prefix: `/api/v1/vault`. All require auth.
 | GET | `/api/v1/vault/folders` | List folders. Query: `parent_id` (optional). |
 | POST | `/api/v1/vault/folders` | Create folder. Body: `name`, `parent_id` (optional). |
 | DELETE | `/api/v1/vault/folders/:id` | Delete folder (files move to root). |
+| POST | `/api/v1/vault/search` | Search by blind index. Body: `{ "term_hashes": ["hex..."], "folder_id?", "limit?", "offset?" }`. Returns `{ "files": [...] }`. |
 | GET | `/api/v1/vault/files` | List files. Query: `folder_id` (optional). |
 | POST | `/api/v1/vault/files` | Upload file. Form: `file`, `folder_id` (optional). |
 | GET | `/api/v1/vault/files/:id` | Get file metadata. |
@@ -155,6 +156,34 @@ Prefix: `/api/v1/vault`. All require auth.
 | POST | `/api/auth/recovery/generate` | **Auth.** Store recovery hash. Body: `{ "recoveryHash": "..." }`. |
 | POST | `/api/auth/recovery/verify` | **No auth.** Body: `{ "recoveryHash": "..." }`. Returns `{ "valid": true, "userId": ... }` or 400. |
 | POST | `/api/auth/recovery/restore` | **No auth.** Body: `{ "recoveryHash": "..." }`. Invalidates all sessions, creates new session, returns `{ "token", "user_id" }`. |
+
+### Wallet (§15 Part 2) — auth required
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/wallet/balances` | List my balances by currency. Returns `{ "balances": [{ "currency", "amount", "hold_amount", "available" }] }`. |
+| GET | `/api/wallet/transactions` | List my transactions. Query: `limit`, `offset`. |
+| POST | `/api/wallet/transfer` | Transfer to another user. Body: `{ "to_user_id", "currency", "amount" }`. |
+
+### Notifications (§16) — auth required
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/notifications/settings` | Get email_enabled, push_enabled. |
+| PATCH | `/api/notifications/settings` | Body: `{ "email_enabled"?, "push_enabled"?: bool }`. |
+| GET | `/api/notifications/history` | List my notifications (queue). |
+
+### Reports and Admin (§18)
+
+| Method | Path | Description |
+|--------|------|-------------|
+| POST | `/api/reports` | **Auth.** Create report. Body: `{ "reported_type", "reported_id", "reason", "description"? }`. |
+| GET | `/api/admin/stats` | **Admin.** Dashboard counts (users, products, orders, reports_pending). |
+| GET | `/api/admin/reports` | **Admin.** List reports. Query: `status`. |
+| GET | `/api/admin/reports/:id` | **Admin.** Get report. |
+| POST | `/api/admin/reports/:id/resolve` | **Admin.** Body: `{ "resolution", "status"? }`. |
+| POST | `/api/admin/users/:id/ban` | **Admin.** Body: `{ "reason", "expires_at"? }`. |
+| POST | `/api/admin/users/:id/unban` | **Admin.** Lift active ban. |
 
 ---
 
