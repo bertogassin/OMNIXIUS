@@ -35,6 +35,16 @@ func Open(dbPath string) error {
 	return RunMigrations()
 }
 
+func splitStatements(s string) []string {
+	var out []string
+	for _, part := range strings.Split(s, ";") {
+		if t := strings.TrimSpace(part); t != "" {
+			out = append(out, part)
+		}
+	}
+	return out
+}
+
 // RunMigrations runs embedded migrations in order (002_*.sql, 003_*.sql, ...).
 func RunMigrations() error {
 	var version int
@@ -69,11 +79,20 @@ func RunMigrations() error {
 			return fmt.Errorf("migration %s: %w", f.name, err)
 		}
 		sql := strings.TrimSpace(string(body))
-		if sql != "" && !strings.HasPrefix(sql, "--") {
-			if _, err = DB.Exec(sql); err != nil {
+		if sql == "" || strings.HasPrefix(sql, "--") {
+			goto updateVersion
+		}
+		for _, stmt := range splitStatements(sql) {
+			stmt = strings.TrimSpace(stmt)
+			if stmt == "" { continue }
+			if _, err = DB.Exec(stmt); err != nil {
+				if strings.Contains(err.Error(), "duplicate column name") {
+					continue
+				}
 				return fmt.Errorf("migration %s: %w", f.name, err)
 			}
 		}
+	updateVersion:
 		if _, err = DB.Exec("UPDATE schema_version SET version = ? WHERE id = 1", f.n); err != nil {
 			return err
 		}

@@ -81,6 +81,7 @@
       login: (email, password) => api.request('/api/auth/login', { method: 'POST', body: { email, password } }),
       logout: () => { api.setToken(null); api.user = null; },
       forgotPassword: (email) => api.request('/api/auth/forgot-password', { method: 'POST', body: { email } }),
+      resetPassword: (token, password) => api.request('/api/auth/reset-password', { method: 'POST', body: { token, password } }),
       changePassword: (currentPassword, newPassword) => api.request('/api/auth/change-password', { method: 'POST', body: { current_password: currentPassword, new_password: newPassword } }),
     },
     users: {

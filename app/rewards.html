@@ -93,8 +93,8 @@
   <script src="js/api.js"></script>
   <script src="../js/main.js"></script>
   <script>
-    (function(){ var t = localStorage.getItem('omnixius_token'); document.getElementById('navLogin').style.display = t ? 'none' : ''; document.getElementById('navLogout').style.display = t ? '' : 'none'; })();
-    document.getElementById('navLogout').onclick = function(e){ e.preventDefault(); localStorage.removeItem('omnixius_token'); localStorage.removeItem('omnixius_user'); location.href = 'login.html'; };
+    (function(){ var t = (typeof api !== 'undefined' && api.getToken) ? api.getToken() : (sessionStorage.getItem('omnixius_token') || localStorage.getItem('omnixius_token')); document.getElementById('navLogin').style.display = t ? 'none' : ''; document.getElementById('navLogout').style.display = t ? '' : 'none'; })();
+    document.getElementById('navLogout').onclick = function(e){ e.preventDefault(); if (typeof api !== 'undefined' && api.auth) api.auth.logout(); location.href = 'login.html'; };
   </script>
 </body>
 </html>

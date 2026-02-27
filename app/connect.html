@@ -6,18 +6,11 @@
   <title>Bond · social — OMNIXIUS</title>
   <link rel="stylesheet" href="../css/style.css">
   <link rel="stylesheet" href="css/app.css">
-  <style>
-    .place-links { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1rem; margin-top: 1.5rem; }
-    .place-links a { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1rem; color: var(--accent); text-decoration: none; transition: border-color 0.2s, transform 0.1s, opacity 0.1s; }
-    .place-links a:hover { border-color: var(--accent); }
-    .place-links a:active { transform: scale(0.97); opacity: 0.9; }
-    .place-links a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-  </style>
 </head>
 <body>
   <header class="header">
     <div class="container">
-      <a href="../index.html" class="logo">OMNIXIUS</a>
+      <a href="../index.html" class="logo"><span class="logo-mark">O</span><span class="logo-text">MNIXIUS</span></a>
       <nav class="nav nav-main nav-unified">
         <div class="nav-group nav-group-main">
           <span class="nav-group-label" data-i18n="navMain">Main</span>
@@ -75,6 +68,7 @@
         </div>
       </nav>
       <div class="lang-switcher">
+        <span class="lang-switcher-label" data-i18n="langLabel">Language</span>
         <a href="#" data-lang="en">EN</a>
         <a href="#" data-lang="ru">RU</a>
         <a href="#" data-lang="fr">FR</a>
@@ -88,27 +82,31 @@
       <button class="menu-toggle" aria-label="Menu"><span></span></button>
     </div>
   </header>
-  <main class="app-page">
+  <main class="app-page app-page-bond">
     <div class="container">
-      <p class="status-done">СДЕЛАНО: место создано. Дальше: развивать (geo, чат, видео).</p>
-      <h1 data-i18n="brandBond">Bond · social</h1>
-      <p class="about-text">Social network, experts, marketplace, chat, video. People and services. One place for everything that connects people.</p>
-      <h2 class="section-title">Your place (live)</h2>
-      <div class="place-links">
-        <a href="mail.html" data-i18n="navRelay">Relay · mail</a>
-        <a href="marketplace.html" data-i18n="navTrove">Trove · marketplace</a>
-        <a href="orders.html" data-i18n="navOrders">Orders</a>
-        <a href="dashboard.html" data-i18n="navProfile">Profile</a>
+      <p class="bond-back-wrap"><a href="../index.html" class="bond-back" data-i18n="home">← Home</a></p>
+      <h1 class="bond-title" data-i18n="brandBond">Bond · social</h1>
+      <p class="bond-intro about-text" data-i18n="bondLiveIntro">Messages with sellers, marketplace, orders, profile. One account — all working.</p>
+      <h2 class="section-title bond-place-title" data-i18n="bondLiveTitle">Available now</h2>
+      <div class="place-links bond-place-links">
+        <a href="mail.html" class="place-link" data-i18n="navRelay"><span class="place-link-icon">✉</span> Relay · mail</a>
+        <a href="marketplace.html" class="place-link" data-i18n="navTrove"><span class="place-link-icon">◆</span> Trove · marketplace</a>
+        <a href="orders.html" class="place-link" data-i18n="navOrders"><span class="place-link-icon">◇</span> Orders</a>
+        <a href="dashboard.html" class="place-link" data-i18n="navProfile"><span class="place-link-icon">▣</span> Profile</a>
+        <a href="ai.html" class="place-link" data-i18n="navOracle"><span class="place-link-icon">◇</span> Oracle · AI</a>
+        <a href="../contact.html" class="place-link" data-i18n="navContact"><span class="place-link-icon">✎</span> Contact</a>
+        <a href="login.html" class="place-link place-link-cta" id="bondLoginLink" data-i18n="signIn" style="display:none;"><span class="place-link-icon">→</span> Sign in</a>
       </div>
-      <p style="margin-top:1.5rem; color:var(--text-muted); font-size:0.9rem;">Next: geo, chat, video, subscriptions. Develop from here.</p>
     </div>
   </main>
   <script src="config.js"></script>
+  <script src="js/i18n.js"></script>
   <script src="js/api.js"></script>
   <script src="../js/main.js"></script>
   <script>
-    (function(){ var t = localStorage.getItem('omnixius_token'); document.getElementById('navLogin').style.display = t ? 'none' : ''; document.getElementById('navLogout').style.display = t ? '' : 'none'; })();
-    document.getElementById('navLogout').onclick = function(e){ e.preventDefault(); localStorage.removeItem('omnixius_token'); localStorage.removeItem('omnixius_user'); location.href = 'login.html'; };
+    (function(){ var t = (typeof api !== 'undefined' && api.getToken) ? api.getToken() : (sessionStorage.getItem('omnixius_token') || localStorage.getItem('omnixius_token')); var el = document.getElementById('navLogin'); if(el) el.style.display = t ? 'none' : ''; el = document.getElementById('navLogout'); if(el) el.style.display = t ? '' : 'none'; el = document.getElementById('bondLoginLink'); if(el) el.style.display = t ? 'none' : 'flex'; })();
+    var logoutEl = document.getElementById('navLogout'); if (logoutEl) logoutEl.onclick = function(e){ e.preventDefault(); if (typeof api !== 'undefined' && api.auth) api.auth.logout(); location.href = 'login.html'; };
+    if (window.i18n) i18n.apply();
   </script>
 </body>
 </html>
