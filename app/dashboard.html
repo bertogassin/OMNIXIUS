@@ -6,6 +6,7 @@
   <title>Profile — OMNIXIUS</title>
   <link rel="stylesheet" href="../css/style.css">
   <link rel="stylesheet" href="css/app.css">
+  <link rel="stylesheet" href="../css/profession.css">
 </head>
 <body>
   <header class="header">
@@ -15,6 +16,7 @@
         <div class="nav-group nav-group-main">
           <span class="nav-group-label" data-i18n="navMain">Main</span>
           <a href="../index.html" data-i18n="home">Home</a>
+          <a href="../index.html#profession" class="profession-pill" id="navProfessionPill" style="display:none;" title="Change profession"></a>
           <a href="login.html" id="navLogin" class="nav-cta" style="display:none;" data-i18n="signIn">Sign in</a>
           <a href="#" id="navLogout" data-i18n="signOut">Sign out</a>
         </div>
@@ -24,6 +26,7 @@
           <a href="mail.html" data-i18n="navMail">Mail</a>
           <a href="orders.html" data-i18n="navOrders">Orders</a>
           <a href="dashboard.html" data-i18n="navProfile">Profile</a>
+          <a href="notifications.html">Notifications</a>
           <a href="ai.html">AI</a>
         </div>
         <div class="nav-group nav-group-more nav-drop">
@@ -31,6 +34,8 @@
           <button type="button" class="nav-drop-trigger" aria-expanded="false" aria-haspopup="true"><span data-i18n="navMore">More</span> ▾</button>
           <div class="nav-drop-panel">
             <a href="trade.html" data-i18n="cardTrade">Trade & Finance</a>
+            <a href="wallet.html">Wallet</a>
+            <a href="remittances.html">Remittances</a>
             <a href="connect.html" data-i18n="cardConnect">Connect</a>
             <a href="repositorium.html" data-i18n="cardRepositorium">Repositorium</a>
             <a href="ixi.html" data-i18n="cardIxi">Blockchain IXI</a>
@@ -39,9 +44,13 @@
             <a href="startups.html" data-i18n="cardStartups">Startups</a>
             <a href="media.html" data-i18n="cardMedia">Media</a>
             <a href="rewards.html" data-i18n="cardRewards">Rewards</a>
+            <a href="settings.html">Settings</a>
+            <a href="admin.html">Admin</a>
           </div>
           <div class="nav-group-app-links">
             <a href="trade.html">Trade</a>
+            <a href="wallet.html">Wallet</a>
+            <a href="remittances.html">Remittances</a>
             <a href="connect.html">Connect</a>
             <a href="repositorium.html">Repositorium</a>
             <a href="ixi.html">IXI</a>
@@ -50,6 +59,7 @@
             <a href="startups.html">Startups</a>
             <a href="media.html">Media</a>
             <a href="rewards.html">Rewards</a>
+            <a href="settings.html">Settings</a>
           </div>
         </div>
         <div class="nav-group nav-group-info nav-drop">
@@ -83,11 +93,11 @@
   </header>
   <main class="app-page">
     <div class="container">
-      <p class="status-done">СДЕЛАНО: работает (Live). Дальше: настройки, восстановление пароля.</p>
+      <p class="status-done">Live. Coming next: settings, password recovery.</p>
       <div id="welcome" class="dashboard-welcome"></div>
       <div id="quickLinks" class="quick-links"></div>
       <h2 class="section-title">Profile</h2>
-      <p><a href="profile-edit.html" class="btn btn-outline" data-i18n="editProfile">Edit profile / Settings</a></p>
+      <p><a href="profile-edit.html" class="btn btn-outline" data-i18n="editProfile">Edit profile</a> <a href="settings.html" class="btn btn-outline">Settings</a></p>
       <div id="profile"><p class="loading-state">Loading…</p></div>
       <h2 class="section-title" data-i18n="balanceTitle">Balance</h2>
       <div id="balanceBlock"><p class="loading-state">Loading…</p></div>
@@ -98,8 +108,10 @@
     </div>
   </main>
   <script src="config.js"></script>
+  <script src="js/professions.js"></script>
   <script src="js/i18n.js"></script>
   <script src="js/api.js"></script>
+  <script>(function(){ var P = window.OMNIXIUS_PROFESSIONS; var el = document.getElementById('navProfessionPill'); if (P && el) { var n = P.getCurrentName(); if (n) { el.textContent = n; el.style.display = ''; } } })();</script>
   <script src="js/nav-unread.js"></script>
   <script>
     (function () {
@@ -161,11 +173,11 @@
         var remTo = (window.i18n && i18n.t('remittancesTo')) ? i18n.t('remittancesTo') : 'To';
         var remStatus = (window.i18n && i18n.t('remittancesStatus')) ? i18n.t('remittancesStatus') : 'Status';
         document.getElementById('remittancesList').innerHTML = rList.length
-          ? '<ul class="mail-list">' + rList.map(function(r) {
+          ? '<ul class="mail-list">' + rList.slice(0, 10).map(function(r) {
               var date = r.created_at != null ? new Date(r.created_at * 1000).toLocaleDateString() : '—';
               return '<li><span>' + (r.amount != null ? Number(r.amount).toFixed(2) : '') + ' ' + (r.currency || 'USD') + ' → ' + (r.to_identifier || '') + ' · ' + (r.status || 'pending') + '</span><span>' + date + '</span></li>';
-            }).join('') + '</ul><p class="text-muted">' + (remTitle) + ' (stub). Real transfers via Trade/IXI later.</p>'
-          : '<p style="color:var(--text-muted);">No remittances yet. Use API POST /api/remittances to create a request (stub).</p>';
+            }).join('') + '</ul><p><a href="remittances.html">View all → Remittances</a></p>'
+          : '<p style="color:var(--text-muted);">No remittances yet. <a href="remittances.html">Create one</a>.</p>';
       } catch (_) {
         document.getElementById('remittancesList').innerHTML = '<p class="text-muted">Could not load remittances.</p>';
       }

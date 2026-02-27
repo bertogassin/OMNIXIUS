@@ -83,6 +83,11 @@
       forgotPassword: (email) => api.request('/api/auth/forgot-password', { method: 'POST', body: { email } }),
       resetPassword: (token, password) => api.request('/api/auth/reset-password', { method: 'POST', body: { token, password } }),
       changePassword: (currentPassword, newPassword) => api.request('/api/auth/change-password', { method: 'POST', body: { current_password: currentPassword, new_password: newPassword } }),
+      sessions: () => api.request('/api/auth/sessions'),
+      sessionDelete: (id) => api.request('/api/auth/sessions/' + id, { method: 'DELETE' }),
+      devices: () => api.request('/api/auth/devices'),
+      deviceDelete: (id) => api.request('/api/auth/devices/' + id, { method: 'DELETE' }),
+      recoveryGenerate: (recoveryHash) => api.request('/api/auth/recovery/generate', { method: 'POST', body: { recoveryHash } }),
     },
     users: {
       me: () => api.request('/api/users/me'),
@@ -117,6 +122,12 @@
       my: () => api.request('/api/remittances/my'),
       create: (to_identifier, amount, currency) => api.request('/api/remittances', { method: 'POST', body: { to_identifier, amount, currency: currency || 'USD' } }),
     },
+    wallet: {
+      balances: () => api.request('/api/wallet/balances'),
+      transactions: (params) => api.request('/api/wallet/transactions?' + new URLSearchParams(params || {}).toString()),
+      transfer: (to_user_id, currency, amount) => api.request('/api/wallet/transfer', { method: 'POST', body: { to_user_id, currency, amount } }),
+      transferVerify: (to_user_id) => api.request('/api/wallet/transfer/verify', { method: 'POST', body: { to_user_id } }),
+    },
     conversations: {
       list: () => api.request('/api/conversations'),
       get: (id) => api.request('/api/conversations/' + id),
@@ -127,6 +138,23 @@
       list: (conversationId) => api.request('/api/messages/conversation/' + conversationId),
       send: (conversationId, body) => api.request('/api/messages/conversation/' + conversationId, { method: 'POST', body: { body } }),
       read: (id) => api.request('/api/messages/' + id + '/read', { method: 'POST' }),
+    },
+    notifications: {
+      settings: () => api.request('/api/notifications/settings'),
+      updateSettings: (data) => api.request('/api/notifications/settings', { method: 'PATCH', body: data }),
+      history: () => api.request('/api/notifications/history'),
+      get: (id) => api.request('/api/notifications/history/' + id),
+      markRead: (id) => api.request('/api/notifications/history/' + id + '/read', { method: 'POST' }),
+    },
+    admin: {
+      stats: () => api.request('/api/admin/stats'),
+      reportsList: (params) => api.request('/api/admin/reports?' + new URLSearchParams(params || {}).toString()),
+      reportGet: (id) => api.request('/api/admin/reports/' + id),
+      reportAssign: (id, assigned_to) => api.request('/api/admin/reports/' + id + '/assign', { method: 'POST', body: { assigned_to } }),
+      reportResolve: (id, resolution, status) => api.request('/api/admin/reports/' + id + '/resolve', { method: 'POST', body: { resolution, status: status || 'resolved' } }),
+      userGet: (id) => api.request('/api/admin/users/' + id),
+      userBan: (id, reason, expires_at) => api.request('/api/admin/users/' + id + '/ban', { method: 'POST', body: expires_at != null ? { reason, expires_at } : { reason } }),
+      userUnban: (id) => api.request('/api/admin/users/' + id + '/unban', { method: 'POST' }),
     },
   };
 })();

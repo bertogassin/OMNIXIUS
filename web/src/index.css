@@ -1,14 +1,14 @@
-.app {
-  font-family: system-ui, sans-serif;
-  padding: 2rem;
-  text-align: center;
+* {
+  box-sizing: border-box;
 }
 
-.app h1 {
-  margin: 0 0 0.5rem;
-}
-
-.app p {
-  color: #666;
+body {
   margin: 0;
+  font-family: system-ui, -apple-system, sans-serif;
+  background: #0c0c0f;
+  color: #e8e6e3;
+}
+
+#root {
+  min-height: 100vh;
 }

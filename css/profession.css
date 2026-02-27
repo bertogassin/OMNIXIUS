@@ -1,0 +1,64 @@
+/* Header profession link (main page) */
+.header-profession-link {
+  margin-right: 1rem;
+  font-size: 0.9rem;
+  color: var(--accent, #00d4aa);
+  text-decoration: none;
+}
+.header-profession-link:hover {
+  text-decoration: underline;
+}
+
+/* Profession choice block — main page */
+.profession-choice .section-title {
+  margin-bottom: 0.5rem;
+}
+.profession-choice .about-text {
+  margin-bottom: 1.25rem;
+}
+.profession-current {
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+  color: var(--text-muted, #8a8a8a);
+}
+.profession-current a {
+  color: var(--accent, #00d4aa);
+}
+.profession-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 0.6rem;
+}
+.profession-card {
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  color: inherit;
+  font-size: 0.9rem;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+.profession-card:hover {
+  border-color: var(--accent, #00d4aa);
+  background: rgba(0, 212, 170, 0.06);
+}
+
+/* App header: current profession pill */
+.profession-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.6rem;
+  background: rgba(0, 212, 170, 0.12);
+  border: 1px solid rgba(0, 212, 170, 0.25);
+  border-radius: 999px;
+  font-size: 0.8rem;
+  color: var(--accent, #00d4aa);
+  text-decoration: none;
+  margin-right: 0.5rem;
+}
+.profession-pill:hover {
+  background: rgba(0, 212, 170, 0.18);
+}

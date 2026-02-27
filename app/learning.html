@@ -24,6 +24,7 @@
           <a href="mail.html" data-i18n="navRelay">Relay · mail</a>
           <a href="orders.html" data-i18n="navOrders">Orders</a>
           <a href="dashboard.html" data-i18n="navProfile">Profile</a>
+          <a href="notifications.html">Notifications</a>
           <a href="ai.html" data-i18n="navOracle">Oracle · AI</a>
         </div>
         <div class="nav-group nav-group-more nav-drop">
@@ -31,6 +32,8 @@
           <button type="button" class="nav-drop-trigger" aria-expanded="false" aria-haspopup="true"><span data-i18n="navMore">More</span> ▾</button>
           <div class="nav-drop-panel">
             <a href="trade.html" data-i18n="brandForge">Forge · trade & finance</a>
+            <a href="wallet.html">Wallet</a>
+            <a href="remittances.html">Remittances</a>
             <a href="connect.html" data-i18n="brandBond">Bond · social</a>
             <a href="repositorium.html" data-i18n="brandArk">Ark · storage</a>
             <a href="ixi.html" data-i18n="brandIxi">IXI · blockchain</a>
@@ -39,9 +42,12 @@
             <a href="startups.html" data-i18n="brandFlare">Flare · startups</a>
             <a href="media.html" data-i18n="brandLens">Lens · media</a>
             <a href="rewards.html" data-i18n="brandBounty">Bounty · rewards</a>
+            <a href="settings.html">Settings</a>
           </div>
           <div class="nav-group-app-links">
             <a href="trade.html" data-i18n="brandForge">Forge</a>
+            <a href="wallet.html">Wallet</a>
+            <a href="remittances.html">Remittances</a>
             <a href="connect.html" data-i18n="brandBond">Bond</a>
             <a href="repositorium.html" data-i18n="brandArk">Ark</a>
             <a href="ixi.html" data-i18n="brandIxi">IXI</a>
@@ -50,6 +56,7 @@
             <a href="startups.html" data-i18n="brandFlare">Flare</a>
             <a href="media.html" data-i18n="brandLens">Lens</a>
             <a href="rewards.html" data-i18n="brandBounty">Bounty</a>
+            <a href="settings.html">Settings</a>
           </div>
         </div>
         <div class="nav-group nav-group-info nav-drop">
@@ -83,18 +90,48 @@
   </header>
   <main class="app-page">
     <div class="container">
-      <p class="status-done">СДЕЛАНО: место создано. Дальше: курсы, эксперты, материалы.</p>
-      <h1>Learning / Courses</h1>
+      <p class="status-done">Live. Courses from Marketplace (category Course).</p>
+      <h1>Ascent · Learning</h1>
       <p class="about-text">Experts, courses, payments, storage for materials. Connects: Connect (experts, community), Trade (payments), Repositorium (storage).</p>
-      <p style="margin-top:1.5rem; padding:1rem; background:var(--bg-card); border:1px solid var(--border); border-radius:10px; color:var(--text-muted);"><strong>Place ready.</strong> Develop from here: courses, experts, materials.</p>
+
+      <section class="learning-section" style="margin-top:1.5rem;">
+        <h2 class="section-title">Courses</h2>
+        <p class="text-muted" style="margin-bottom:1rem;">Listings with category "Course" from the marketplace. Enroll opens the course page; subscribe if it is a subscription.</p>
+        <div id="coursesList"><p class="loading-state">Loading…</p></div>
+        <p style="margin-top:1rem;"><a href="marketplace.html" class="btn btn-outline">Browse Marketplace</a> <a href="product-create.html" class="btn btn-outline">Add a course (create listing with category Course)</a></p>
+      </section>
     </div>
   </main>
   <script src="config.js"></script>
   <script src="js/api.js"></script>
+  <script src="js/utils.js"></script>
   <script src="../js/main.js"></script>
   <script>
     (function(){ var t = (typeof api !== 'undefined' && api.getToken) ? api.getToken() : (sessionStorage.getItem('omnixius_token') || localStorage.getItem('omnixius_token')); document.getElementById('navLogin').style.display = t ? 'none' : ''; document.getElementById('navLogout').style.display = t ? '' : 'none'; })();
     document.getElementById('navLogout').onclick = function(e){ e.preventDefault(); if (typeof api !== 'undefined' && api.auth) api.auth.logout(); location.href = 'login.html'; };
+
+    (function() {
+      var el = document.getElementById('coursesList');
+      function escapeHtml(s) { var d = document.createElement('div'); d.textContent = s == null ? '' : s; return d.innerHTML; }
+      api.products.list({ category: 'Course' }).then(function(data) {
+        var list = Array.isArray(data) ? data : [];
+        if (list.length === 0) {
+          el.innerHTML = '<p class="text-muted">No courses yet. Add a listing in <a href="marketplace.html">Marketplace</a> with category <strong>Course</strong> to show it here.</p>';
+          return;
+        }
+        var noPhoto = 'No photo';
+        var html = '<div class="app-grid">';
+        list.forEach(function(p) {
+          var imgUrl = p.image_path ? (window.API_URL + '/uploads/' + p.image_path) : 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22260%22 height=%22180%22><rect fill=%22%23222%22 width=%22260%22 height=%22180%22/><text x=%2250%25%22 y=%2250%25%22 fill=%23666%22 text-anchor=%22middle%22 dy=%22.3em%22>' + encodeURIComponent(noPhoto) + '</text></svg>';
+          var subBadge = (p.is_subscription === 1 || p.is_subscription === true) ? '<span class="card-badge card-badge-subscription">Subscription</span>' : '';
+          html += '<a href="product.html?id=' + p.id + '" class="app-card"><div class="app-card-image-wrap"><img src="' + imgUrl + '" alt="" class="app-card-img"></div>' + subBadge + '<div class="body"><span class="app-card-category">' + escapeHtml(p.category || '') + '</span><h3>' + escapeHtml(p.title) + '</h3><p class="price">' + p.price + '</p><p class="meta">' + escapeHtml(p.seller_name || '') + '</p></div></a>';
+        });
+        html += '</div>';
+        el.innerHTML = html;
+      }).catch(function() {
+        el.innerHTML = '<p class="text-muted">Could not load courses.</p>';
+      });
+    })();
   </script>
 </body>
 </html>

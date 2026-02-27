@@ -13,25 +13,30 @@
   </style>
 </head>
 <body>
-  <h1>OMNIXIUS — все ссылки</h1>
-  <a href="https://bertogassin.github.io/OMNIXIUS/">Главная</a>
-  <a href="https://bertogassin.github.io/OMNIXIUS/app/login.html">Вход (Sign in)</a>
-  <a href="https://bertogassin.github.io/OMNIXIUS/app/register.html">Регистрация</a>
-  <a href="https://bertogassin.github.io/OMNIXIUS/app/login.html?api_url=http://localhost:3000">Вход (URL уже подставлен localhost:3000)</a>
-  <a href="https://bertogassin.github.io/OMNIXIUS/app/test-register.html?api_url=http://localhost:3000">Тест: регистрация + вход (один клик)</a>
-  <a href="https://bertogassin.github.io/OMNIXIUS/app/marketplace.html">Маркетплейс</a>
-  <a href="https://bertogassin.github.io/OMNIXIUS/app/ai.html">AI</a>
-  <a href="https://bertogassin.github.io/OMNIXIUS/app/dashboard.html">Личный кабинет</a>
-  <a href="https://bertogassin.github.io/OMNIXIUS/#map">Карта (Map) — на главной</a>
-  <a href="https://bertogassin.github.io/OMNIXIUS/app/connect.html">CONNECT</a>
-  <a href="https://bertogassin.github.io/OMNIXIUS/app/trade.html">TRADE & FINANCE</a>
-  <a href="https://bertogassin.github.io/OMNIXIUS/app/repositorium.html">REPOSITORIUM</a>
-  <a href="https://bertogassin.github.io/OMNIXIUS/app/ixi.html">Blockchain IXI</a>
-  <a href="https://bertogassin.github.io/OMNIXIUS/app/learning.html">Learning</a>
-  <a href="https://bertogassin.github.io/OMNIXIUS/app/startups.html">Startups</a>
-  <a href="https://bertogassin.github.io/OMNIXIUS/app/media.html">Media</a>
-  <a href="https://bertogassin.github.io/OMNIXIUS/app/rewards.html">Rewards</a>
-  <p class="note" style="margin-top:1rem; padding:0.75rem; background:rgba(255,193,7,0.1); border-radius:8px; border:1px solid rgba(255,193,7,0.3);"><strong>Реальная причина, почему не получается войти/зарегистрироваться:</strong> Сайт на GitHub Pages — это только HTML/JS (статика). Регистрация и вход идут через API (бэкенд в папке backend-go). Этот бэкенд нигде не развёрнут в интернете — он работает только у тебя на компе по команде <code>go run .</code>. Поэтому: либо открывай сайт с того же компьютера, где запущен бэкенд, и вводи <code>http://localhost:3000</code>; либо задеплой backend-go на Render/Railway и вставь выданный URL — тогда вход будет работать с любого устройства.</p>
-  <p class="note">Бэкенд: в папке backend-go выполни <code>go run .</code>, потом открой «Вход» или «Тест» с этого же компьютера.</p>
+  <h1>OMNIXIUS — All links (dev)</h1>
+  <a href="../index.html">Home</a>
+  <a href="login.html">Sign in</a>
+  <a href="register.html">Register</a>
+  <a href="login.html?api_url=http://localhost:3000">Sign in (API URL pre-filled: localhost:3000)</a>
+  <a href="test-register.html?api_url=http://localhost:3000">Test: register + sign in (one click)</a>
+  <a href="marketplace.html">Marketplace (Trove)</a>
+  <a href="ai.html">AI (Oracle)</a>
+  <a href="dashboard.html">Profile / Dashboard</a>
+  <a href="notifications.html">Notifications</a>
+  <a href="../index.html#map">Map — on home</a>
+  <a href="connect.html">Connect (Bond)</a>
+  <a href="trade.html">Trade & Finance (Forge)</a>
+  <a href="wallet.html">Wallet</a>
+  <a href="remittances.html">Remittances</a>
+  <a href="repositorium.html">Repositorium (Ark)</a>
+  <a href="ixi.html">Blockchain IXI</a>
+  <a href="learning.html">Learning (Ascent)</a>
+  <a href="startups.html">Startups (Flare)</a>
+  <a href="media.html">Media (Lens)</a>
+  <a href="rewards.html">Rewards (Bounty)</a>
+  <a href="settings.html">Settings</a>
+  <a href="admin.html">Admin (admin role only)</a>
+  <p class="note" style="margin-top:1rem; padding:0.75rem; background:rgba(255,193,7,0.1); border-radius:8px; border:1px solid rgba(255,193,7,0.3);"><strong>Why sign in may not work:</strong> The site is static (e.g. GitHub Pages). Registration and login go through the API (backend in <code>backend-go/</code>). Run <code>go run .</code> in <code>backend-go/</code> on your machine, then use Sign in or Test from the same host with <code>http://localhost:3000</code>. Or deploy backend-go (e.g. Render/Railway) and set the API URL in the app.</p>
+  <p class="note">Backend: in <code>backend-go/</code> run <code>go run .</code>, then open Sign in or Test from this device.</p>
 </body>
 </html>

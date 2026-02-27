@@ -1,0 +1,51 @@
+.dashboard-page h1 {
+  margin: 0 0 0.5rem;
+  font-size: 1.75rem;
+}
+
+.dashboard-welcome {
+  color: #8a8a8a;
+  margin: 0 0 1.5rem;
+}
+
+.dashboard-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.dashboard-card {
+  display: block;
+  padding: 1.25rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  text-decoration: none;
+  color: #e8e6e3;
+  min-width: 200px;
+  transition: border-color 0.2s;
+}
+
+.dashboard-card:hover {
+  border-color: #00d4aa;
+}
+
+.dashboard-card h2 {
+  margin: 0 0 0.35rem;
+  font-size: 1.1rem;
+  color: #00d4aa;
+}
+
+.dashboard-card p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #8a8a8a;
+}
+
+.dashboard-card-out {
+  color: #8a8a8a;
+}
+
+.dashboard-card-out:hover {
+  color: #00d4aa;
+}

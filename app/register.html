@@ -292,7 +292,7 @@
         }
         api.setToken(data.token, true);
         api.user = data.user;
-        location.href = 'dashboard.html';
+        location.href = '../index.html#profession';
       } catch (x) {
         if (btn) { btn.disabled = false; btn.textContent = (typeof window.i18n !== 'undefined' && i18n.t('createAccount')) || 'Create account'; }
         if (x && x.status === 0) {

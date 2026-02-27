@@ -10,11 +10,13 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Syne:wght@500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/design-system.css">
+  <link rel="stylesheet" href="css/profession.css">
 </head>
 <body>
   <header class="header" id="site-header">
     <div class="container header-inner">
       <a href="index.html" class="logo"><span class="logo-mark">O</span><span class="logo-text">MNIXIUS</span></a>
+      <a href="index.html#profession" class="header-profession-link" id="headerProfessionLink" style="display:none;"></a>
       <div class="lang-switcher">
         <span class="lang-switcher-label" data-i18n="langLabel">Language</span>
         <a href="#" data-lang="en">EN</a>
@@ -45,6 +47,7 @@
           <a href="app/ai.html" data-i18n="navOracle">Oracle</a>
           <a href="app/connect.html" data-i18n="brandBond">Bond</a>
           <a href="app/trade.html" data-i18n="brandForge">Forge</a>
+          <a href="app/wallet.html">Wallet</a>
           <a href="app/repositorium.html" data-i18n="brandArk">Ark</a>
           <a href="app/ixi.html" data-i18n="brandIxi">IXI</a>
           <a href="app/vault.html" data-i18n="brandCrate">Crate</a>
@@ -52,7 +55,17 @@
           <a href="app/startups.html" data-i18n="brandFlare">Flare</a>
           <a href="app/media.html" data-i18n="brandLens">Lens</a>
           <a href="app/rewards.html" data-i18n="brandBounty">Bounty</a>
+          <a href="app/admin.html">Admin</a>
         </nav>
+      </div>
+    </section>
+
+    <section id="profession" class="section profession-choice">
+      <div class="container">
+        <h2 class="section-title" data-i18n="professionTitle">What are you looking for?</h2>
+        <p class="about-text" data-i18n="professionIntro">Choose your profession or service — you can change it anytime on this page. All main directions stay available.</p>
+        <p id="professionCurrent" class="profession-current" style="display:none;"><span data-i18n="professionSelected">Selected:</span> <strong id="professionCurrentName"></strong> · <a href="#profession" id="professionChangeLink" data-i18n="professionChange">Change</a></p>
+        <div id="professionGrid" class="profession-grid"></div>
       </div>
     </section>
 
@@ -78,28 +91,32 @@
           <a href="app/trade.html" class="direction-card">
             <h3 data-i18n="brandForge">Forge · trade & finance</h3>
             <p data-i18n="cardTradeDesc">Exchange, wallets, copy trading, investments.</p>
-            <span class="live" data-i18n="placeReadyLabel">Place ready →</span>
+            <span class="live">Coming next: Wallet, Trade UI →</span>
           </a>
           <a href="app/repositorium.html" class="direction-card">
             <h3 data-i18n="brandArk">Ark · storage</h3>
             <p data-i18n="cardRepositoriumDesc">Decentralized storage and compute. Data and infrastructure.</p>
-            <span class="live" data-i18n="placeReadyLabel">Place ready →</span>
+            <span class="live">Coming next: nodes, compute →</span>
           </a>
           <a href="app/ixi.html" class="direction-card">
             <h3 data-i18n="brandIxi">IXI · blockchain</h3>
             <p data-i18n="cardIxiDesc">Consensus, ZKP, tokenomics, buyback fund.</p>
-            <span class="live" data-i18n="placeReadyLabel">Place ready →</span>
+            <span class="live">Coming next: consensus, ZKP →</span>
           </a>
         </div>
 
         <h3 class="section-title" style="margin-top:2.5rem;" data-i18n="otherDirections">Other directions</h3>
         <ul class="screens-list screens-list-compact">
           <li><a href="app/mail.html" data-i18n="brandRelay">Relay · mail</a> <span data-i18n="cardRelayDesc">— inbox, conversations with sellers</span></li>
+          <li><a href="app/wallet.html">Wallet</a> — balances, transfers</li>
+          <li><a href="app/remittances.html">Remittances</a> — cross-border transfer requests</li>
           <li><a href="app/vault.html" data-i18n="brandCrate">Crate · files</a> <span data-i18n="cardCrateDesc">— files and folders</span></li>
           <li><a href="app/learning.html" data-i18n="brandAscent">Ascent · learning</a> <span data-i18n="cardLearningDesc">— courses, experts</span></li>
           <li><a href="app/startups.html" data-i18n="brandFlare">Flare · startups</a> <span data-i18n="cardStartupsDesc">— launchpad, tokens</span></li>
           <li><a href="app/media.html" data-i18n="brandLens">Lens · media</a> <span data-i18n="cardMediaDesc">— content, subscriptions</span></li>
           <li><a href="app/rewards.html" data-i18n="brandBounty">Bounty · rewards</a> <span data-i18n="cardRewardsDesc">— loyalty, referrals</span></li>
+          <li><a href="app/notifications.html">Notifications</a> — history, mark as read</li>
+          <li><a href="app/settings.html">Settings</a> — security, sessions, recovery, notifications</li>
         </ul>
       </div>
     </section>
@@ -142,7 +159,54 @@
     </div>
   </footer>
 
+  <script src="app/js/professions.js"></script>
   <script src="app/js/i18n.js"></script>
   <script src="js/main.js"></script>
+  <script>
+    (function() {
+      var P = window.OMNIXIUS_PROFESSIONS;
+      if (!P) return;
+      var grid = document.getElementById('professionGrid');
+      var currentEl = document.getElementById('professionCurrent');
+      var currentNameEl = document.getElementById('professionCurrentName');
+      var changeLink = document.getElementById('professionChangeLink');
+      function render() {
+        grid.innerHTML = P.getList().map(function(p) {
+          var name = P.getNameFor(p);
+          return '<button type="button" class="profession-card" data-id="' + p.id + '" data-name="' + name.replace(/"/g, '&quot;') + '">' + name + '</button>';
+        }).join('');
+        grid.querySelectorAll('.profession-card').forEach(function(btn) {
+          btn.onclick = function() {
+            var id = this.getAttribute('data-id');
+            var name = this.getAttribute('data-name');
+            P.setCurrent(id, name);
+            updateCurrent();
+          };
+        });
+        updateCurrent();
+      }
+      function updateCurrent() {
+        var id = P.getCurrentId();
+        var name = P.getCurrentName();
+        if (id && name) {
+          currentNameEl.textContent = name;
+          currentEl.style.display = 'block';
+        } else {
+          currentEl.style.display = 'none';
+        }
+      }
+      if (changeLink) changeLink.onclick = function() { document.getElementById('profession').scrollIntoView({ behavior: 'smooth' }); };
+      var headerLink = document.getElementById('headerProfessionLink');
+      if (headerLink) {
+        function updateHeader() {
+          var name = P.getCurrentName();
+          if (name) { headerLink.textContent = name; headerLink.style.display = ''; } else { headerLink.style.display = 'none'; }
+        }
+        updateCurrent = (function(orig) { return function() { orig(); if (headerLink) updateHeader(); }; })(updateCurrent);
+        updateHeader();
+      }
+      render();
+    })();
+  </script>
 </body>
 </html>
