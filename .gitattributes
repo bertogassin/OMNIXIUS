@@ -1,7 +1,10 @@
 # GitHub Linguist: main app is TypeScript (web/) + Go (backend-go).
-# Root HTML/CSS and js/ are landing only — do not count as main project language.
+# Exclude legacy HTML/JS/CSS from stats so repo shows TypeScript + Go.
 *.html linguist-documentation=true
 css/* linguist-documentation=true
-js/i18n.js linguist-documentation=true
-js/professions.js linguist-documentation=true
-js/main.js linguist-documentation=true
+css/**/*.css linguist-documentation=true
+js/*.js linguist-documentation=true
+# Android WebView legacy bundle (not main app)
+mobile/**/*.js linguist-documentation=true
+mobile/**/*.css linguist-documentation=true
+mobile/**/*.html linguist-documentation=true
