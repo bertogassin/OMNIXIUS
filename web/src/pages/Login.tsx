@@ -141,8 +141,6 @@ export default function Login() {
         </form>
         <p className="login-links">
           <Link to="/forgot-password">Forgot password?</Link>
-          {' · '}
-          <Link to="/register">Register</Link>
         </p>
         <p className="login-note">
           API URL: set in .env <code>VITE_API_URL</code> (e.g. http://localhost:3000) or use the block above.
