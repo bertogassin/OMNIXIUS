@@ -72,7 +72,7 @@ export default function Register() {
     <div className="page login-page">
       <div className="login-card register-card">
         <h1>Create account</h1>
-        <p className="login-sub">Create your OMNIXIUS account. All fields validated.</p>
+        <p className="login-sub">Beta: no email confirmation. Sign in right after.</p>
         <form onSubmit={submit} className="login-form">
           {err && <p className="login-error">{err}</p>}
 

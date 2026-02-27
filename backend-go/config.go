@@ -35,6 +35,15 @@ type Config struct {
 	RustServiceURL string // e.g. http://localhost:8081; empty = do not call Rust
 }
 
+func getEnvInt(key string, defaultVal int) int {
+	if v := os.Getenv(key); v != "" {
+		if n, err := strconv.Atoi(v); err == nil && n >= 0 {
+			return n
+		}
+	}
+	return defaultVal
+}
+
 func LoadConfig() Config {
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -58,7 +67,7 @@ func LoadConfig() Config {
 		SiteRoot:         siteRoot,
 		AppURL:           appURL,
 		AllowedOrigins:   os.Getenv("ALLOWED_ORIGINS"), // e.g. "https://bertogassin.github.io,https://omnixius.com"
-		MaxLoginAttempts: 5,
+		MaxLoginAttempts: getEnvInt("MAX_LOGIN_ATTEMPTS", 5),
 		UploadDir:        "uploads",
 		MaxFileSize:      5 * 1024 * 1024,
 		Argon2Time:      3,

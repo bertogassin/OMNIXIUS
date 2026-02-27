@@ -489,7 +489,15 @@ func getLoginLimiter(ip string) *rate.Limiter {
 	if l, ok := loginLimiters[ip]; ok {
 		return l
 	}
-	l := rate.NewLimiter(rate.Every(15*time.Minute/5), 5) // 5 per 15 min
+	maxAttempts := cfg.MaxLoginAttempts
+	if maxAttempts <= 0 {
+		maxAttempts = 5
+	}
+	// Localhost: allow many attempts for dev and auto-login retries
+	if ip == "127.0.0.1" || ip == "::1" {
+		maxAttempts = 100
+	}
+	l := rate.NewLimiter(rate.Every(15*time.Minute/time.Duration(maxAttempts)), maxAttempts)
 	loginLimiters[ip] = l
 	return l
 }

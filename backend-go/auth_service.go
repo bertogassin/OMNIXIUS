@@ -45,7 +45,7 @@ func AuthRegister(email, password, name string) (user gin.H, token string, err e
 	hash := hashPasswordArgon2(password)
 	verifyToken := make([]byte, 32)
 	rand.Read(verifyToken)
-	// email_verified = 1 until we have mail sending; then set 0 and send confirm link
+	// Beta: email_verified = 1 (no confirmation). Later: set 0 and send confirm link.
 	res, err := db.DB.Exec(
 		"INSERT INTO users (email, password_hash, name, role, email_verify_token, email_verified) VALUES (?, ?, ?, 'user', ?, 1)",
 		email, hash, nullStr(name), hex.EncodeToString(verifyToken),

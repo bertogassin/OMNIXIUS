@@ -34,17 +34,30 @@ export default function Login() {
     setApiUrl(stored || '');
   }, [isLocal]);
 
-  // Auto-enter on localhost: seed test user (if empty DB) then log in so browser opens "already inside"
+  // Auto-enter on localhost: seed test user (if empty DB) then log in. Retry a few times (backend may still be starting).
   const didAutoEnter = React.useRef(false);
   useEffect(() => {
     if (token || !isLocal || didAutoEnter.current) return;
     const apiBase = 'http://localhost:3000';
+    const maxAttempts = 5;
+    const delayMs = 2000;
+    let attempt = 0;
+    function run() {
+      attempt += 1;
+      fetch(apiBase + '/api/seed-test-user', { method: 'POST' })
+        .then((r) => r.json().catch(() => ({})))
+        .then(() => login(TEST_USER_EMAIL, TEST_USER_PASSWORD, true))
+        .then(() => navigate(from || '/', { replace: true }))
+        .catch(() => {
+          if (attempt < maxAttempts) {
+            setTimeout(run, delayMs);
+          } else {
+            didAutoEnter.current = false;
+          }
+        });
+    }
     didAutoEnter.current = true;
-    fetch(apiBase + '/api/seed-test-user', { method: 'POST' })
-      .then((r) => r.json().catch(() => ({})))
-      .then(() => login(TEST_USER_EMAIL, TEST_USER_PASSWORD, true))
-      .then(() => navigate(from || '/', { replace: true }))
-      .catch(() => { didAutoEnter.current = false; });
+    run();
   }, [token, isLocal, login, navigate, from]);
 
   if (token) {

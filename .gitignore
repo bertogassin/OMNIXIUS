@@ -16,6 +16,7 @@ web/dist
 mobile/android/.gradle
 mobile/android/build
 mobile/android/app/build
+mobile/android/local.properties
 analytics/spark/target
 **/target/
 **/__pycache__/
