@@ -1,0 +1,7 @@
+# GitHub Linguist: main app is TypeScript (web/) + Go (backend-go).
+# Root HTML/CSS and js/ are landing only — do not count as main project language.
+*.html linguist-documentation=true
+css/* linguist-documentation=true
+js/i18n.js linguist-documentation=true
+js/professions.js linguist-documentation=true
+js/main.js linguist-documentation=true

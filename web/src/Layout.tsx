@@ -23,9 +23,14 @@ export default function Layout() {
                 <Link to="/marketplace">Marketplace</Link>
                 <Link to="/orders">Orders</Link>
                 <Link to="/find-professional">Find professional</Link>
+                <Link to="/mail">Mail</Link>
                 <Link to="/notifications">Notifications</Link>
                 <Link to="/profile">Profile</Link>
+                <Link to="/wallet">Wallet</Link>
+                <Link to="/trade">Trade</Link>
+                <Link to="/ai">AI</Link>
                 <Link to="/settings">Settings</Link>
+                <Link to="/admin">Admin</Link>
                 <span className="layout-user">{user?.email ?? user?.name ?? 'User'}</span>
                 <button type="button" className="layout-btn" onClick={handleLogout}>
                   Sign out

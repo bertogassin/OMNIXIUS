@@ -24,11 +24,16 @@ start-rust.bat
 ### Открыть в браузере
 
 - Главная: http://localhost:3000/
-- Вход: http://localhost:3000/app/login.html
-- Дашборд: http://localhost:3000/app/dashboard.html
-- Маркетплейс: http://localhost:3000/app/marketplace.html
-- Заказы: http://localhost:3000/app/orders.html
-- Найти специалиста: http://localhost:3000/app/find-professional.html
+- Вход: http://localhost:3000/app/login
+- Регистрация: http://localhost:3000/app/register
+- Дашборд: http://localhost:3000/app
+- Маркетплейс: http://localhost:3000/app/marketplace
+- Заказы: http://localhost:3000/app/orders
+- Найти специалиста: http://localhost:3000/app/find-professional
+- Почта: http://localhost:3000/app/mail
+- Кошелёк: http://localhost:3000/app/wallet
+- Trade: http://localhost:3000/app/trade
+- AI: http://localhost:3000/app/ai
 
 ### AI (опционально)
 

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { api } from '../api';
 import '../pages/Marketplace.css';
 
@@ -59,9 +60,9 @@ export default function Marketplace() {
               {p.price != null && (
                 <span className="marketplace-item-price">{p.price} USD</span>
               )}
-              <a href={`/app/marketplace?product=${p.id}`} className="marketplace-item-link">
+              <Link to={`/product/${p.id}`} className="marketplace-item-link">
                 View →
-              </a>
+              </Link>
             </li>
           ))}
         </ul>
