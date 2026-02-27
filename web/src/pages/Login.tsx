@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../auth';
+import { API_URL } from '../config';
 import '../pages/Login.css';
 
 const API_STORAGE_KEY = 'omnixius_api_url';
+const TEST_USER_EMAIL = 'test@test.com';
+const TEST_USER_PASSWORD = 'Test123!';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -15,6 +18,8 @@ export default function Login() {
   const [apiUrl, setApiUrl] = useState('');
   const [showApiBlock, setShowApiBlock] = useState(false);
   const [apiCheckResult, setApiCheckResult] = useState('');
+  const [seedResult, setSeedResult] = useState('');
+  const [seeding, setSeeding] = useState(false);
   const { login, token } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -28,6 +33,19 @@ export default function Login() {
     if (!isLocal && !stored) setShowApiBlock(true);
     setApiUrl(stored || '');
   }, [isLocal]);
+
+  // Auto-enter on localhost: seed test user (if empty DB) then log in so browser opens "already inside"
+  const didAutoEnter = React.useRef(false);
+  useEffect(() => {
+    if (token || !isLocal || didAutoEnter.current) return;
+    const apiBase = 'http://localhost:3000';
+    didAutoEnter.current = true;
+    fetch(apiBase + '/api/seed-test-user', { method: 'POST' })
+      .then((r) => r.json().catch(() => ({})))
+      .then(() => login(TEST_USER_EMAIL, TEST_USER_PASSWORD, true))
+      .then(() => navigate(from || '/', { replace: true }))
+      .catch(() => { didAutoEnter.current = false; });
+  }, [token, isLocal, login, navigate, from]);
 
   if (token) {
     navigate(from, { replace: true });
@@ -53,6 +71,53 @@ export default function Login() {
       setApiCheckResult('Backend not reachable. Run: go run . in backend-go');
     }
   };
+
+  const handleSeedTestUser = async () => {
+    const base =
+      (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:3000' : '') ||
+      API_URL ||
+      apiUrl.trim().replace(/\/+$/, '') ||
+      (typeof window !== 'undefined' && localStorage.getItem(API_STORAGE_KEY)) ||
+      '';
+    const apiBase = String(base || 'http://localhost:3000').replace(/\/+$/, '');
+    setSeedResult('');
+    setSeeding(true);
+    setError('');
+    try {
+      const r = await fetch(apiBase + '/api/seed-test-user', { method: 'POST' });
+      const data = await r.json().catch(() => ({}));
+      if (r.status === 201) {
+        const d = data as { token?: string; user?: unknown };
+        if (d.token && d.user) {
+          try {
+            await login(TEST_USER_EMAIL, TEST_USER_PASSWORD, true);
+            navigate(from, { replace: true });
+            return;
+          } catch {
+            setEmail(TEST_USER_EMAIL);
+            setPassword(TEST_USER_PASSWORD);
+            setSeedResult('Test user created. Click Sign in.');
+          }
+        } else {
+          setEmail(TEST_USER_EMAIL);
+          setPassword(TEST_USER_PASSWORD);
+          setSeedResult('Test user created. Click Sign in.');
+        }
+      } else {
+        setSeedResult((data as { message?: string }).message || (data as { error?: string }).error || 'Done');
+      }
+    } catch {
+      setSeedResult('Backend not reachable. Is it running? go run . in backend-go');
+    } finally {
+      setSeeding(false);
+    }
+  };
+
+  const [copied, setCopied] = useState(false);
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text).then(() => { setCopied(true); setTimeout(() => setCopied(false), 2000); }).catch(() => {});
+  };
+  const appUrl = typeof window !== 'undefined' ? window.location.origin + '/app/' : 'http://localhost:5173/app/';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,6 +158,13 @@ export default function Login() {
             {apiCheckResult && <p className="login-api-result">{apiCheckResult}</p>}
           </div>
         )}
+        <div className="login-api-block" style={{ marginTop: '0.5rem' }}>
+          <p className="login-api-title">Test user (empty DB only)</p>
+          <button type="button" className="login-btn" onClick={handleSeedTestUser} disabled={seeding}>
+            {seeding ? 'Creating…' : 'Create test user (test@test.com / Test123!)'}
+          </button>
+          {seedResult && <p className="login-api-result" style={{ color: seedResult.includes('reachable') ? '#e57373' : undefined }}>{seedResult}</p>}
+        </div>
         {error && <p className="login-error">{error}</p>}
         <form onSubmit={handleSubmit} className="login-form">
           <label>
@@ -141,10 +213,25 @@ export default function Login() {
         </form>
         <p className="login-links">
           <Link to="/forgot-password">Forgot password?</Link>
+          {' · '}
+          <Link to="/register">Register</Link>
         </p>
-        <p className="login-note">
-          API URL: set in .env <code>VITE_API_URL</code> (e.g. http://localhost:3000) or use the block above.
-        </p>
+        <div className="login-api-block" style={{ marginTop: '1rem' }}>
+          <p className="login-api-title">App link (copy and send)</p>
+          <div className="login-api-row">
+            <input type="text" readOnly value={appUrl} className="login-input" style={{ flex: 1, cursor: 'text' }} onFocus={(e) => e.target.select()} />
+            <button type="button" className="login-btn" onClick={() => copyToClipboard(appUrl)}>{copied ? 'Copied' : 'Copy'}</button>
+          </div>
+          {isLocal && (
+            <>
+              <p className="login-api-title" style={{ marginTop: '0.75rem' }}>Backend URL</p>
+              <div className="login-api-row">
+                <input type="text" readOnly value="http://localhost:3000" className="login-input" style={{ flex: 1, cursor: 'text' }} onFocus={(e) => e.target.select()} />
+                <button type="button" className="login-btn" onClick={() => copyToClipboard('http://localhost:3000')}>Copy</button>
+              </div>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -101,6 +101,7 @@ func main() {
 	api.POST("/auth/reset-password", handleResetPassword)
 	api.POST("/auth/recovery/verify", handleRecoveryVerify)
 	api.POST("/auth/recovery/restore", handleRecoveryRestore)
+	api.POST("/seed-test-user", handleSeedTestUser)
 
 	auth := api.Group("")
 	auth.Use(authRequired())
@@ -566,6 +567,28 @@ func handleRegister(c *gin.Context) {
 		return
 	}
 	c.JSON(201, gin.H{"user": user, "token": token})
+}
+
+// handleSeedTestUser creates a test user only when the DB has zero users. For local dev.
+const testUserEmail = "test@test.com"
+const testUserPassword = "Test123!"
+
+func handleSeedTestUser(c *gin.Context) {
+	var n int
+	if db.DB.QueryRow("SELECT COUNT(*) FROM users").Scan(&n) != nil {
+		c.JSON(500, gin.H{"error": "Database error"})
+		return
+	}
+	if n > 0 {
+		c.JSON(200, gin.H{"ok": true, "message": "Users already exist. Use existing account or register.", "test_email": testUserEmail, "test_password": testUserPassword})
+		return
+	}
+	user, token, err := AuthRegister(testUserEmail, testUserPassword, "Test User")
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(201, gin.H{"ok": true, "message": "Test user created. You can sign in.", "user": user, "token": token, "test_email": testUserEmail, "test_password": testUserPassword})
 }
 
 	const registerPageHTML = `<!DOCTYPE html>

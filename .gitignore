@@ -30,3 +30,6 @@ tmpdir/
 .env
 .env.*
 !.env.example
+
+# Launcher generated
+urls.txt
