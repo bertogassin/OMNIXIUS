@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Conversation — OMNIXIUS</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <header class="header">
+    <div class="container">
+      <a href="../index.html" class="logo">OMNIXIUS</a>
+      <nav class="nav nav-main nav-unified">
+        <div class="nav-group nav-group-main">
+          <span class="nav-group-label" data-i18n="navMain">Main</span>
+          <a href="../index.html" data-i18n="home">Home</a>
+          <a href="login.html" id="navLogin" class="nav-cta" data-i18n="signIn">Sign in</a>
+          <a href="#" id="navLogout" style="display:none;" data-i18n="signOut">Sign out</a>
+        </div>
+        <div class="nav-group nav-group-app">
+          <span class="nav-group-label" data-i18n="navApp">App</span>
+          <a href="marketplace.html" data-i18n="navTrove">Trove · marketplace</a>
+          <a href="mail.html" data-i18n="navRelay">Relay · mail</a>
+          <a href="orders.html" data-i18n="navOrders">Orders</a>
+          <a href="dashboard.html" data-i18n="navProfile">Profile</a>
+          <a href="ai.html" data-i18n="navOracle">Oracle · AI</a>
+        </div>
+        <div class="nav-group nav-group-more nav-drop">
+          <span class="nav-group-label" data-i18n="navMore">More</span>
+          <button type="button" class="nav-drop-trigger" aria-expanded="false" aria-haspopup="true"><span data-i18n="navMore">More</span> ▾</button>
+          <div class="nav-drop-panel">
+            <a href="trade.html" data-i18n="brandForge">Forge · trade & finance</a>
+            <a href="connect.html" data-i18n="brandBond">Bond · social</a>
+            <a href="repositorium.html" data-i18n="brandArk">Ark · storage</a>
+            <a href="ixi.html" data-i18n="brandIxi">IXI · blockchain</a>
+            <a href="vault.html" data-i18n="brandCrate">Crate · files</a>
+            <a href="learning.html" data-i18n="brandAscent">Ascent · learning</a>
+            <a href="startups.html" data-i18n="brandFlare">Flare · startups</a>
+            <a href="media.html" data-i18n="brandLens">Lens · media</a>
+            <a href="rewards.html" data-i18n="brandBounty">Bounty · rewards</a>
+          </div>
+          <div class="nav-group-app-links">
+            <a href="trade.html" data-i18n="brandForge">Forge</a>
+            <a href="connect.html" data-i18n="brandBond">Bond</a>
+            <a href="repositorium.html" data-i18n="brandArk">Ark</a>
+            <a href="ixi.html" data-i18n="brandIxi">IXI</a>
+            <a href="vault.html" data-i18n="brandCrate">Crate</a>
+            <a href="learning.html" data-i18n="brandAscent">Ascent</a>
+            <a href="startups.html" data-i18n="brandFlare">Flare</a>
+            <a href="media.html" data-i18n="brandLens">Lens</a>
+            <a href="rewards.html" data-i18n="brandBounty">Bounty</a>
+          </div>
+        </div>
+        <div class="nav-group nav-group-info nav-drop">
+          <span class="nav-group-label" data-i18n="navInfo">Info</span>
+          <button type="button" class="nav-drop-trigger" aria-expanded="false" aria-haspopup="true"><span data-i18n="navInfo">Info</span> ▾</button>
+          <div class="nav-drop-panel">
+            <a href="../ecosystem.html" data-i18n="navEcosystem">Ecosystem</a>
+            <a href="../architecture.html" data-i18n="navArchitecture">Architecture</a>
+            <a href="../contact.html" data-i18n="navContact">Contact</a>
+          </div>
+          <div class="nav-group-app-links">
+            <a href="../ecosystem.html">Ecosystem</a>
+            <a href="../architecture.html">Architecture</a>
+            <a href="../contact.html">Contact</a>
+          </div>
+        </div>
+      </nav>
+      <div class="lang-switcher">
+        <a href="#" data-lang="en">EN</a>
+        <a href="#" data-lang="ru">RU</a>
+        <a href="#" data-lang="fr">FR</a>
+        <a href="#" data-lang="de">DE</a>
+        <a href="#" data-lang="es">ES</a>
+        <a href="#" data-lang="it">IT</a>
+        <a href="#" data-lang="ar">AR</a>
+        <a href="#" data-lang="zh">ZH</a>
+        <a href="#" data-lang="ja">JA</a>
+      </div>
+      <button class="menu-toggle" aria-label="Menu"><span></span></button>
+    </div>
+  </header>
+  <main class="app-page">
+    <div class="container">
+      <div class="conversation-header">
+        <p style="margin-bottom:0.5rem;"><a href="mail.html" id="backToMail" data-i18n="backToMail">← Mail</a></p>
+        <h2 class="conversation-title" id="conversationTitle"></h2>
+        <p class="conversation-about" id="conversationAbout" style="display:none;"></p>
+      </div>
+      <div class="thread-wrap" id="threadWrap">
+        <div id="root"></div>
+      </div>
+      <div class="thread-send" id="sendForm" style="display:none;">
+        <input type="text" id="msgInput" placeholder="Message" aria-label="Message text">
+        <button type="button" class="btn btn-primary" id="sendBtn">Send</button>
+      </div>
+    </div>
+  </main>
+  <script src="config.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/nav-unread.js"></script>
+  <script>
+    var t = function (k) { return window.i18n ? i18n.t(k) : k; };
+    if (typeof api === 'undefined' || !api.getToken || !api.getToken()) { location.href = 'login.html'; return; }
+    document.getElementById('navLogout').onclick = () => { api.auth.logout(); location.href = '../index.html'; };
+
+    const params = new URLSearchParams(location.search);
+    const convId = params.get('id');
+    const userId = params.get('userId');
+    const productId = params.get('productId');
+
+    let conversationId = convId;
+
+    async function loadOrCreate() {
+      if (conversationId) {
+        const [meta, messages] = await Promise.all([api.conversations.get(conversationId), api.messages.list(conversationId)]);
+        await markConversationRead(messages);
+        var other = meta.other || {};
+        var otherName = other.name || other.email || 'User';
+        document.getElementById('conversationTitle').textContent = (t('chatWith') || 'Chat with') + ' ' + otherName;
+        var aboutEl = document.getElementById('conversationAbout');
+        if (meta.product_id && (meta.product_title || meta.product_id)) {
+          aboutEl.style.display = '';
+          aboutEl.innerHTML = (t('aboutProduct') || 'About') + ': <a href="product.html?id=' + meta.product_id + '">' + escapeHtml(meta.product_title || ('#' + meta.product_id)) + '</a>';
+        } else {
+          aboutEl.style.display = 'none';
+        }
+        render(messages);
+        document.getElementById('sendForm').style.display = 'flex';
+        document.getElementById('msgInput').placeholder = t('messagePlaceholder');
+        document.getElementById('sendBtn').textContent = t('send');
+        document.getElementById('backToMail').textContent = t('backToMail');
+        return;
+      }
+      if (userId) {
+        const conv = await api.conversations.create(userId, productId || undefined);
+        conversationId = conv.id;
+        history.replaceState(null, '', 'conversation.html?id=' + conv.id);
+        try {
+          var meta = await api.conversations.get(conversationId);
+          var other = meta.other || {};
+          var otherName = other.name || other.email || 'User';
+          document.getElementById('conversationTitle').textContent = (t('chatWith') || 'Chat with') + ' ' + otherName;
+          var aboutEl = document.getElementById('conversationAbout');
+          if (meta.product_id && (meta.product_title || meta.product_id)) {
+            aboutEl.style.display = '';
+            aboutEl.innerHTML = (t('aboutProduct') || 'About') + ': <a href="product.html?id=' + meta.product_id + '">' + escapeHtml(meta.product_title || ('#' + meta.product_id)) + '</a>';
+          }
+        } catch (_) {}
+        document.getElementById('root').innerHTML = '<p style="color:var(--text-muted);">' + t('conversationCreated') + '</p>';
+        document.getElementById('sendForm').style.display = 'flex';
+        document.getElementById('msgInput').placeholder = t('messagePlaceholder');
+        document.getElementById('sendBtn').textContent = t('send');
+        document.getElementById('backToMail').textContent = t('backToMail');
+        return;
+      }
+      document.getElementById('root').innerHTML = '<p>' + t('specifyConvId') + '</p>';
+    }
+
+    function scrollThreadBottom() {
+      var wrap = document.getElementById('threadWrap');
+      if (wrap) wrap.scrollTop = wrap.scrollHeight;
+    }
+    function render(messages) {
+      const me = api.user?.id;
+      var html = messages.length === 0
+        ? '<div class="empty-state"><p class="empty-state-text">' + t('noMessages') + '</p></div>'
+        : `<div class="thread">
+          ${messages.map(m => `
+            <div class="msg ${m.sender_id === me ? 'mine' : ''}" data-msg-id="${m.id}">
+              <div class="meta">${escapeHtml(m.sender_name)} · ${formatDate(m.created_at)}</div>
+              <div>${escapeHtml(m.body)}</div>
+            </div>
+          `).join('')}
+        </div>`;
+      document.getElementById('root').innerHTML = html;
+      scrollThreadBottom();
+    }
+    async function markConversationRead(messages) {
+      const me = api.user?.id;
+      for (var i = 0; i < messages.length; i++) {
+        var m = messages[i];
+        if (m.sender_id !== me && !m.read_at) {
+          try { await api.messages.read(m.id); } catch (_) {}
+        }
+      }
+    }
+
+    function doSend() {
+      const input = document.getElementById('msgInput');
+      const body = input.value.trim();
+      if (!body || !conversationId) return;
+      api.messages.send(conversationId, body).then(function () {
+        input.value = '';
+        return api.messages.list(conversationId);
+      }).then(render);
+    }
+    document.getElementById('sendBtn').onclick = doSend;
+    document.getElementById('msgInput').addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); doSend(); }
+    });
+
+    loadOrCreate().then(function () { if (window.i18n) i18n.apply(); });
+  </script>
+  <script src="../js/main.js"></script>
+</body>
+</html>

@@ -113,6 +113,25 @@ body {
 }
 .logo:hover { color: var(--accent); }
 
+.logo-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5em;
+  height: 1.5em;
+  margin-right: 0.15em;
+  border-radius: 50%;
+  background: var(--accent-dim);
+  color: var(--accent);
+  font-weight: 800;
+  font-size: 0.95em;
+  vertical-align: middle;
+}
+.logo-header {
+  opacity: 1;
+  transition: opacity 0.4s ease;
+}
+
 .nav {
   display: flex;
   gap: 2rem;
@@ -152,7 +171,9 @@ body {
 .nav-main .nav-group-label {
   display: none;
 }
-.nav-main .nav-group-app .nav-group-app-links {
+.nav-main .nav-group-app .nav-group-app-links,
+.nav-main .nav-group-more .nav-group-app-links,
+.nav-main .nav-group-info .nav-group-app-links {
   display: none;
 }
 .nav-main .nav-drop {
@@ -274,11 +295,12 @@ body {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 100% 60% at 50% -10%, var(--accent-glow) 0%, transparent 50%),
-    radial-gradient(ellipse 80% 40% at 50% 20%, var(--accent-dim) 0%, transparent 55%);
+    radial-gradient(ellipse 120% 80% at 50% -20%, rgba(0, 217, 180, 0.18) 0%, transparent 45%),
+    radial-gradient(ellipse 90% 60% at 50% 30%, rgba(0, 217, 180, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse 70% 50% at 80% 80%, rgba(0, 184, 153, 0.06) 0%, transparent 45%),
+    radial-gradient(ellipse 60% 40% at 20% 70%, rgba(0, 217, 180, 0.05) 0%, transparent 40%);
   pointer-events: none;
 }
-
 .hero .container {
   text-align: center;
   position: relative;
@@ -300,7 +322,7 @@ body {
   font-size: 1.15rem;
   font-weight: 400;
   color: var(--text-muted);
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
   max-width: 540px;
   margin-left: auto;
   margin-right: auto;
@@ -311,7 +333,314 @@ body {
   flex-wrap: wrap;
   gap: 1rem;
   justify-content: center;
+  margin-bottom: 2.5rem;
 }
+.hero-actions.hero-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 0.75rem;
+  max-width: 520px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.hero-actions.hero-cards .btn {
+  margin: 0;
+  text-align: center;
+}
+.hero-platforms {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  justify-content: center;
+  max-width: 560px;
+  margin: 0 auto;
+}
+.hero-platforms a {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-decoration: none;
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  transition: color 0.2s, border-color 0.2s, background 0.2s;
+}
+.hero-platforms a:hover {
+  color: var(--accent);
+  border-color: rgba(0, 217, 180, 0.4);
+  background: var(--accent-dim);
+}
+
+/* Legacy dial (unused after hero redesign) */
+.hero-dial {
+  flex-direction: column;
+  padding-top: 5rem;
+}
+.hero-dial .dial-wrap {
+  position: relative;
+  width: min(360px, 88vw);
+  height: min(360px, 88vw);
+  margin: 0 auto 1.75rem;
+  filter: drop-shadow(0 0 40px rgba(0, 217, 180, 0.08));
+}
+.dial-inner-ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 44%;
+  height: 44%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 1px solid rgba(0, 217, 180, 0.2);
+  pointer-events: none;
+  z-index: 0;
+}
+.dial-ring .dial-hole {
+  z-index: 1;
+}
+
+.dial-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  background:
+    linear-gradient(var(--bg-card), var(--bg-card)) padding-box,
+    linear-gradient(165deg, var(--border) 0%, rgba(0, 217, 180, 0.2) 40%, var(--border) 70%, rgba(0, 217, 180, 0.15) 100%) border-box;
+  box-shadow:
+    inset 0 0 60px rgba(0, 0, 0, 0.4),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.03),
+    0 20px 50px rgba(0, 0, 0, 0.35);
+}
+.dial-hole {
+  position: absolute;
+  width: 54px;
+  height: 54px;
+  left: 50%;
+  top: 50%;
+  margin-left: -27px;
+  margin-top: -27px;
+  transform-origin: 50% 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: var(--text);
+  border-radius: 50%;
+  background: linear-gradient(180deg, rgba(26, 26, 32, 0.95) 0%, rgba(15, 15, 20, 0.98) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow:
+    0 2px 16px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  transition: background 0.25s, border-color 0.25s, color 0.25s, opacity 0.3s, transform 0.3s, box-shadow 0.25s;
+  opacity: 0;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+/* Круг: каждое отверстие сдвинуто по своему углу (0°=верх, по часовой) */
+.dial-hole:nth-child(1)  { transform: rotate(0deg)   translateY(-132px) rotate(0deg) scale(0.3); }
+.dial-hole:nth-child(2)  { transform: rotate(30deg)  translateY(-132px) rotate(-30deg) scale(0.3); }
+.dial-hole:nth-child(3)  { transform: rotate(60deg)  translateY(-132px) rotate(-60deg) scale(0.3); }
+.dial-hole:nth-child(4)  { transform: rotate(90deg)  translateY(-132px) rotate(-90deg) scale(0.3); }
+.dial-hole:nth-child(5)  { transform: rotate(120deg) translateY(-132px) rotate(-120deg) scale(0.3); }
+.dial-hole:nth-child(6)  { transform: rotate(150deg) translateY(-132px) rotate(-150deg) scale(0.3); }
+.dial-hole:nth-child(7)  { transform: rotate(180deg) translateY(-132px) rotate(-180deg) scale(0.3); }
+.dial-hole:nth-child(8)  { transform: rotate(210deg) translateY(-132px) rotate(-210deg) scale(0.3); }
+.dial-hole:nth-child(9)  { transform: rotate(240deg) translateY(-132px) rotate(-240deg) scale(0.3); }
+.dial-hole:nth-child(10) { transform: rotate(270deg) translateY(-132px) rotate(-270deg) scale(0.3); }
+.dial-hole:nth-child(11) { transform: rotate(300deg) translateY(-132px) rotate(-300deg) scale(0.3); }
+.dial-hole:nth-child(12) { transform: rotate(330deg) translateY(-132px) rotate(-330deg) scale(0.3); }
+body.dial-animate .dial-hole:nth-child(1)  { animation: dial-in-0 0.5s 0.05s ease forwards; }
+body.dial-animate .dial-hole:nth-child(2)  { animation: dial-in-30 0.5s 0.1s ease forwards; }
+body.dial-animate .dial-hole:nth-child(3)  { animation: dial-in-60 0.5s 0.15s ease forwards; }
+body.dial-animate .dial-hole:nth-child(4)  { animation: dial-in-90 0.5s 0.2s ease forwards; }
+body.dial-animate .dial-hole:nth-child(5)  { animation: dial-in-120 0.5s 0.25s ease forwards; }
+body.dial-animate .dial-hole:nth-child(6)  { animation: dial-in-150 0.5s 0.3s ease forwards; }
+body.dial-animate .dial-hole:nth-child(7)  { animation: dial-in-180 0.5s 0.35s ease forwards; }
+body.dial-animate .dial-hole:nth-child(8)  { animation: dial-in-210 0.5s 0.4s ease forwards; }
+body.dial-animate .dial-hole:nth-child(9)  { animation: dial-in-240 0.5s 0.45s ease forwards; }
+body.dial-animate .dial-hole:nth-child(10) { animation: dial-in-270 0.5s 0.5s ease forwards; }
+body.dial-animate .dial-hole:nth-child(11) { animation: dial-in-300 0.5s 0.55s ease forwards; }
+body.dial-animate .dial-hole:nth-child(12) { animation: dial-in-330 0.5s 0.6s ease forwards; }
+@keyframes dial-in-0   { to { opacity: 1; transform: rotate(0deg)   translateY(-132px) rotate(0deg) scale(1); } }
+@keyframes dial-in-30  { to { opacity: 1; transform: rotate(30deg)  translateY(-132px) rotate(-30deg) scale(1); } }
+@keyframes dial-in-60  { to { opacity: 1; transform: rotate(60deg)  translateY(-132px) rotate(-60deg) scale(1); } }
+@keyframes dial-in-90  { to { opacity: 1; transform: rotate(90deg)  translateY(-132px) rotate(-90deg) scale(1); } }
+@keyframes dial-in-120 { to { opacity: 1; transform: rotate(120deg) translateY(-132px) rotate(-120deg) scale(1); } }
+@keyframes dial-in-150 { to { opacity: 1; transform: rotate(150deg) translateY(-132px) rotate(-150deg) scale(1); } }
+@keyframes dial-in-180 { to { opacity: 1; transform: rotate(180deg) translateY(-132px) rotate(-180deg) scale(1); } }
+@keyframes dial-in-210 { to { opacity: 1; transform: rotate(210deg) translateY(-132px) rotate(-210deg) scale(1); } }
+@keyframes dial-in-240 { to { opacity: 1; transform: rotate(240deg) translateY(-132px) rotate(-240deg) scale(1); } }
+@keyframes dial-in-270 { to { opacity: 1; transform: rotate(270deg) translateY(-132px) rotate(-270deg) scale(1); } }
+@keyframes dial-in-300 { to { opacity: 1; transform: rotate(300deg) translateY(-132px) rotate(-300deg) scale(1); } }
+@keyframes dial-in-330 { to { opacity: 1; transform: rotate(330deg) translateY(-132px) rotate(-330deg) scale(1); } }
+.dial-hole:hover {
+  background: linear-gradient(180deg, rgba(0, 217, 180, 0.18) 0%, rgba(0, 184, 153, 0.12) 100%);
+  border-color: rgba(0, 217, 180, 0.5);
+  color: var(--accent);
+  box-shadow:
+    0 4px 24px rgba(0, 217, 180, 0.2),
+    0 0 0 1px rgba(0, 217, 180, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+.dial-hole:hover .dial-icon { color: var(--accent); }
+.dial-hole:active { opacity: 0.9; }
+.dial-hole .dial-icon {
+  font-family: var(--font-head);
+  font-weight: 800;
+  font-size: 1.1rem;
+  line-height: 1;
+  color: var(--accent);
+}
+.dial-hole .dial-label {
+  margin-top: 2px;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.dial-center {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  width: 120px;
+  text-align: center;
+  pointer-events: none;
+  transition: transform 1s cubic-bezier(0.25, 0.1, 0.25, 1), opacity 0.5s ease;
+}
+.dial-center .dial-center-mark {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #00e5c0 0%, var(--accent) 35%, var(--accent-soft) 100%);
+  color: var(--bg);
+  font-family: var(--font-head);
+  font-weight: 800;
+  font-size: 1.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 6px;
+  box-shadow:
+    0 6px 28px rgba(0, 217, 180, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.1) inset,
+    0 2px 8px rgba(0, 0, 0, 0.2);
+  animation: dial-center-pulse 3s ease-in-out infinite;
+}
+@keyframes dial-center-pulse {
+  0%, 100% { box-shadow: 0 6px 28px rgba(0, 217, 180, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1) inset, 0 2px 8px rgba(0, 0, 0, 0.2); }
+  50% { box-shadow: 0 8px 36px rgba(0, 217, 180, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.12) inset, 0 2px 8px rgba(0, 0, 0, 0.2); }
+}
+.dial-center .dial-center-text {
+  display: block;
+  width: 100%;
+  font-family: var(--font-head);
+  font-weight: 800;
+  font-size: 1.05rem;
+  letter-spacing: 0.14em;
+  color: var(--text);
+  text-shadow: 0 0 30px rgba(0, 217, 180, 0.15);
+}
+
+.hero-tagline-dial {
+  margin-bottom: 1.5rem;
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+}
+.hero-actions-dial {
+  margin-bottom: 0;
+}
+.hero-actions-dial .btn-primary {
+  padding: 0.85rem 2rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  border-radius: 999px;
+  box-shadow: 0 4px 24px rgba(0, 217, 180, 0.35);
+  transition: box-shadow 0.25s, transform 0.2s;
+}
+.hero-actions-dial .btn-primary:hover {
+  box-shadow: 0 6px 32px rgba(0, 217, 180, 0.45);
+  transform: translateY(-1px);
+}
+
+@media (max-width: 480px) {
+  .dial-hole {
+    width: 44px;
+    height: 44px;
+    margin-left: -22px;
+    margin-top: -22px;
+    font-size: 0.6rem;
+    opacity: 1;
+  }
+  .dial-hole:nth-child(1)  { transform: rotate(0deg)   translateY(-118px) rotate(0deg) scale(1); }
+  .dial-hole:nth-child(2)  { transform: rotate(30deg)  translateY(-118px) rotate(-30deg) scale(1); }
+  .dial-hole:nth-child(3)  { transform: rotate(60deg)  translateY(-118px) rotate(-60deg) scale(1); }
+  .dial-hole:nth-child(4)  { transform: rotate(90deg)  translateY(-118px) rotate(-90deg) scale(1); }
+  .dial-hole:nth-child(5)  { transform: rotate(120deg) translateY(-118px) rotate(-120deg) scale(1); }
+  .dial-hole:nth-child(6)  { transform: rotate(150deg) translateY(-118px) rotate(-150deg) scale(1); }
+  .dial-hole:nth-child(7)  { transform: rotate(180deg) translateY(-118px) rotate(-180deg) scale(1); }
+  .dial-hole:nth-child(8)  { transform: rotate(210deg) translateY(-118px) rotate(-210deg) scale(1); }
+  .dial-hole:nth-child(9)  { transform: rotate(240deg) translateY(-118px) rotate(-240deg) scale(1); }
+  .dial-hole:nth-child(10) { transform: rotate(270deg) translateY(-118px) rotate(-270deg) scale(1); }
+  .dial-hole:nth-child(11) { transform: rotate(300deg) translateY(-118px) rotate(-300deg) scale(1); }
+  .dial-hole:nth-child(12) { transform: rotate(330deg) translateY(-118px) rotate(-330deg) scale(1); }
+  body.dial-animate .dial-hole:nth-child(1)  { animation: dial-in-0-m 0.4s 0.02s ease forwards; }
+  body.dial-animate .dial-hole:nth-child(2)  { animation: dial-in-30-m 0.5s 0.1s ease forwards; }
+  body.dial-animate .dial-hole:nth-child(3)  { animation: dial-in-60-m 0.5s 0.15s ease forwards; }
+  body.dial-animate .dial-hole:nth-child(4)  { animation: dial-in-90-m 0.5s 0.2s ease forwards; }
+  body.dial-animate .dial-hole:nth-child(5)  { animation: dial-in-120-m 0.5s 0.25s ease forwards; }
+  body.dial-animate .dial-hole:nth-child(6)  { animation: dial-in-150-m 0.5s 0.3s ease forwards; }
+  body.dial-animate .dial-hole:nth-child(7)  { animation: dial-in-180-m 0.5s 0.35s ease forwards; }
+  body.dial-animate .dial-hole:nth-child(8)  { animation: dial-in-210-m 0.5s 0.4s ease forwards; }
+  body.dial-animate .dial-hole:nth-child(9)  { animation: dial-in-240-m 0.5s 0.45s ease forwards; }
+  body.dial-animate .dial-hole:nth-child(10) { animation: dial-in-270-m 0.5s 0.5s ease forwards; }
+  body.dial-animate .dial-hole:nth-child(11) { animation: dial-in-300-m 0.5s 0.55s ease forwards; }
+  body.dial-animate .dial-hole:nth-child(12) { animation: dial-in-330-m 0.5s 0.6s ease forwards; }
+  @keyframes dial-in-0-m   { to { opacity: 1; transform: rotate(0deg)   translateY(-118px) rotate(0deg) scale(1); } }
+  @keyframes dial-in-30-m  { to { opacity: 1; transform: rotate(30deg)  translateY(-118px) rotate(-30deg) scale(1); } }
+  @keyframes dial-in-60-m  { to { opacity: 1; transform: rotate(60deg)  translateY(-118px) rotate(-60deg) scale(1); } }
+  @keyframes dial-in-90-m  { to { opacity: 1; transform: rotate(90deg)  translateY(-118px) rotate(-90deg) scale(1); } }
+  @keyframes dial-in-120-m { to { opacity: 1; transform: rotate(120deg) translateY(-118px) rotate(-120deg) scale(1); } }
+  @keyframes dial-in-150-m { to { opacity: 1; transform: rotate(150deg) translateY(-118px) rotate(-150deg) scale(1); } }
+  @keyframes dial-in-180-m { to { opacity: 1; transform: rotate(180deg) translateY(-118px) rotate(-180deg) scale(1); } }
+  @keyframes dial-in-210-m { to { opacity: 1; transform: rotate(210deg) translateY(-118px) rotate(-210deg) scale(1); } }
+  @keyframes dial-in-240-m { to { opacity: 1; transform: rotate(240deg) translateY(-118px) rotate(-240deg) scale(1); } }
+  @keyframes dial-in-270-m { to { opacity: 1; transform: rotate(270deg) translateY(-118px) rotate(-270deg) scale(1); } }
+  @keyframes dial-in-300-m { to { opacity: 1; transform: rotate(300deg) translateY(-118px) rotate(-300deg) scale(1); } }
+  @keyframes dial-in-330-m { to { opacity: 1; transform: rotate(330deg) translateY(-118px) rotate(-330deg) scale(1); } }
+  .dial-hole .dial-icon { font-size: 0.95rem; }
+  .dial-center .dial-center-mark {
+    width: 48px;
+    height: 48px;
+    font-size: 1.5rem;
+  }
+  .dial-center .dial-center-text { font-size: 0.85rem; }
+  body:has(.hero-dial) .logo-header { opacity: 1; }
+}
+
+.screens-list-compact {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.screens-list-compact li {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border);
+}
+.screens-list-compact li:last-child { border-bottom: none; }
+.screens-list-compact a { font-weight: 500; }
+.screens-list-compact span { color: var(--text-muted); font-size: 0.95em; }
 .btn-outline {
   background: transparent;
   color: var(--accent);
@@ -398,6 +727,20 @@ body {
   font-size: 1.1rem;
 }
 
+.section.about .container {
+  padding: 2rem 1.5rem;
+  border-radius: var(--radius);
+  background: linear-gradient(180deg, rgba(20, 20, 28, 0.6) 0%, rgba(15, 15, 20, 0.4) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+}
+.section.about h2 {
+  background: linear-gradient(135deg, var(--text) 0%, var(--accent) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
 /* All main screens list */
 .screens-list {
   list-style: none;
@@ -482,11 +825,21 @@ body {
   gap: 1rem;
   margin-top: 1rem;
 }
+#map h2,
+#map .section-title {
+  background: linear-gradient(135deg, var(--text) 0%, var(--accent) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
 .direction-card {
-  background: var(--bg-card);
+  background: linear-gradient(180deg, var(--bg-card) 0%, rgba(18, 18, 24, 0.98) 100%);
   border: 1px solid var(--border);
   border-left: 3px solid transparent;
   border-radius: var(--radius);
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.15);
+  transition: border-color 0.25s, box-shadow 0.25s, transform 0.25s ease;
   padding: 1.35rem;
   display: block;
   color: inherit;
@@ -494,11 +847,11 @@ body {
   transition: border-color 0.25s, transform 0.2s ease, box-shadow 0.25s, background 0.2s;
 }
 .direction-card:hover {
-  border-color: var(--accent);
+  border-color: rgba(0, 217, 180, 0.4);
   border-left-color: var(--accent);
-  box-shadow: var(--shadow-hover);
+  box-shadow: 0 8px 32px rgba(0, 217, 180, 0.1), var(--shadow-hover);
   background: var(--bg-card-hover);
-  transform: translateY(-2px);
+  transform: translateY(-3px);
 }
 .direction-card h3 {
   font-family: var(--font-head);
@@ -733,12 +1086,16 @@ body {
   .nav.open .nav-drop-panel {
     display: none !important;
   }
-  .nav.open .nav-group-app .nav-group-app-links {
+  .nav.open .nav-group-app .nav-group-app-links,
+  .nav.open .nav-group-more .nav-group-app-links,
+  .nav.open .nav-group-info .nav-group-app-links {
     display: flex;
     flex-direction: column;
     gap: 0;
   }
-  .nav.open .nav-group-app .nav-group-app-links a {
+  .nav.open .nav-group-app .nav-group-app-links a,
+  .nav.open .nav-group-more .nav-group-app-links a,
+  .nav.open .nav-group-info .nav-group-app-links a {
     padding: 0.75rem 0;
     min-height: 44px;
     display: flex;
@@ -832,6 +1189,12 @@ body {
   margin-bottom: 0.5rem;
 }
 
+.stack-preview h2 {
+  background: linear-gradient(135deg, var(--text) 0%, var(--accent) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
 .stack-preview .btn {
   margin-top: 1rem;
 }

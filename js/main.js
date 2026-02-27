@@ -48,4 +48,5 @@
       if (nav && nav.classList.contains('open')) nav.classList.remove('open');
     }
   });
+
 })();

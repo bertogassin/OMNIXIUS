@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Closed content — OMNIXIUS</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <header class="header">
+    <div class="container">
+      <a href="../index.html" class="logo">OMNIXIUS</a>
+      <nav class="nav nav-main nav-unified">
+        <div class="nav-group nav-group-main">
+          <span class="nav-group-label">Main</span>
+          <a href="../index.html#screens">All screens</a>
+          <a href="../index.html#about">About</a>
+          <a href="../index.html#map">Map</a>
+          <a href="login.html" id="navLogin" class="nav-cta" data-i18n="signIn">Sign in</a>
+          <a href="#" id="navLogout" style="display:none;" data-i18n="signOut">Sign out</a>
+        </div>
+        <div class="nav-group nav-group-app">
+          <span class="nav-group-label">App</span>
+          <button type="button" class="nav-drop-trigger" aria-expanded="false" aria-haspopup="true">App ▾</button>
+          <div class="nav-drop-panel">
+            <a href="marketplace.html" data-i18n="navMarketplace">Marketplace</a>
+            <a href="mail.html" data-i18n="navMail">Mail</a>
+            <a href="orders.html" data-i18n="navOrders">Orders</a>
+            <a href="dashboard.html" data-i18n="navProfile">Profile</a>
+            <a href="ai.html">AI</a>
+          </div>
+          <div class="nav-group-app-links">
+            <a href="marketplace.html" data-i18n="navMarketplace">Marketplace</a>
+            <a href="mail.html" data-i18n="navMail">Mail</a>
+            <a href="orders.html" data-i18n="navOrders">Orders</a>
+            <a href="dashboard.html" data-i18n="navProfile">Profile</a>
+            <a href="ai.html">AI</a>
+          </div>
+        </div>
+        <div class="nav-group nav-group-info">
+          <span class="nav-group-label">Info</span>
+          <a href="../ecosystem.html">Ecosystem</a>
+          <a href="../architecture.html">Architecture</a>
+          <a href="../contact.html">Contact</a>
+        </div>
+      </nav>
+      <div class="lang-switcher">
+        <a href="#" data-lang="en">EN</a>
+        <a href="#" data-lang="ru">RU</a>
+        <a href="#" data-lang="fr">FR</a>
+        <a href="#" data-lang="de">DE</a>
+        <a href="#" data-lang="es">ES</a>
+        <a href="#" data-lang="it">IT</a>
+        <a href="#" data-lang="ar">AR</a>
+        <a href="#" data-lang="zh">ZH</a>
+        <a href="#" data-lang="ja">JA</a>
+      </div>
+      <button class="menu-toggle" aria-label="Menu"><span></span></button>
+    </div>
+  </header>
+  <main class="app-page">
+    <div class="container">
+      <div id="root"><p class="loading-state">Loading…</p></div>
+    </div>
+  </main>
+  <script src="config.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/utils.js"></script>
+  <script>
+    if (typeof api === 'undefined') { document.getElementById('root').innerHTML = '<p class="error">Scripts did not load.</p>'; throw 0; }
+    var t = function (k) { return typeof window.i18n !== 'undefined' && window.i18n.t ? i18n.t(k) : k; };
+    var productId = new URLSearchParams(location.search).get('product');
+    if (!productId) { document.getElementById('root').innerHTML = '<p class="error">' + (t('productIdMissing') || 'Product ID missing.') + '</p>'; throw 0; }
+    var token = api.getToken && api.getToken();
+    if (!token) { document.getElementById('root').innerHTML = '<p class="error">' + (t('closedContentSignIn') || 'Sign in to access.') + ' <a href="login.html">' + (t('signIn') || 'Sign in') + '</a></p>'; throw 0; }
+    document.getElementById('navLogin').style.display = 'none';
+    document.getElementById('navLogout').style.display = 'inline';
+    document.getElementById('navLogout').onclick = () => { api.auth.logout(); location.href = 'login.html'; };
+
+    (async () => {
+      var root = document.getElementById('root');
+      try {
+        var res = await api.products.closedContent(productId);
+        var url = (res && res.url) ? res.url.trim() : '';
+        if (!url) {
+          root.innerHTML = '<p class="text-muted">' + (t('closedContentNone') || 'No closed content.') + '</p><p><a href="product.html?id=' + encodeURIComponent(productId) + '">← ' + (t('backToProduct') || 'Back to product') + '</a></p>';
+          return;
+        }
+        root.innerHTML = '<p><a href="' + escapeHtml(url) + '" target="_blank" rel="noopener noreferrer" class="btn btn-primary">' + (t('closedContentOpenLink') || 'Open content') + '</a></p><p class="text-muted">' + (t('closedContentOpenHint') || 'Link opens in a new tab.') + '</p><p><a href="product.html?id=' + encodeURIComponent(productId) + '">← ' + (t('backToProduct') || 'Back to product') + '</a></p>';
+      } catch (err) {
+        var msg = (err.data && err.data.error) ? err.data.error : (t('loadFailed') || 'Failed');
+        root.innerHTML = '<p class="error">' + escapeHtml(msg) + '</p><p><a href="product.html?id=' + encodeURIComponent(productId) + '">← ' + (t('backToProduct') || 'Back to product') + '</a></p>';
+      }
+    })();
+    if (window.i18n) i18n.apply();
+  </script>
+  <script src="../js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Register — OMNIXIUS</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <header class="header">
+    <div class="container">
+      <a href="../index.html" class="logo">OMNIXIUS</a>
+      <nav class="nav nav-main nav-unified">
+        <div class="nav-group nav-group-main">
+          <span class="nav-group-label">Main</span>
+          <a href="../index.html#screens">All screens</a>
+          <a href="../index.html#about">About</a>
+          <a href="../index.html#map">Map</a>
+          <a href="login.html" id="navLogin" class="nav-cta" data-i18n="signIn">Sign in</a>
+          <a href="#" id="navLogout" style="display:none;">Sign out</a>
+        </div>
+        <div class="nav-group nav-group-app">
+          <span class="nav-group-label">App</span>
+          <button type="button" class="nav-drop-trigger" aria-expanded="false" aria-haspopup="true">App ▾</button>
+          <div class="nav-drop-panel">
+            <a href="marketplace.html">Marketplace</a>
+            <a href="mail.html">Mail</a>
+            <a href="orders.html">Orders</a>
+            <a href="vault.html">Vault</a>
+            <a href="dashboard.html">Profile</a>
+            <a href="ai.html">AI</a>
+          </div>
+          <div class="nav-group-app-links">
+            <a href="marketplace.html">Marketplace</a>
+            <a href="mail.html">Mail</a>
+            <a href="orders.html">Orders</a>
+            <a href="vault.html">Vault</a>
+            <a href="dashboard.html">Profile</a>
+            <a href="ai.html">AI</a>
+          </div>
+        </div>
+        <div class="nav-group nav-group-info">
+          <span class="nav-group-label">Info</span>
+          <a href="../ecosystem.html">Ecosystem</a>
+          <a href="../architecture.html">Architecture</a>
+          <a href="../contact.html">Contact</a>
+        </div>
+      </nav>
+      <div class="lang-switcher">
+        <a href="#" data-lang="en">EN</a>
+        <a href="#" data-lang="ru">RU</a>
+        <a href="#" data-lang="fr">FR</a>
+        <a href="#" data-lang="de">DE</a>
+        <a href="#" data-lang="es">ES</a>
+        <a href="#" data-lang="it">IT</a>
+        <a href="#" data-lang="ar">AR</a>
+        <a href="#" data-lang="zh">ZH</a>
+        <a href="#" data-lang="ja">JA</a>
+      </div>
+      <button class="menu-toggle" aria-label="Menu"><span></span></button>
+    </div>
+  </header>
+  <main class="app-page app-page-auth">
+    <div class="container">
+      <div id="apiUrlHint" class="api-url-hint" style="display:none;"></div>
+      <div class="auth-card">
+        <h1 class="auth-title" data-i18n="registerTitle">Register</h1>
+        <form class="app-form app-form-slim" id="form" novalidate>
+          <p class="error" id="err" style="display:none;" role="alert"></p>
+          <label data-i18n="email">Email</label>
+          <input type="email" name="email" required autocomplete="email" placeholder="you@example.com" maxlength="255" id="emailInp" autofocus>
+          <p class="form-hint form-hint-inline" id="emailValidHint" style="display:none;"></p>
+          <label data-i18n="passwordMin">Password (min 8)</label>
+          <div class="input-with-toggle">
+            <input type="password" name="password" required minlength="8" maxlength="128" autocomplete="new-password" id="pwd">
+            <button type="button" class="pwd-toggle" aria-label="Show password" id="pwdToggle1">👁</button>
+          </div>
+          <p class="form-hint form-hint-inline" id="pwdLenHint" style="display:none;"></p>
+          <label data-i18n="confirmPassword">Confirm</label>
+          <div class="input-with-toggle">
+            <input type="password" name="password2" required minlength="8" maxlength="128" autocomplete="new-password" id="pwd2">
+            <button type="button" class="pwd-toggle" aria-label="Show password" id="pwdToggle2">👁</button>
+          </div>
+          <p class="form-hint form-hint-inline" id="pwdMismatch" style="display:none;" data-i18n="passwordMismatch">Passwords do not match</p>
+          <p class="form-hint form-hint-ok form-hint-inline" id="pwdMatchOk" style="display:none;"></p>
+          <label data-i18n="name">Name <span class="label-optional" data-i18n="optional">(optional)</span></label>
+          <input type="text" name="name" autocomplete="name" data-i18n-placeholder="namePlaceholder" placeholder="Your name" maxlength="200" id="nameInp">
+          <label class="checkbox-label">
+            <input type="checkbox" name="agree" id="agree" required>
+            <span><span data-i18n="agreeTermsPrefix">I agree to</span> <a href="../contact.html" target="_blank" rel="noopener"><span data-i18n="termsAndPrivacy">Terms and Privacy</span></a></span>
+          </label>
+          <button type="submit" class="btn btn-primary btn-block" id="submitBtn" data-i18n="createAccount">Create account</button>
+        </form>
+        <p class="auth-link"><a href="login.html" data-i18n="haveAccount">Already have an account? Sign in</a></p>
+      </div>
+    </div>
+  </main>
+  <script src="config.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    var isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+    var hasApiUrl = !!(window.API_URL || (typeof localStorage !== 'undefined' && localStorage.getItem('omnixius_api_url')));
+    var needApiUrl = !isLocal && !hasApiUrl;
+    function askApiUrl() {
+      var url = prompt((typeof window.i18n !== 'undefined' && window.i18n.t('apiUrlPrompt')) || 'Backend URL (to sign in):', localStorage.getItem('omnixius_api_url') || '');
+      if (url && url.trim()) { var u = (typeof window.normalizeApiUrl === 'function' ? window.normalizeApiUrl(url) : url.trim().replace(/\/+$/, '')) || url.trim(); if (u) { localStorage.setItem('omnixius_api_url', u); location.reload(); } }
+      return !!url;
+    }
+    (function () {
+      var hint = document.getElementById('apiUrlHint');
+      var t = function (k, d) { return (typeof window.i18n !== 'undefined' && window.i18n.t(k)) || d || k; };
+      if (needApiUrl) {
+        var ph = t('apiUrlPlaceholder', 'http://localhost:3000');
+        var useT = t('saveApiUrl', 'Use');
+        hint.innerHTML = '<p class="api-url-hint-title">Backend URL</p><p class="api-url-reality"><strong>Why it does not work:</strong> This site is only static (GitHub Pages). Registration and login need a running API server (backend-go). It is not deployed on the internet — run it on your computer and open this page from the same computer, or deploy the backend (e.g. Render) and use that URL.</p><p class="api-url-hint-explain">Run <code>go run .</code> in backend-go, then paste <code>http://localhost:3000</code> and click Use.</p><div class="api-url-row"><input type="url" id="apiUrlInput" placeholder="' + ph + '" value="" autocomplete="url"><button type="button" class="btn btn-primary" id="saveApiUrl">' + useT + '</button></div><p id="apiUrlCheckResult" class="api-url-check-result" style="display:none;"></p>';
+        hint.style.display = 'block';
+        hint.classList.add('api-url-hint-required');
+        var input = document.getElementById('apiUrlInput');
+        if (input) input.value = localStorage.getItem('omnixius_api_url') || '';
+        document.getElementById('saveApiUrl').onclick = function (e) {
+          e.preventDefault();
+          var raw = (document.getElementById('apiUrlInput').value || '').trim();
+          var url = (typeof window.normalizeApiUrl === 'function' ? window.normalizeApiUrl(raw) : raw.replace(/\/+$/, '')) || raw;
+          var resEl = document.getElementById('apiUrlCheckResult');
+          if (!url) { if (resEl) { resEl.textContent = 'Enter URL'; resEl.style.display = 'block'; resEl.style.color = '#e74c3c'; } return; }
+          if (resEl) { resEl.textContent = '…'; resEl.style.display = 'block'; resEl.style.color = 'inherit'; }
+          localStorage.setItem('omnixius_api_url', url);
+          fetch(url.replace(/\/+$/, '') + '/health', { method: 'GET' }).then(function (r) { return r.ok ? r.json() : Promise.reject(); }).then(function () {
+            location.reload();
+          }).catch(function () {
+            if (resEl) { resEl.textContent = (typeof window.i18n !== 'undefined' && window.i18n.t('backendNotReachable')) || 'Backend not running. Run: go run . in backend-go'; resEl.style.color = '#e74c3c'; }
+          });
+        };
+      } else if (location.hostname !== 'localhost' && location.hostname !== '127.0.0.1' && window.API_URL) {
+        hint.innerHTML = '<a href="#" id="changeApiUrl">' + ((typeof window.i18n !== 'undefined' && window.i18n.t('changeApiUrl')) || 'Change API URL') + '</a>';
+        hint.style.display = 'block';
+        hint.style.marginBottom = '0.5rem';
+        document.getElementById('changeApiUrl').onclick = function (e) {
+          e.preventDefault();
+          var url = prompt('Backend API URL:', localStorage.getItem('omnixius_api_url') || window.API_URL || '');
+          if (url !== null && url.trim()) { var u = (typeof window.normalizeApiUrl === 'function' ? window.normalizeApiUrl(url) : url.replace(/\/+$/, '')) || url.trim(); localStorage.setItem('omnixius_api_url', u); location.reload(); }
+        };
+      } else if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+        hint.innerHTML = '<span style="color:var(--text-muted); font-size:0.85rem;">Backend: run <code>go run .</code> in the backend-go folder if registration fails.</span>';
+        hint.style.display = 'block';
+        hint.style.marginBottom = '0.5rem';
+      }
+      if (typeof window.i18n !== 'undefined' && window.i18n.apply) i18n.apply();
+    })();
+    try { if (typeof api !== 'undefined' && api.getToken && api.getToken()) { location.href = 'dashboard.html'; } } catch (_) {}
+
+    (function () {
+      function bindToggle(inpId, btnId) {
+        var pwd = document.getElementById(inpId);
+        var btn = document.getElementById(btnId);
+        if (pwd && btn) btn.onclick = function () { var isPass = pwd.type === 'password'; pwd.type = isPass ? 'text' : 'password'; btn.setAttribute('aria-label', isPass ? 'Hide password' : 'Show password'); btn.textContent = isPass ? '🙈' : '👁'; };
+      }
+      bindToggle('pwd', 'pwdToggle1');
+      bindToggle('pwd2', 'pwdToggle2');
+    })();
+    var form = document.getElementById('form');
+    var pwd = document.getElementById('pwd');
+    var pwd2 = document.getElementById('pwd2');
+    var pwdMismatch = document.getElementById('pwdMismatch');
+    function validEmail(s) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s || '') && (s || '').length <= 255;
+    }
+    function updateEmailHint() {
+      var el = document.getElementById('emailInp');
+      var hint = document.getElementById('emailValidHint');
+      if (!el || !hint) return;
+      var v = el.value.trim();
+      if (v.length === 0) { hint.style.display = 'none'; return; }
+      hint.style.display = 'block';
+      hint.textContent = validEmail(v) ? '✓' : (window.i18n ? i18n.t('invalidEmail') : 'Invalid email');
+      hint.classList.toggle('form-hint-ok', validEmail(v));
+    }
+    function updatePasswordHints() {
+      var lenHint = document.getElementById('pwdLenHint');
+      var matchOk = document.getElementById('pwdMatchOk');
+      var t = function (k) { return window.i18n ? i18n.t(k) : k; };
+      if (lenHint) {
+        var len = pwd.value.length;
+        lenHint.style.display = len > 0 ? 'block' : 'none';
+        lenHint.classList.toggle('form-hint-ok', len >= 8 && len <= 128);
+        lenHint.textContent = len >= 8 ? '✓' : (len > 128 ? t('passwordTooLong') : len + '/8');
+      }
+      if (matchOk) {
+        var both = pwd.value && pwd2.value;
+        matchOk.style.display = both && pwd.value === pwd2.value ? 'block' : 'none';
+        matchOk.textContent = '✓';
+      }
+    }
+    document.getElementById('emailInp').addEventListener('input', updateEmailHint);
+    document.getElementById('emailInp').addEventListener('blur', updateEmailHint);
+    pwd2.addEventListener('input', function () {
+      pwdMismatch.style.display = (pwd.value && pwd2.value && pwd.value !== pwd2.value) ? 'block' : 'none';
+      updatePasswordHints();
+    });
+    pwd.addEventListener('input', function () {
+      pwdMismatch.style.display = (pwd.value && pwd2.value && pwd.value !== pwd2.value) ? 'block' : 'none';
+      updatePasswordHints();
+    });
+
+    function showError(msg) {
+      var err = document.getElementById('err');
+      err.textContent = msg;
+      err.style.display = 'block';
+      err.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    form.onsubmit = async (e) => {
+      e.preventDefault();
+      var err = document.getElementById('err');
+      var btn = document.getElementById('submitBtn');
+      if (err) err.style.display = 'none';
+
+      if (typeof api === 'undefined' || !api.auth || !api.auth.register) {
+        showError('Page error: scripts did not load. Open from the same site (e.g. index → Register).');
+        return;
+      }
+      if (!window.API_URL && !isLocal) {
+        showError((typeof window.i18n !== 'undefined' && i18n.t('cannotConnect')) || 'Set backend URL first (enter when prompted).');
+        askApiUrl();
+        return;
+      }
+
+      var emailEl = form.querySelector('input[name="email"]');
+      var pwdEl = form.querySelector('input[name="password"]');
+      var nameEl = form.querySelector('input[name="name"]');
+      var agreeEl = form.querySelector('input[name="agree"]');
+
+      var email = (emailEl && emailEl.value || '').trim();
+      var password = (pwdEl && pwdEl.value) || '';
+      var nameVal = (nameEl && nameEl.value || '').trim();
+      nameVal = nameVal || null;
+
+      if (!email) {
+        showError((typeof window.i18n !== 'undefined' && i18n.t('invalidEmail')) || 'Please enter a valid email address.');
+        return;
+      }
+      if (!validEmail(email)) {
+        showError((typeof window.i18n !== 'undefined' && i18n.t('invalidEmail')) || 'Please enter a valid email address.');
+        return;
+      }
+      if (password.length < 8) {
+        showError((typeof window.i18n !== 'undefined' && i18n.t('passwordTooShort')) || 'Password must be at least 8 characters.');
+        return;
+      }
+      if (password.length > 128) {
+        showError((typeof window.i18n !== 'undefined' && i18n.t('passwordTooLong')) || 'Password must be up to 128 characters.');
+        return;
+      }
+      if (password !== (pwd2 && pwd2.value || '')) {
+        showError((typeof window.i18n !== 'undefined' && i18n.t('passwordMismatch')) || 'Passwords do not match');
+        return;
+      }
+      if (!agreeEl || !agreeEl.checked) {
+        showError((typeof window.i18n !== 'undefined' && i18n.t('agreeTerms')) || 'Please agree to the Terms and Privacy.');
+        return;
+      }
+
+      if (btn) { btn.disabled = true; btn.textContent = (typeof window.i18n !== 'undefined' && i18n.t('registering')) || 'Creating account…'; }
+      try {
+        var data = await api.auth.register(email, password, nameVal);
+        if (!data || !data.token) {
+          if (btn) { btn.disabled = false; btn.textContent = (typeof window.i18n !== 'undefined' && i18n.t('createAccount')) || 'Create account'; }
+          showError((typeof window.i18n !== 'undefined' && i18n.t('registerFailed')) || 'Registration failed. Try again.');
+          return;
+        }
+        api.setToken(data.token, true);
+        api.user = data.user;
+        location.href = 'dashboard.html';
+      } catch (x) {
+        if (btn) { btn.disabled = false; btn.textContent = (typeof window.i18n !== 'undefined' && i18n.t('createAccount')) || 'Create account'; }
+        if (x && x.status === 0) {
+          showError((x.data && x.data.error) || ((typeof window.i18n !== 'undefined' && i18n.t('cannotConnect')) || 'Cannot reach server. Set API URL?'));
+        } else if (x && x.message && (x.message.includes('fetch') || x.message.includes('Failed') || x.message === 'API URL not set')) {
+          showError((typeof window.i18n !== 'undefined' && i18n.t('cannotConnect')) || 'Cannot reach server. Set API URL or start the backend (localhost).');
+        } else if (x && x.status === 409) {
+          showError((typeof window.i18n !== 'undefined' && i18n.t('emailAlreadyRegistered')) || ((x.data && x.data.error) || 'Email already registered.'));
+        } else {
+          showError((x && x.data && x.data.error) || ((typeof window.i18n !== 'undefined' && i18n.t('registerFailed')) || 'Registration failed'));
+        }
+      }
+    };
+  </script>
+  <script src="../js/main.js"></script>
+</body>
+</html>

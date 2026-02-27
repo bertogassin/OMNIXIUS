@@ -1,17 +1,21 @@
 ---
-description: OMNIXIUS tech stack by direction — use only these languages per area
+description: OMNIXIUS tech stack — priorities: security, speed, graphics, design, scalability. Language order: Spark, Rust, Go, Swift, then the rest.
 alwaysApply: true
 ---
 
 # OMNIXIUS — Stack by direction
 
+Priorities (in order): **security**, **speed**, **graphics**, **design**, **scalability**. Goal: **site, app, and project — best in the world**. Languages are chosen for that outcome.
+
+**Language order (first to last):** Spark → Rust → Go → Swift → Kotlin → TypeScript/JS → Python → C++/C# (games) → Bash/Python/YAML (infra). Use each only where it delivers maximum for world-class result.
+
 When adding or changing code, use only the stack below for each direction.
 
-- **Server (logic, data, load):** Go (API, microservices, chats), Rust (video, search, heavy compute), Spark/Scala/Java (analytics, recommendations).
+- **Server (logic, data, load):** Spark (analytics, recommendations), Rust (video, search, heavy compute), Go (API, microservices, chats).
 - **Website (browser):** TypeScript/JavaScript, React or Vue for UI.
 - **Mobile:** Swift (iPhone), Kotlin (Android).
 - **Games (if any):** C++ (Unreal), C# (Unity).
 - **AI / smart features:** Python (neural nets, recognition).
 - **Infrastructure:** Bash/Python scripts, YAML for server config.
 
-Existing code: `backend-go/` = Go API; `app/`, `js/` = web (migrate to TS + React/Vue when refactoring). Do not introduce new server logic in Node; use Go or Rust. See ARCHITECTURE.md §2 for full table.
+Existing code: `backend-go/` = Go API; `app/`, `js/` = web (migrate to TS + React/Vue when refactoring). Do not introduce new server logic in Node; use Go or Rust. See ARCHITECTURE.md §2 for full table and language order.
