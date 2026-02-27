@@ -120,3 +120,15 @@
 .login-pwd-toggle { padding: 0.5rem 0.6rem; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; color: #b0b0b0; font-size: 0.85rem; cursor: pointer; }
 .login-links { margin-top: 1rem; font-size: 0.9rem; }
 .login-links a { color: #00d4aa; }
+
+/* Register: validation hints and requirements */
+.login-card.register-card { max-width: 420px; }
+.login-input-valid { border-color: rgba(0, 212, 170, 0.5); }
+.login-input-invalid { border-color: rgba(229, 115, 115, 0.6); }
+.register-hint { display: block; font-size: 0.8rem; color: #8a8a8a; margin-top: 0.25rem; }
+.register-hint-ok { color: #00d4aa; }
+.register-requirements { list-style: none; padding: 0; margin: 0.35rem 0 0; font-size: 0.85rem; color: #8a8a8a; }
+.register-requirements li { margin: 0.2rem 0; padding-left: 1.2rem; position: relative; }
+.register-requirements li::before { content: '○'; position: absolute; left: 0; color: #6a6a6a; }
+.register-requirements li.register-ok { color: #00d4aa; }
+.register-requirements li.register-ok::before { content: '✓'; color: #00d4aa; }
