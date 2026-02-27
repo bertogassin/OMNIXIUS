@@ -3,51 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Mail — OMNIXIUS</title>
+  <title>Relay · mail — OMNIXIUS</title>
   <link rel="stylesheet" href="../css/style.css">
   <link rel="stylesheet" href="css/app.css">
 </head>
 <body>
   <header class="header">
-    <div class="container">
-      <a href="../index.html" class="logo">OMNIXIUS</a>
-      <nav class="nav nav-main nav-unified">
-        <div class="nav-group nav-group-main">
-          <span class="nav-group-label">Main</span>
-          <a href="../index.html#screens">All screens</a>
-          <a href="../index.html#about">About</a>
-          <a href="../index.html#map">Map</a>
-          <a href="login.html" id="navLogin" class="nav-cta" style="display:none;">Sign in</a>
-          <a href="#" id="navLogout" data-i18n="signOut" aria-label="Sign out">Sign out</a>
-        </div>
-        <div class="nav-group nav-group-app">
-          <span class="nav-group-label">App</span>
-          <button type="button" class="nav-drop-trigger" aria-expanded="false" aria-haspopup="true">App ▾</button>
-          <div class="nav-drop-panel">
-            <a href="marketplace.html" data-i18n="navMarketplace">Marketplace</a>
-            <a href="mail.html" data-i18n="navMail">Mail</a>
-            <a href="orders.html" data-i18n="navOrders">Orders</a>
-            <a href="vault.html">Vault</a>
-            <a href="dashboard.html" data-i18n="navProfile">Profile</a>
-            <a href="ai.html">AI</a>
-          </div>
-          <div class="nav-group-app-links">
-            <a href="marketplace.html" data-i18n="navMarketplace">Marketplace</a>
-            <a href="mail.html" data-i18n="navMail">Mail</a>
-            <a href="orders.html" data-i18n="navOrders">Orders</a>
-            <a href="vault.html">Vault</a>
-            <a href="dashboard.html" data-i18n="navProfile">Profile</a>
-            <a href="ai.html">AI</a>
-          </div>
-        </div>
-        <div class="nav-group nav-group-info">
-          <span class="nav-group-label">Info</span>
-          <a href="../ecosystem.html">Ecosystem</a>
-          <a href="../architecture.html">Architecture</a>
-          <a href="../contact.html">Contact</a>
-        </div>
-      </nav>
+    <div class="container header-inner">
+      <a href="../index.html" class="logo"><span class="logo-mark">O</span><span class="logo-text">MNIXIUS</span></a>
       <div class="lang-switcher">
+        <span class="lang-switcher-label" data-i18n="langLabel">Language</span>
         <a href="#" data-lang="en">EN</a>
         <a href="#" data-lang="ru">RU</a>
         <a href="#" data-lang="fr">FR</a>
@@ -58,13 +23,19 @@
         <a href="#" data-lang="zh">ZH</a>
         <a href="#" data-lang="ja">JA</a>
       </div>
-      <button class="menu-toggle" aria-label="Menu"><span></span></button>
     </div>
   </header>
-  <main class="app-page">
+  <main class="app-page app-page-mail">
     <div class="container">
-      <section class="mail-vision" aria-labelledby="mail-vision-title">
-        <h2 id="mail-vision-title" class="mail-vision-title" data-i18n="mailVisionTitle">Mail direction</h2>
+      <div class="mail-toolbar">
+        <a href="../index.html" class="mail-back" data-i18n="backToMail">← Relay</a>
+        <h1 class="mail-title">Relay · mail<span class="mail-unread-badge" id="mailUnreadBadge" aria-hidden="true"></span></h1>
+        <button type="button" class="btn btn-outline btn-sm mail-refresh" id="mailRefresh" aria-label="Refresh" title="Refresh">↻</button>
+      </div>
+      <p class="mail-inbox-label" id="mailInboxLabel" data-i18n="mailInbox">Inbox</p>
+      <ul class="mail-list" id="list"></ul>
+      <details class="mail-vision" aria-labelledby="mail-vision-title">
+        <summary id="mail-vision-title" class="mail-vision-summary" data-i18n="mailVisionTitle">Mail direction</summary>
         <p class="mail-vision-intro" data-i18n="mailVisionIntro">Our roadmap: post-quantum security, E2EE by default, distributed nodes, semantic search, Passkeys. No ads — freemium.</p>
         <ul class="mail-vision-pillars">
           <li><strong data-i18n="mailVisionSecurity">Security</strong> <span data-i18n="mailVisionSecurityDesc">Post-quantum crypto (Kyber/Dilithium), E2EE, optional Tor, Passkeys/WebAuthn.</span></li>
@@ -72,12 +43,7 @@
           <li><strong data-i18n="mailVisionSmart">Intelligence</strong> <span data-i18n="mailVisionSmartDesc">Semantic search, local AI summarization, self-destruct option, real-time delivery.</span></li>
           <li><strong data-i18n="mailVisionModel">Model</strong> <span data-i18n="mailVisionModelDesc">Freemium, no ads. Free: E2EE + base search. Pro: sovereign node, API.</span></li>
         </ul>
-      </section>
-      <div class="mail-header">
-        <h1 data-i18n="mailTitle">Mail</h1>
-        <button type="button" class="btn btn-outline btn-sm" id="mailRefresh" aria-label="Refresh" title="Refresh">↻</button>
-      </div>
-      <ul class="mail-list" id="list"></ul>
+      </details>
     </div>
   </main>
   <script src="config.js"></script>
@@ -87,7 +53,6 @@
   <script src="js/nav-unread.js"></script>
   <script>
     if (typeof api === 'undefined' || !api.getToken || !api.getToken()) { location.href = 'login.html'; return; }
-    document.getElementById('navLogout').onclick = () => { api.auth.logout(); location.href = '../index.html'; };
     var listEl = document.getElementById('list');
     var t = function (k) { return window.i18n ? i18n.t(k) : k; };
     (async () => {
@@ -95,15 +60,25 @@
       try {
         const list = await api.conversations.list();
         if (list.length === 0) {
-          listEl.innerHTML = '<div class="empty-state"><p class="empty-state-title">' + t('noConversations') + '</p><p class="empty-state-text">' + t('noConversationsHint') + '</p><p><a href="marketplace.html" class="btn btn-primary">' + t('navMarketplace') + '</a></p></div>';
+          listEl.innerHTML = '<div class="empty-state"><p class="empty-state-title">' + t('noConversations') + '</p><p class="empty-state-text">' + t('noConversationsHint') + '</p><p><a href="marketplace.html" class="btn btn-primary">' + t('navTrove') + '</a></p></div>';
         } else {
+          try {
+            var unreadRes = await api.conversations.unreadCount();
+            var unreadN = unreadRes && (unreadRes.unread != null) ? parseInt(unreadRes.unread, 10) : 0;
+            var badgeEl = document.getElementById('mailUnreadBadge');
+            if (badgeEl) {
+              if (unreadN > 0) { badgeEl.textContent = ' (' + (unreadN > 99 ? '99+' : unreadN) + ')'; badgeEl.style.display = ''; }
+              else { badgeEl.textContent = ''; badgeEl.style.display = 'none'; }
+            }
+          } catch (_) {}
           listEl.innerHTML = list.map(c => {
             const preview = (c.last_message || '').trim();
             const short = preview.length > 60 ? preview.slice(0, 60) + '…' : preview;
             const otherName = escapeHtml(c.other?.name || c.other?.email || 'User');
             const productTitle = (c.product_title || '').trim();
             const productPart = productTitle ? ' · <span class="mail-product">' + escapeHtml(productTitle) + '</span>' : '';
-            return `<li class="${c.unread ? 'unread' : ''}">
+            return `<li class="mail-list-item ${c.unread ? 'unread' : ''}">
+              <span class="mail-unread-dot" aria-hidden="true"></span>
               <a href="conversation.html?id=${c.id}" class="mail-list-link">
                 <strong>${otherName}</strong>${productPart}
                 ${short ? `<br><span class="mail-preview">${escapeHtml(short)}</span>` : ''}

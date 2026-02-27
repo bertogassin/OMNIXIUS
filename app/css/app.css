@@ -208,16 +208,54 @@
 .app-card .price { color: var(--accent); font-weight: 600; }
 .app-card .meta { font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem; }
 
+.app-page-mail .mail-list { margin-bottom: 2rem; }
+.app-page-mail .loading-state { padding: 2rem; text-align: center; color: var(--text-muted); }
+.app-page-mail .error { color: var(--text); margin-bottom: 0.75rem; }
+.app-page-mail .error + .btn { margin-top: 0.25rem; }
+.mail-inbox-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin: 0 0 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.mail-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+.mail-back {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.mail-back:hover { color: var(--accent); }
+.mail-title { margin: 0; font-size: 1.5rem; font-weight: 700; flex: 1; min-width: 0; }
+.mail-unread-badge { display: none; color: var(--accent); font-weight: 600; font-size: 1rem; }
+.mail-refresh { padding: 0.4rem 0.75rem; font-size: 0.9rem; }
 .mail-vision {
-  margin-bottom: 2rem;
-  padding: 1.5rem;
+  margin-top: 0;
+  padding: 1rem 1.25rem;
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   border-left: 3px solid var(--accent);
 }
-.mail-vision-title { font-size: 1.1rem; font-weight: 600; margin: 0 0 0.5rem; color: var(--text); }
-.mail-vision-intro { font-size: 0.95rem; color: var(--text-muted); line-height: 1.6; margin: 0 0 1rem; }
+.mail-vision-summary {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+  list-style: none;
+}
+.mail-vision-summary::-webkit-details-marker { display: none; }
+.mail-vision-summary::before { content: '▸ '; color: var(--accent); }
+.mail-vision[open] .mail-vision-summary::before { content: '▾ '; }
+.mail-vision-intro { font-size: 0.95rem; color: var(--text-muted); line-height: 1.6; margin: 0.75rem 0 1rem; }
 .mail-vision-pillars { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.6rem; }
 .mail-vision-pillars li { font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; }
 .mail-vision-pillars strong { color: var(--accent); font-weight: 600; margin-right: 0.35rem; }
@@ -225,18 +263,33 @@
 .mail-header h1 { margin: 0; }
 .mail-header .btn-sm { padding: 0.4rem 0.75rem; font-size: 0.9rem; }
 .mail-preview { font-size: 0.9rem; color: var(--text-muted); }
-.mail-date { font-size: 0.85rem; color: var(--text-muted); white-space: nowrap; flex-shrink: 0; margin-left: 1rem; }
+.mail-date { font-size: 0.85rem; color: var(--text-muted); white-space: nowrap; flex-shrink: 0; }
 .mail-product { font-size: 0.9rem; color: var(--text-muted); font-weight: normal; }
-.mail-list { list-style: none; padding: 0; margin: 0; }
-.mail-list li {
-  padding: 1rem;
-  border-bottom: 1px solid var(--border);
-  display: flex; justify-content: space-between; align-items: center;
+.mail-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.5rem; }
+.mail-list li.mail-list-item {
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: border-color 0.2s, background 0.2s;
 }
-.mail-list li.unread { background: rgba(0,212,170,0.05); }
-.mail-list a { color: inherit; text-decoration: none; display: block; flex: 1; min-width: 0; transition: background 0.15s, opacity 0.15s; }
-.mail-list a:hover { background: rgba(0,212,170,0.08); }
-.mail-list a:active { background: rgba(0,212,170,0.12); opacity: 0.9; }
+.mail-list li.mail-list-item:hover { border-color: var(--accent); background: var(--bg-card-hover); }
+.mail-list li.mail-list-item.unread { border-left: 3px solid var(--accent); background: rgba(0,212,170,0.06); }
+.mail-unread-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex-shrink: 0;
+  opacity: 0;
+}
+.mail-list li.mail-list-item.unread .mail-unread-dot { opacity: 1; }
+.mail-list a { color: inherit; text-decoration: none; display: block; flex: 1; min-width: 0; transition: opacity 0.15s; }
+.mail-list a:hover { opacity: 0.9; }
+.mail-list a:active { opacity: 0.85; }
 .mail-list a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .conversation-header { margin-bottom: 1rem; }
 .conversation-title { font-size: 1.15rem; font-weight: 600; margin: 0 0 0.25rem; }
