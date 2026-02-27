@@ -19,7 +19,8 @@ start-rust.bat
 
 - **Порядок стека:** 1. Rust (http://localhost:8081) — поиск/ранжирование, тяжёлые задачи. 2. Go (http://localhost:3000) — API, сайт, статика.
 - Поиск специалистов при `sort=rating` или `sort=distance` при запущенном Rust отдаёт ранжирование в Rust.
-- Сайт: корень (index.html, css/, js/) + приложение по адресу **/app** (SPA из `web/dist`). Перед запуском бэкенда соберите фронт: `cd web && npm run build`.
+- Сайт: корень (index.html, css/) + скрипт лендинга **/app/assets/landing.js** (TypeScript в `web/src/landing/`) + приложение по адресу **/app** (SPA из `web/dist`). Перед запуском бэкенда: `cd web && npm run build`. Лендинг (i18n, профессии, нав) — один бандл из TS; старые js/main.js, js/i18n.js, js/professions.js удалены.
+- **Mobile (Android):** один код — WebView грузит тот же сайт по URL (`BuildConfig.APP_URL`, по умолчанию https://omnixius.com/app/). В `assets/www/` только fallback index.html (редирект). Дубликаты HTML/JS убраны.
 
 ### Открыть в браузере
 

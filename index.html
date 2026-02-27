@@ -101,57 +101,6 @@
     </div>
   </footer>
 
-  <script src="js/professions.js"></script>
-  <script src="js/i18n.js"></script>
-  <script src="js/main.js"></script>
-  <script>
-    (function() {
-      var P = window.OMNIXIUS_PROFESSIONS;
-      if (!P) return;
-      var grid = document.getElementById('professionGrid');
-      var currentEl = document.getElementById('professionCurrent');
-      var currentNameEl = document.getElementById('professionCurrentName');
-      var changeLink = document.getElementById('professionChangeLink');
-      function render() {
-        grid.innerHTML = P.getList().map(function(p) {
-          var name = P.getNameFor(p);
-          var icon = (p.icon || '').replace(/"/g, '&quot;');
-          return '<button type="button" class="profession-card" data-id="' + p.id + '" data-name="' + name.replace(/"/g, '&quot;') + '"><span class="profession-card-icon" aria-hidden="true">' + icon + '</span><span class="profession-card-name">' + name + '</span></button>';
-        }).join('');
-        grid.querySelectorAll('.profession-card').forEach(function(btn) {
-          btn.onclick = function() {
-            var id = this.getAttribute('data-id');
-            var name = this.getAttribute('data-name');
-            P.setCurrent(id, name);
-            updateCurrent();
-          };
-        });
-        updateCurrent();
-      }
-      function updateCurrent() {
-        var id = P.getCurrentId();
-        var name = P.getCurrentName();
-        if (id && name) {
-          currentNameEl.textContent = name;
-          currentEl.style.display = 'block';
-        } else {
-          currentEl.style.display = 'none';
-        }
-        var workspaceEl = document.getElementById('professionWorkspaceLink');
-        if (workspaceEl) workspaceEl.style.display = (id === 'design') ? 'block' : 'none';
-      }
-      if (changeLink) changeLink.onclick = function() { document.getElementById('profession').scrollIntoView({ behavior: 'smooth' }); };
-      var headerLink = document.getElementById('headerProfessionLink');
-      if (headerLink) {
-        function updateHeader() {
-          var name = P.getCurrentName();
-          if (name) { headerLink.textContent = name; headerLink.style.display = ''; } else { headerLink.style.display = 'none'; }
-        }
-        updateCurrent = (function(orig) { return function() { orig(); if (headerLink) updateHeader(); }; })(updateCurrent);
-        updateHeader();
-      }
-      render();
-    })();
-  </script>
+  <script type="module" src="/app/assets/landing.js"></script>
 </body>
 </html>

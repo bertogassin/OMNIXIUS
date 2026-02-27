@@ -27,3 +27,37 @@ jobs:
         run: go test ./... -count=1 -v
       - name: Build
         run: go build -o /dev/null .
+
+  rust:
+    name: Build (Rust service)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: services/rust
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Cache Cargo
+        uses: Swatinem/rust-cache@v2
+      - name: Build
+        run: cargo build --release
+      - name: Test
+        run: cargo test
+
+  web:
+    name: Build (TypeScript / React)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: web/package-lock.json
+      - name: Install deps
+        run: npm ci
+      - name: Build
+        run: npm run build

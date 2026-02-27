@@ -12,7 +12,9 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "0.1.0"
+        buildConfigField("String", "APP_URL", "\"https://omnixius.com/app/\"")
     }
+    buildFeatures { buildConfig = true }
     buildTypes {
         release {
             isMinifyEnabled = false

@@ -1,0 +1,231 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Edit profile ÔÇö OMNIXIUS</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <header class="header">
+    <div class="container">
+      <a href="../index.html" class="logo">OMNIXIUS</a>
+      <nav class="nav nav-main nav-unified">
+        <div class="nav-group nav-group-main">
+          <span class="nav-group-label" data-i18n="navMain">Main</span>
+          <a href="../index.html" data-i18n="home">Home</a>
+          <a href="login.html" id="navLogin" class="nav-cta" data-i18n="signIn">Sign in</a>
+          <a href="#" id="navLogout" style="display:none;" data-i18n="signOut">Sign out</a>
+        </div>
+        <div class="nav-group nav-group-app">
+          <span class="nav-group-label" data-i18n="navApp">App</span>
+          <a href="marketplace.html" data-i18n="navTrove">Trove ┬À marketplace</a>
+          <a href="mail.html" data-i18n="navRelay">Relay ┬À mail</a>
+          <a href="orders.html" data-i18n="navOrders">Orders</a>
+          <a href="dashboard.html" data-i18n="navProfile">Profile</a>
+          <a href="notifications.html">Notifications</a>
+          <a href="ai.html" data-i18n="navOracle">Oracle ┬À AI</a>
+        </div>
+        <div class="nav-group nav-group-more nav-drop">
+          <span class="nav-group-label" data-i18n="navMore">More</span>
+          <button type="button" class="nav-drop-trigger" aria-expanded="false" aria-haspopup="true"><span data-i18n="navMore">More</span> Ôû¥</button>
+          <div class="nav-drop-panel">
+            <a href="trade.html" data-i18n="brandForge">Forge ┬À trade & finance</a>
+            <a href="wallet.html">Wallet</a>
+            <a href="remittances.html">Remittances</a>
+            <a href="connect.html" data-i18n="brandBond">Bond ┬À social</a>
+            <a href="repositorium.html" data-i18n="brandArk">Ark ┬À storage</a>
+            <a href="ixi.html" data-i18n="brandIxi">IXI ┬À blockchain</a>
+            <a href="vault.html" data-i18n="brandCrate">Crate ┬À files</a>
+            <a href="learning.html" data-i18n="brandAscent">Ascent ┬À learning</a>
+            <a href="startups.html" data-i18n="brandFlare">Flare ┬À startups</a>
+            <a href="media.html" data-i18n="brandLens">Lens ┬À media</a>
+            <a href="rewards.html" data-i18n="brandBounty">Bounty ┬À rewards</a>
+            <a href="settings.html">Settings</a>
+          </div>
+          <div class="nav-group-app-links">
+            <a href="trade.html" data-i18n="brandForge">Forge</a>
+            <a href="wallet.html">Wallet</a>
+            <a href="remittances.html">Remittances</a>
+            <a href="connect.html" data-i18n="brandBond">Bond</a>
+            <a href="repositorium.html" data-i18n="brandArk">Ark</a>
+            <a href="ixi.html" data-i18n="brandIxi">IXI</a>
+            <a href="vault.html" data-i18n="brandCrate">Crate</a>
+            <a href="learning.html" data-i18n="brandAscent">Ascent</a>
+            <a href="startups.html" data-i18n="brandFlare">Flare</a>
+            <a href="media.html" data-i18n="brandLens">Lens</a>
+            <a href="rewards.html" data-i18n="brandBounty">Bounty</a>
+            <a href="settings.html">Settings</a>
+          </div>
+        </div>
+        <div class="nav-group nav-group-info nav-drop">
+          <span class="nav-group-label" data-i18n="navInfo">Info</span>
+          <button type="button" class="nav-drop-trigger" aria-expanded="false" aria-haspopup="true"><span data-i18n="navInfo">Info</span> Ôû¥</button>
+          <div class="nav-drop-panel">
+            <a href="../ecosystem.html" data-i18n="navEcosystem">Ecosystem</a>
+            <a href="../architecture.html" data-i18n="navArchitecture">Architecture</a>
+            <a href="../contact.html" data-i18n="navContact">Contact</a>
+          </div>
+          <div class="nav-group-app-links">
+            <a href="../ecosystem.html">Ecosystem</a>
+            <a href="../architecture.html">Architecture</a>
+            <a href="../contact.html">Contact</a>
+          </div>
+        </div>
+      </nav>
+      <div class="lang-switcher">
+        <a href="#" data-lang="en">EN</a>
+        <a href="#" data-lang="ru">RU</a>
+        <a href="#" data-lang="fr">FR</a>
+        <a href="#" data-lang="de">DE</a>
+        <a href="#" data-lang="es">ES</a>
+        <a href="#" data-lang="it">IT</a>
+        <a href="#" data-lang="ar">AR</a>
+        <a href="#" data-lang="zh">ZH</a>
+        <a href="#" data-lang="ja">JA</a>
+      </div>
+      <button class="menu-toggle" aria-label="Menu"><span></span></button>
+    </div>
+  </header>
+  <main class="app-page">
+    <div class="container">
+      <p class="status-done">Live. Profile edit, avatar.</p>
+      <p><a href="settings.html" class="btn btn-outline">Security, sessions, recovery ÔåÆ Settings</a></p>
+      <h1 data-i18n="settingsTitle">Profile</h1>
+      <form class="app-form" id="form" style="max-width:400px;">
+        <p class="error" id="err" style="display:none;" role="alert"></p>
+        <p class="success" id="formSuccess" style="display:none; color: var(--accent);" role="status"></p>
+        <label data-i18n="name">Name</label>
+        <input type="text" name="name" id="name">
+        <label data-i18n="profilePhoto">Profile photo</label>
+        <input type="file" name="avatar" accept="image/jpeg,image/png,image/webp" id="avatarInput">
+        <p class="form-hint" id="avatarHint" style="font-size:0.8rem; color:var(--text-muted);"></p>
+        <div id="avatarPreview" style="margin-top:0.5rem;"></div>
+        <button type="submit" class="btn btn-primary" id="formSubmitBtn" data-i18n="save">Save</button>
+      </form>
+      <h2 class="section-title" style="margin-top:2rem;" data-i18n="changePassword">Change password</h2>
+      <form class="app-form" id="pwdForm" style="max-width:400px;">
+        <p class="error" id="pwdErr" style="display:none;" role="alert"></p>
+        <label data-i18n="currentPassword">Current password</label>
+        <input type="password" name="current" id="currentPwd" autocomplete="current-password">
+        <label data-i18n="newPassword">New password</label>
+        <input type="password" name="new" id="newPwd" minlength="8" maxlength="128" autocomplete="new-password">
+        <label data-i18n="confirmPasswordLabel">Confirm password</label>
+        <input type="password" name="new2" id="newPwd2" minlength="8" maxlength="128" autocomplete="new-password">
+        <p class="form-hint" id="pwdMismatch" style="display:none;" data-i18n="passwordMismatch">Passwords do not match</p>
+        <button type="submit" class="btn btn-primary" data-i18n="save">Save</button>
+      </form>
+    </div>
+  </main>
+  <script src="config.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/nav-unread.js"></script>
+  <script>
+    if (typeof api === 'undefined' || !api.getToken || !api.getToken()) { location.href = 'login.html'; return; }
+    document.getElementById('navLogout').onclick = () => { api.auth.logout(); location.href = '../index.html'; };
+    (async () => {
+      const u = await api.users.me();
+      document.getElementById('name').value = u.name || '';
+    })();
+    var MAX_AVATAR_MB = 5;
+    document.getElementById('avatarInput').onchange = function () {
+      var f = this.files[0];
+      var hint = document.getElementById('avatarHint');
+      var preview = document.getElementById('avatarPreview');
+      if (!f) { hint.textContent = ''; preview.innerHTML = ''; return; }
+      if (f.size > MAX_AVATAR_MB * 1024 * 1024) {
+        hint.textContent = 'Max ' + MAX_AVATAR_MB + ' MB';
+        hint.style.color = '#e74c3c';
+        this.value = '';
+        preview.innerHTML = '';
+        return;
+      }
+      hint.textContent = f.name + ' (' + (f.size / 1024).toFixed(1) + ' KB)';
+      hint.style.color = '';
+      var url = URL.createObjectURL(f);
+      preview.innerHTML = '<img src="' + url + '" alt="" style="max-width:120px; max-height:120px; border-radius:50%; object-fit:cover; margin-top:0.25rem;">';
+    };
+    document.getElementById('form').onsubmit = async (e) => {
+      e.preventDefault();
+      const err = document.getElementById('err');
+      const success = document.getElementById('formSuccess');
+      const btn = document.getElementById('formSubmitBtn');
+      err.style.display = 'none';
+      success.style.display = 'none';
+      const name = e.target.name.value.trim() || null;
+      const file = e.target.avatar.files[0];
+      if (file && file.size > MAX_AVATAR_MB * 1024 * 1024) {
+        err.textContent = 'File too large (max ' + MAX_AVATAR_MB + ' MB)';
+        err.style.display = 'block';
+        return;
+      }
+      btn.disabled = true;
+      btn.textContent = (window.i18n && window.i18n.t('loading')) ? i18n.t('loading') : 'SavingÔÇª';
+      try {
+        await api.users.updateMe({ name });
+        var newAvatarPath = null;
+        if (file) {
+          const fd = new FormData();
+          fd.append('avatar', file);
+          const r = await fetch(window.API_URL + '/api/users/me/avatar', {
+            method: 'POST',
+            headers: { Authorization: 'Bearer ' + api.getToken() },
+            body: fd,
+          });
+          var data = await r.json().catch(() => ({}));
+          if (!r.ok) throw data;
+          newAvatarPath = data.avatar_path || null;
+        }
+        success.innerHTML = (window.i18n && window.i18n.t('aiSaved')) ? i18n.t('aiSaved') : 'Saved';
+        if (newAvatarPath && document.getElementById('avatarPreview')) {
+          document.getElementById('avatarPreview').innerHTML = '<img src="' + (window.API_URL || '') + '/uploads/' + newAvatarPath + '" alt="" style="max-width:120px; max-height:120px; border-radius:50%; object-fit:cover; margin-top:0.25rem;">';
+        }
+        success.innerHTML += ' <a href="dashboard.html">' + ((window.i18n && window.i18n.t('navProfile')) ? i18n.t('navProfile') : 'Profile') + '</a>';
+        success.style.display = 'block';
+      } catch (x) {
+        err.textContent = (x && (x.data && x.data.error || x.error)) || 'Error';
+        err.style.display = 'block';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = (window.i18n && window.i18n.t('save')) ? i18n.t('save') : 'Save';
+      }
+    };
+    document.getElementById('pwdForm').onsubmit = async (e) => {
+      e.preventDefault();
+      var pwdErr = document.getElementById('pwdErr');
+      var mismatch = document.getElementById('pwdMismatch');
+      pwdErr.style.display = 'none';
+      mismatch.style.display = 'none';
+      var cur = document.getElementById('currentPwd').value;
+      var newP = document.getElementById('newPwd').value;
+      var new2 = document.getElementById('newPwd2').value;
+      var t = function (k) { return window.i18n ? i18n.t(k) : k; };
+      if (newP.length < 8) { pwdErr.textContent = t('passwordTooShort'); pwdErr.style.display = 'block'; return; }
+      if (newP !== new2) { mismatch.style.display = 'block'; return; }
+      try {
+        await api.auth.changePassword(cur, newP);
+        pwdErr.style.display = 'block';
+        pwdErr.style.color = 'var(--accent)';
+        pwdErr.textContent = t('changePasswordSuccess');
+        document.getElementById('currentPwd').value = '';
+        document.getElementById('newPwd').value = '';
+        document.getElementById('newPwd2').value = '';
+      } catch (x) {
+        pwdErr.style.color = '';
+        pwdErr.textContent = (x && x.status === 401) ? t('currentPasswordWrong') : ((x && x.data && x.data.error) || 'Error');
+        pwdErr.style.display = 'block';
+      }
+    };
+    document.getElementById('newPwd2').addEventListener('input', function () {
+      var el = document.getElementById('pwdMismatch');
+      var p = document.getElementById('newPwd').value;
+      var p2 = document.getElementById('newPwd2').value;
+      el.style.display = (p && p2 && p !== p2) ? 'block' : 'none';
+    });
+    if (window.i18n) i18n.apply();
+  </script>
+  <script src="../js/main.js"></script>
+</body>
+</html>

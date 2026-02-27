@@ -1,0 +1,165 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Notifications ÔÇö OMNIXIUS</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <header class="header">
+    <div class="container">
+      <a href="../index.html" class="logo">OMNIXIUS</a>
+      <nav class="nav nav-main nav-unified">
+        <div class="nav-group nav-group-main">
+          <span class="nav-group-label" data-i18n="navMain">Main</span>
+          <a href="../index.html" data-i18n="home">Home</a>
+          <a href="login.html" id="navLogin" class="nav-cta" data-i18n="signIn">Sign in</a>
+          <a href="#" id="navLogout" style="display:none;" data-i18n="signOut">Sign out</a>
+        </div>
+        <div class="nav-group nav-group-app">
+          <span class="nav-group-label" data-i18n="navApp">App</span>
+          <a href="marketplace.html" data-i18n="navTrove">Trove ┬À marketplace</a>
+          <a href="mail.html" data-i18n="navRelay">Relay ┬À mail</a>
+          <a href="orders.html" data-i18n="navOrders">Orders</a>
+          <a href="dashboard.html" data-i18n="navProfile">Profile</a>
+          <a href="notifications.html" style="color:var(--accent);">Notifications</a>
+          <a href="ai.html" data-i18n="navOracle">Oracle ┬À AI</a>
+        </div>
+        <div class="nav-group nav-group-more nav-drop">
+          <span class="nav-group-label" data-i18n="navMore">More</span>
+          <button type="button" class="nav-drop-trigger" aria-expanded="false" aria-haspopup="true"><span data-i18n="navMore">More</span> Ôû¥</button>
+          <div class="nav-drop-panel">
+            <a href="trade.html" data-i18n="brandForge">Forge ┬À trade & finance</a>
+            <a href="wallet.html">Wallet</a>
+            <a href="remittances.html">Remittances</a>
+            <a href="connect.html" data-i18n="brandBond">Bond ┬À social</a>
+            <a href="repositorium.html" data-i18n="brandArk">Ark ┬À storage</a>
+            <a href="ixi.html" data-i18n="brandIxi">IXI ┬À blockchain</a>
+            <a href="vault.html" data-i18n="brandCrate">Crate ┬À files</a>
+            <a href="learning.html" data-i18n="brandAscent">Ascent ┬À learning</a>
+            <a href="startups.html" data-i18n="brandFlare">Flare ┬À startups</a>
+            <a href="media.html" data-i18n="brandLens">Lens ┬À media</a>
+            <a href="rewards.html" data-i18n="brandBounty">Bounty ┬À rewards</a>
+            <a href="settings.html">Settings</a>
+          </div>
+          <div class="nav-group-app-links">
+            <a href="trade.html" data-i18n="brandForge">Forge</a>
+            <a href="wallet.html">Wallet</a>
+            <a href="remittances.html">Remittances</a>
+            <a href="connect.html" data-i18n="brandBond">Bond</a>
+            <a href="repositorium.html" data-i18n="brandArk">Ark</a>
+            <a href="ixi.html" data-i18n="brandIxi">IXI</a>
+            <a href="vault.html" data-i18n="brandCrate">Crate</a>
+            <a href="learning.html" data-i18n="brandAscent">Ascent</a>
+            <a href="startups.html" data-i18n="brandFlare">Flare</a>
+            <a href="media.html" data-i18n="brandLens">Lens</a>
+            <a href="rewards.html" data-i18n="brandBounty">Bounty</a>
+            <a href="settings.html">Settings</a>
+          </div>
+        </div>
+        <div class="nav-group nav-group-info nav-drop">
+          <span class="nav-group-label" data-i18n="navInfo">Info</span>
+          <button type="button" class="nav-drop-trigger" aria-expanded="false" aria-haspopup="true"><span data-i18n="navInfo">Info</span> Ôû¥</button>
+          <div class="nav-drop-panel">
+            <a href="../ecosystem.html" data-i18n="navEcosystem">Ecosystem</a>
+            <a href="../architecture.html" data-i18n="navArchitecture">Architecture</a>
+            <a href="../contact.html" data-i18n="navContact">Contact</a>
+          </div>
+          <div class="nav-group-app-links">
+            <a href="../ecosystem.html">Ecosystem</a>
+            <a href="../architecture.html">Architecture</a>
+            <a href="../contact.html">Contact</a>
+          </div>
+        </div>
+      </nav>
+      <div class="lang-switcher">
+        <a href="#" data-lang="en">EN</a>
+        <a href="#" data-lang="ru">RU</a>
+        <a href="#" data-lang="fr">FR</a>
+        <a href="#" data-lang="de">DE</a>
+        <a href="#" data-lang="es">ES</a>
+        <a href="#" data-lang="it">IT</a>
+        <a href="#" data-lang="ar">AR</a>
+        <a href="#" data-lang="zh">ZH</a>
+        <a href="#" data-lang="ja">JA</a>
+      </div>
+      <button class="menu-toggle" aria-label="Menu"><span></span></button>
+    </div>
+  </header>
+  <main class="app-page">
+    <div class="container">
+      <h1>Notifications</h1>
+      <p class="about-text">Your notification history. Mark as read and manage preferences in <a href="settings.html">Settings</a>.</p>
+
+      <section class="notif-section" style="margin-top:1.5rem;">
+        <div id="notifList"><p class="loading-state">LoadingÔÇª</p></div>
+      </section>
+    </div>
+  </main>
+  <script src="config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="../js/main.js"></script>
+  <script>
+    if (!api.getToken()) { location.href = 'login.html'; }
+    (function(){ var t = api.getToken(); document.getElementById('navLogin').style.display = t ? 'none' : ''; document.getElementById('navLogout').style.display = t ? '' : 'none'; })();
+    document.getElementById('navLogout').onclick = function(e){ e.preventDefault(); if (api.auth) api.auth.logout(); location.href = 'login.html'; };
+
+    function escapeHtml(s) {
+      if (s == null || s === undefined) return '';
+      var d = document.createElement('div');
+      d.textContent = s;
+      return d.innerHTML;
+    }
+
+    function fmtDate(ts) {
+      if (ts == null || ts === undefined) return 'ÔÇö';
+      return new Date(ts * 1000).toLocaleString();
+    }
+
+    function loadNotifications() {
+      var el = document.getElementById('notifList');
+      api.notifications.history().then(function(res) {
+        var list = res.notifications || [];
+        if (list.length === 0) {
+          el.innerHTML = '<p class="text-muted">No notifications yet.</p>';
+          return;
+        }
+        var html = '<ul class="notif-list">';
+        list.forEach(function(n) {
+          var title = escapeHtml(n.title || 'Notification');
+          var body = escapeHtml(n.body || '');
+          var meta = [n.type, n.channel].filter(Boolean).join(' ┬À ');
+          html += '<li class="notif-item card" data-id="' + n.id + '"><div class="notif-header"><strong>' + title + '</strong> <button type="button" class="btn btn-outline btn-sm notif-mark-read" data-id="' + n.id + '">Mark read</button></div>';
+          if (body) html += '<p class="notif-body">' + body + '</p>';
+          html += '<p class="notif-meta text-muted">' + escapeHtml(meta) + ' ┬À ' + fmtDate(n.created_at) + '</p></li>';
+        });
+        html += '</ul>';
+        el.innerHTML = html;
+        el.querySelectorAll('.notif-mark-read').forEach(function(btn) {
+          btn.onclick = function() {
+            var id = btn.getAttribute('data-id');
+            btn.disabled = true;
+            api.notifications.markRead(id).then(function() {
+              btn.textContent = 'Read';
+              btn.disabled = true;
+            }).catch(function() { btn.disabled = false; });
+          };
+        });
+      }).catch(function(err) {
+        el.innerHTML = '<p class="text-muted">Could not load notifications. ' + (err.data && err.data.error ? err.data.error : '') + '</p>';
+      });
+    }
+
+    loadNotifications();
+  </script>
+  <style>
+    .notif-list { list-style: none; padding: 0; margin: 0; }
+    .notif-item { padding: 1rem; margin-bottom: 0.75rem; }
+    .notif-header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.25rem; }
+    .notif-body { margin: 0.5rem 0; font-size: 0.95rem; }
+    .notif-meta { margin: 0; font-size: 0.85rem; }
+  </style>
+</body>
+</html>

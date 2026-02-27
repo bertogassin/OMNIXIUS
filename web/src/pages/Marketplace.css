@@ -3,6 +3,14 @@
   font-size: 1.75rem;
 }
 
+.marketplace-status { font-size: 0.9rem; color: #6a6a6a; margin: 0 0 1rem; }
+.marketplace-filters { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin-bottom: 1.5rem; }
+.marketplace-filters input[type="text"],
+.marketplace-filters input[type="number"] { padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); background: rgba(0,0,0,0.3); color: #e8e6e3; max-width: 120px; }
+.marketplace-filters select { padding: 0.4rem 0.6rem; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); background: rgba(0,0,0,0.3); color: #e8e6e3; }
+.marketplace-filter-cb { display: flex; align-items: center; gap: 0.35rem; font-size: 0.9rem; color: #b0b0b0; }
+.marketplace-search-btn { padding: 0.5rem 1rem; background: #00d4aa; color: #0c0c0f; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; }
+
 .marketplace-intro,
 .marketplace-loading,
 .marketplace-empty {

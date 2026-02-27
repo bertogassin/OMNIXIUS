@@ -1,0 +1,42 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Links ÔÇö OMNIXIUS</title>
+  <style>
+    body { font-family: system-ui, sans-serif; background: #0c0c0f; color: #e8e6e3; padding: 2rem; max-width: 500px; margin: 0 auto; }
+    h1 { font-size: 1.25rem; margin-bottom: 1rem; }
+    a { display: block; color: #00d4aa; margin: 0.5rem 0; word-break: break-all; }
+    a:hover { text-decoration: underline; }
+    .note { font-size: 0.9rem; color: #8a8a8a; margin-top: 1.5rem; }
+  </style>
+</head>
+<body>
+  <h1>OMNIXIUS ÔÇö All links (dev)</h1>
+  <a href="../index.html">Home</a>
+  <a href="login.html">Sign in</a>
+  <a href="register.html">Register</a>
+  <a href="login.html?api_url=http://localhost:3000">Sign in (API URL pre-filled: localhost:3000)</a>
+  <a href="test-register.html?api_url=http://localhost:3000">Test: register + sign in (one click)</a>
+  <a href="marketplace.html">Marketplace (Trove)</a>
+  <a href="ai.html">AI (Oracle)</a>
+  <a href="dashboard.html">Profile / Dashboard</a>
+  <a href="notifications.html">Notifications</a>
+  <a href="../index.html#map">Map ÔÇö on home</a>
+  <a href="connect.html">Connect (Bond)</a>
+  <a href="trade.html">Trade & Finance (Forge)</a>
+  <a href="wallet.html">Wallet</a>
+  <a href="remittances.html">Remittances</a>
+  <a href="repositorium.html">Repositorium (Ark)</a>
+  <a href="ixi.html">Blockchain IXI</a>
+  <a href="learning.html">Learning (Ascent)</a>
+  <a href="startups.html">Startups (Flare)</a>
+  <a href="media.html">Media (Lens)</a>
+  <a href="rewards.html">Rewards (Bounty)</a>
+  <a href="settings.html">Settings</a>
+  <a href="admin.html">Admin (admin role only)</a>
+  <p class="note" style="margin-top:1rem; padding:0.75rem; background:rgba(255,193,7,0.1); border-radius:8px; border:1px solid rgba(255,193,7,0.3);"><strong>Why sign in may not work:</strong> The site is static (e.g. GitHub Pages). Registration and login go through the API (backend in <code>backend-go/</code>). Run <code>go run .</code> in <code>backend-go/</code> on your machine, then use Sign in or Test from the same host with <code>http://localhost:3000</code>. Or deploy backend-go (e.g. Render/Railway) and set the API URL in the app.</p>
+  <p class="note">Backend: in <code>backend-go/</code> run <code>go run .</code>, then open Sign in or Test from this device.</p>
+</body>
+</html>

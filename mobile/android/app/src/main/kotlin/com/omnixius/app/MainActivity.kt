@@ -7,7 +7,7 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
 
-/** OMNIXIUS — весь сайт из папки SITE OMNIXIUS в WebView. */
+/** OMNIXIUS — WebView loads the same app as the site (one codebase: web/ TypeScript). */
 class MainActivity : AppCompatActivity() {
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -25,7 +25,7 @@ class MainActivity : AppCompatActivity() {
             mixedContentMode = WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
         }
 
-        webView.loadUrl("file:///android_asset/www/index.html")
+        webView.loadUrl(BuildConfig.APP_URL)
     }
 
     override fun onBackPressed() {

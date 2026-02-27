@@ -1,0 +1,171 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Add listing ÔÇö OMNIXIUS</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <header class="header">
+    <div class="container">
+      <a href="../index.html" class="logo">OMNIXIUS</a>
+      <nav class="nav nav-main nav-unified">
+        <div class="nav-group nav-group-main">
+          <span class="nav-group-label" data-i18n="navMain">Main</span>
+          <a href="../index.html" data-i18n="home">Home</a>
+          <a href="login.html" id="navLogin" class="nav-cta" data-i18n="signIn">Sign in</a>
+          <a href="#" id="navLogout" style="display:none;" data-i18n="signOut">Sign out</a>
+        </div>
+        <div class="nav-group nav-group-app">
+          <span class="nav-group-label" data-i18n="navApp">App</span>
+          <a href="marketplace.html" data-i18n="navTrove">Trove ┬À marketplace</a>
+          <a href="mail.html" data-i18n="navRelay">Relay ┬À mail</a>
+          <a href="orders.html" data-i18n="navOrders">Orders</a>
+          <a href="dashboard.html" data-i18n="navProfile">Profile</a>
+          <a href="notifications.html">Notifications</a>
+          <a href="ai.html" data-i18n="navOracle">Oracle ┬À AI</a>
+        </div>
+        <div class="nav-group nav-group-more nav-drop">
+          <span class="nav-group-label" data-i18n="navMore">More</span>
+          <button type="button" class="nav-drop-trigger" aria-expanded="false" aria-haspopup="true"><span data-i18n="navMore">More</span> Ôû¥</button>
+          <div class="nav-drop-panel">
+            <a href="trade.html" data-i18n="brandForge">Forge ┬À trade & finance</a>
+            <a href="wallet.html">Wallet</a>
+            <a href="remittances.html">Remittances</a>
+            <a href="connect.html" data-i18n="brandBond">Bond ┬À social</a>
+            <a href="repositorium.html" data-i18n="brandArk">Ark ┬À storage</a>
+            <a href="ixi.html" data-i18n="brandIxi">IXI ┬À blockchain</a>
+            <a href="vault.html" data-i18n="brandCrate">Crate ┬À files</a>
+            <a href="learning.html" data-i18n="brandAscent">Ascent ┬À learning</a>
+            <a href="startups.html" data-i18n="brandFlare">Flare ┬À startups</a>
+            <a href="media.html" data-i18n="brandLens">Lens ┬À media</a>
+            <a href="rewards.html" data-i18n="brandBounty">Bounty ┬À rewards</a>
+            <a href="settings.html">Settings</a>
+          </div>
+          <div class="nav-group-app-links">
+            <a href="trade.html" data-i18n="brandForge">Forge</a>
+            <a href="wallet.html">Wallet</a>
+            <a href="remittances.html">Remittances</a>
+            <a href="connect.html" data-i18n="brandBond">Bond</a>
+            <a href="repositorium.html" data-i18n="brandArk">Ark</a>
+            <a href="ixi.html" data-i18n="brandIxi">IXI</a>
+            <a href="vault.html" data-i18n="brandCrate">Crate</a>
+            <a href="learning.html" data-i18n="brandAscent">Ascent</a>
+            <a href="startups.html" data-i18n="brandFlare">Flare</a>
+            <a href="media.html" data-i18n="brandLens">Lens</a>
+            <a href="rewards.html" data-i18n="brandBounty">Bounty</a>
+            <a href="settings.html">Settings</a>
+          </div>
+        </div>
+        <div class="nav-group nav-group-info nav-drop">
+          <span class="nav-group-label" data-i18n="navInfo">Info</span>
+          <button type="button" class="nav-drop-trigger" aria-expanded="false" aria-haspopup="true"><span data-i18n="navInfo">Info</span> Ôû¥</button>
+          <div class="nav-drop-panel">
+            <a href="../ecosystem.html" data-i18n="navEcosystem">Ecosystem</a>
+            <a href="../architecture.html" data-i18n="navArchitecture">Architecture</a>
+            <a href="../contact.html" data-i18n="navContact">Contact</a>
+          </div>
+          <div class="nav-group-app-links">
+            <a href="../ecosystem.html">Ecosystem</a>
+            <a href="../architecture.html">Architecture</a>
+            <a href="../contact.html">Contact</a>
+          </div>
+        </div>
+      </nav>
+      <div class="lang-switcher">
+        <a href="#" data-lang="en">EN</a>
+        <a href="#" data-lang="ru">RU</a>
+        <a href="#" data-lang="fr">FR</a>
+        <a href="#" data-lang="de">DE</a>
+        <a href="#" data-lang="es">ES</a>
+        <a href="#" data-lang="it">IT</a>
+        <a href="#" data-lang="ar">AR</a>
+        <a href="#" data-lang="zh">ZH</a>
+        <a href="#" data-lang="ja">JA</a>
+      </div>
+      <button class="menu-toggle" aria-label="Menu"><span></span></button>
+    </div>
+  </header>
+  <main class="app-page">
+    <div class="container">
+      <p class="status-done">Live. Listing creation. Coming next: photos, categories.</p>
+      <h1>New listing</h1>
+      <form class="app-form" id="form" style="max-width:500px;">
+        <p class="error" id="err" style="display:none;"></p>
+        <label>Title *</label>
+        <input type="text" name="title" required minlength="2">
+        <label>Description</label>
+        <textarea name="description" rows="4"></textarea>
+        <label>Price *</label>
+        <input type="number" name="price" required min="0" step="0.01">
+        <label>Category *</label>
+        <input type="text" name="category" required list="cats">
+        <datalist id="cats"></datalist>
+        <label>City / location</label>
+        <input type="text" name="location">
+        <label class="form-checkbox"><input type="checkbox" name="is_service" value="1"> <span data-i18n="productIsService">This is a service</span></label>
+        <label class="form-checkbox"><input type="checkbox" name="is_subscription" value="1"> <span data-i18n="productIsSubscription">Subscription (price per month)</span></label>
+        <label data-i18n="closedContentUrlLabel">Closed content URL (for subscribers)</label>
+        <input type="url" name="closed_content_url" data-i18n-placeholder="closedContentUrlPlaceholder" placeholder="https://ÔÇª (optional)">
+        <label>Photo</label>
+        <input type="file" name="image" accept="image/jpeg,image/png,image/webp" id="productImageInput">
+        <p class="form-hint" id="imageHint" style="font-size:0.8rem; color:var(--text-muted);"></p>
+        <button type="submit" class="btn btn-primary" id="productSubmitBtn">Publish</button>
+      </form>
+    </div>
+  </main>
+  <script src="config.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    if (typeof api === 'undefined' || !api.getToken || !api.getToken()) { location.href = 'login.html'; return; }
+    document.getElementById('navLogout').onclick = () => { api.auth.logout(); location.href = '../index.html'; };
+    api.products.categories().then(cats => {
+      document.getElementById('cats').innerHTML = cats.map(c => `<option value="${c}">`).join('');
+    });
+    var MAX_IMAGE_MB = 10;
+    document.getElementById('productImageInput').onchange = function () {
+      var f = this.files[0];
+      var hint = document.getElementById('imageHint');
+      if (!f) { hint.textContent = ''; return; }
+      if (f.size > MAX_IMAGE_MB * 1024 * 1024) {
+        hint.textContent = 'Max ' + MAX_IMAGE_MB + ' MB';
+        hint.style.color = '#e74c3c';
+        this.value = '';
+        return;
+      }
+      hint.textContent = f.name + ' (' + (f.size / 1024).toFixed(1) + ' KB)';
+      hint.style.color = '';
+    };
+    document.getElementById('form').onsubmit = async (e) => {
+      e.preventDefault();
+      const err = document.getElementById('err');
+      const btn = document.getElementById('productSubmitBtn');
+      err.style.display = 'none';
+      var file = e.target.image && e.target.image.files[0];
+      if (file && file.size > MAX_IMAGE_MB * 1024 * 1024) {
+        err.textContent = 'Image too large (max ' + MAX_IMAGE_MB + ' MB)';
+        err.style.display = 'block';
+        return;
+      }
+      btn.disabled = true;
+      btn.textContent = 'PublishingÔÇª';
+      try {
+        const fd = new FormData(e.target);
+        const r = await api.products.create(fd);
+        btn.textContent = 'Done';
+        location.href = 'product.html?id=' + r.id;
+      } catch (x) {
+        err.textContent = x.data?.error || 'Error';
+        err.style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = 'Publish';
+      }
+    };
+    if (window.i18n) i18n.apply();
+  </script>
+  <script src="../js/main.js"></script>
+</body>
+</html>

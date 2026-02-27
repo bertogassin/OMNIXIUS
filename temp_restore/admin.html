@@ -1,0 +1,148 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Admin ÔÇö OMNIXIUS</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <header class="header">
+    <div class="container">
+      <a href="../index.html" class="logo">OMNIXIUS</a>
+      <nav class="nav nav-main nav-unified">
+        <div class="nav-group nav-group-main">
+          <a href="dashboard.html">Dashboard</a>
+          <a href="admin.html" style="color:var(--accent);">Admin</a>
+          <a href="#" id="navLogout">Sign out</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+  <main class="app-page">
+    <div class="container">
+      <h1>Admin</h1>
+      <div id="adminDenied" style="display:none;">
+        <p class="error">Access denied. Admin role required.</p>
+        <p><a href="dashboard.html">Back to Dashboard</a></p>
+      </div>
+      <div id="adminContent" style="display:none;">
+        <section class="admin-section card" style="padding:1.25rem; margin-top:1.5rem;">
+          <h2 class="section-title">Stats</h2>
+          <div id="adminStats"><p class="loading-state">LoadingÔÇª</p></div>
+        </section>
+
+        <section class="admin-section card" style="padding:1.25rem; margin-top:1.5rem;">
+          <h2 class="section-title">Reports</h2>
+          <p class="text-muted" style="margin-bottom:0.75rem;">Filter: <select id="reportStatusFilter"><option value="">All</option><option value="pending">Pending</option><option value="resolved">Resolved</option></select> <button type="button" class="btn btn-sm btn-outline" id="reportsRefresh">Refresh</button></p>
+          <div id="adminReports"><p class="loading-state">LoadingÔÇª</p></div>
+        </section>
+
+        <section class="admin-section card" style="padding:1.25rem; margin-top:1.5rem;">
+          <h2 class="section-title">User lookup</h2>
+          <p class="text-muted" style="margin-bottom:0.75rem;">View user and ban/unban.</p>
+          <label class="app-form">User ID <input type="number" id="userIdInput" class="input" min="1" placeholder="User ID" style="max-width:120px;"></label>
+          <button type="button" class="btn btn-primary btn-sm" id="userLoadBtn">Load</button>
+          <div id="userResult" style="margin-top:1rem;"></div>
+        </section>
+      </div>
+    </div>
+  </main>
+  <script src="config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="../js/main.js"></script>
+  <script>
+    if (!api.getToken()) { location.href = 'login.html'; }
+
+    document.getElementById('navLogout').onclick = function(e) { e.preventDefault(); api.auth.logout(); location.href = 'login.html'; };
+
+    function escapeHtml(s) { var d = document.createElement('div'); d.textContent = s == null ? '' : s; return d.innerHTML; }
+    function fmtDate(ts) { return ts != null ? new Date(ts * 1000).toLocaleString() : 'ÔÇö'; }
+
+    (async function init() {
+      var me = await api.users.me().catch(function() { return null; });
+      if (!me || (me.role || '').toLowerCase() !== 'admin') {
+        document.getElementById('adminDenied').style.display = 'block';
+        return;
+      }
+      document.getElementById('adminContent').style.display = 'block';
+
+      function loadStats() {
+        api.admin.stats().then(function(s) {
+          document.getElementById('adminStats').innerHTML =
+            '<p><strong>Users:</strong> ' + (s.users ?? 'ÔÇö') + ' &middot; <strong>Products:</strong> ' + (s.products ?? 'ÔÇö') + ' &middot; <strong>Orders:</strong> ' + (s.orders ?? 'ÔÇö') + ' &middot; <strong>Reports pending:</strong> ' + (s.reports_pending ?? 'ÔÇö') + '</p>';
+        }).catch(function() { document.getElementById('adminStats').innerHTML = '<p class="text-muted">Failed to load stats.</p>'; });
+      }
+
+      function loadReports() {
+        var status = document.getElementById('reportStatusFilter').value;
+        var params = status ? { status: status } : {};
+        api.admin.reportsList(params).then(function(res) {
+          var list = res.reports || [];
+          if (list.length === 0) {
+            document.getElementById('adminReports').innerHTML = '<p class="text-muted">No reports.</p>';
+            return;
+          }
+          var html = '<table class="admin-table"><thead><tr><th>ID</th><th>Type</th><th>Reported ID</th><th>Reason</th><th>Status</th><th>Created</th><th>Actions</th></tr></thead><tbody>';
+          list.forEach(function(r) {
+            html += '<tr><td>' + r.id + '</td><td>' + escapeHtml(r.reported_type) + '</td><td>' + escapeHtml(String(r.reported_id)) + '</td><td>' + escapeHtml(r.reason) + '</td><td>' + escapeHtml(r.status) + '</td><td>' + fmtDate(r.created_at) + '</td><td><button type="button" class="btn btn-sm btn-outline report-resolve" data-id="' + r.id + '">Resolve</button></td></tr>';
+          });
+          html += '</tbody></table>';
+          document.getElementById('adminReports').innerHTML = html;
+          document.querySelectorAll('.report-resolve').forEach(function(btn) {
+            btn.onclick = function() {
+              var id = this.getAttribute('data-id');
+              var resolution = prompt('Resolution note:');
+              if (resolution === null) return;
+              api.admin.reportResolve(id, resolution || 'Resolved').then(function() { loadReports(); loadStats(); }).catch(function(e) { alert(e.data && e.data.error ? e.data.error : 'Failed'); });
+            };
+          });
+        }).catch(function(e) {
+          if (e.status === 403) { document.getElementById('adminDenied').style.display = 'block'; document.getElementById('adminContent').style.display = 'none'; return; }
+          document.getElementById('adminReports').innerHTML = '<p class="text-muted">Failed to load reports.</p>';
+        });
+      }
+
+      document.getElementById('reportStatusFilter').onchange = loadReports;
+      document.getElementById('reportsRefresh').onclick = loadReports;
+
+      document.getElementById('userLoadBtn').onclick = function() {
+        var id = document.getElementById('userIdInput').value.trim();
+        var el = document.getElementById('userResult');
+        if (!id) { el.innerHTML = '<p class="text-muted">Enter user ID.</p>'; return; }
+        el.innerHTML = '<p class="loading-state">LoadingÔÇª</p>';
+        api.admin.userGet(id).then(function(u) {
+          var banned = u.banned ? ('Yes' + (u.banned.expires_at ? ' (expires ' + fmtDate(u.banned.expires_at) + ')' : '')) : 'No';
+          el.innerHTML = '<div class="card" style="padding:1rem;"><p><strong>ID:</strong> ' + u.id + ' &middot; <strong>Email:</strong> ' + escapeHtml(u.email) + ' &middot; <strong>Role:</strong> ' + escapeHtml(u.role) + ' &middot; <strong>Created:</strong> ' + fmtDate(u.created_at) + ' &middot; <strong>Banned:</strong> ' + banned + '</p>' +
+            (u.banned ? '<p><button type="button" class="btn btn-sm btn-outline user-unban" data-id="' + u.id + '">Unban</button></p>' : '<p><button type="button" class="btn btn-sm btn-outline user-ban" data-id="' + u.id + '">Ban</button></p>') + '</div>';
+          el.querySelectorAll('.user-unban').forEach(function(b) {
+            b.onclick = function() {
+              api.admin.userUnban(b.getAttribute('data-id')).then(function() { document.getElementById('userLoadBtn').click(); }).catch(function(e) { alert(e.data && e.data.error ? e.data.error : 'Failed'); });
+            };
+          });
+          el.querySelectorAll('.user-ban').forEach(function(b) {
+            b.onclick = function() {
+              var reason = prompt('Ban reason (required):');
+              if (reason === null || !reason.trim()) return;
+              api.admin.userBan(b.getAttribute('data-id'), reason.trim()).then(function() { document.getElementById('userLoadBtn').click(); }).catch(function(e) { alert(e.data && e.data.error ? e.data.error : 'Failed'); });
+            };
+          });
+        }).catch(function(e) {
+          if (e.status === 403) { document.getElementById('adminDenied').style.display = 'block'; document.getElementById('adminContent').style.display = 'none'; return; }
+          el.innerHTML = '<p class="text-muted">' + (e.data && e.data.error ? e.data.error : 'Failed to load user.') + '</p>';
+        });
+      };
+
+      loadStats();
+      loadReports();
+    })();
+  </script>
+  <style>
+    .admin-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    .admin-table th, .admin-table td { padding: 0.5rem; text-align: left; border-bottom: 1px solid var(--border); }
+    .admin-table th { color: var(--text-muted); font-weight: 600; }
+  </style>
+</body>
+</html>

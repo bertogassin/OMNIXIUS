@@ -1,0 +1,188 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Profile ÔÇö OMNIXIUS</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="css/app.css">
+  <link rel="stylesheet" href="../css/profession.css">
+</head>
+<body>
+  <header class="header">
+    <div class="container">
+      <a href="../index.html" class="logo">OMNIXIUS</a>
+      <nav class="nav nav-main nav-unified">
+        <div class="nav-group nav-group-main">
+          <span class="nav-group-label" data-i18n="navMain">Main</span>
+          <a href="../index.html" data-i18n="home">Home</a>
+          <a href="../index.html#profession" class="profession-pill" id="navProfessionPill" style="display:none;" title="Change profession"></a>
+          <a href="login.html" id="navLogin" class="nav-cta" style="display:none;" data-i18n="signIn">Sign in</a>
+          <a href="#" id="navLogout" data-i18n="signOut">Sign out</a>
+        </div>
+        <div class="nav-group nav-group-app">
+          <span class="nav-group-label" data-i18n="navApp">App</span>
+          <a href="marketplace.html" data-i18n="navMarketplace">Marketplace</a>
+          <a href="mail.html" data-i18n="navMail">Mail</a>
+          <a href="orders.html" data-i18n="navOrders">Orders</a>
+          <a href="dashboard.html" data-i18n="navProfile">Profile</a>
+          <a href="notifications.html">Notifications</a>
+          <a href="ai.html">AI</a>
+        </div>
+        <div class="nav-group nav-group-more nav-drop">
+          <span class="nav-group-label" data-i18n="navMore">More</span>
+          <button type="button" class="nav-drop-trigger" aria-expanded="false" aria-haspopup="true"><span data-i18n="navMore">More</span> Ôû¥</button>
+          <div class="nav-drop-panel">
+            <a href="trade.html" data-i18n="cardTrade">Trade & Finance</a>
+            <a href="wallet.html">Wallet</a>
+            <a href="remittances.html">Remittances</a>
+            <a href="connect.html" data-i18n="cardConnect">Connect</a>
+            <a href="repositorium.html" data-i18n="cardRepositorium">Repositorium</a>
+            <a href="ixi.html" data-i18n="cardIxi">Blockchain IXI</a>
+            <a href="vault.html">Vault</a>
+            <a href="learning.html" data-i18n="cardLearning">Learning</a>
+            <a href="startups.html" data-i18n="cardStartups">Startups</a>
+            <a href="media.html" data-i18n="cardMedia">Media</a>
+            <a href="rewards.html" data-i18n="cardRewards">Rewards</a>
+            <a href="settings.html">Settings</a>
+            <a href="admin.html">Admin</a>
+          </div>
+          <div class="nav-group-app-links">
+            <a href="trade.html">Trade</a>
+            <a href="wallet.html">Wallet</a>
+            <a href="remittances.html">Remittances</a>
+            <a href="connect.html">Connect</a>
+            <a href="repositorium.html">Repositorium</a>
+            <a href="ixi.html">IXI</a>
+            <a href="vault.html">Vault</a>
+            <a href="learning.html">Learning</a>
+            <a href="startups.html">Startups</a>
+            <a href="media.html">Media</a>
+            <a href="rewards.html">Rewards</a>
+            <a href="settings.html">Settings</a>
+          </div>
+        </div>
+        <div class="nav-group nav-group-info nav-drop">
+          <span class="nav-group-label" data-i18n="navInfo">Info</span>
+          <button type="button" class="nav-drop-trigger" aria-expanded="false" aria-haspopup="true"><span data-i18n="navInfo">Info</span> Ôû¥</button>
+          <div class="nav-drop-panel">
+            <a href="../ecosystem.html" data-i18n="navEcosystem">Ecosystem</a>
+            <a href="../architecture.html" data-i18n="navArchitecture">Architecture</a>
+            <a href="../contact.html" data-i18n="navContact">Contact</a>
+          </div>
+          <div class="nav-group-app-links">
+            <a href="../ecosystem.html">Ecosystem</a>
+            <a href="../architecture.html">Architecture</a>
+            <a href="../contact.html">Contact</a>
+          </div>
+        </div>
+      </nav>
+      <div class="lang-switcher">
+        <a href="#" data-lang="en">EN</a>
+        <a href="#" data-lang="ru">RU</a>
+        <a href="#" data-lang="fr">FR</a>
+        <a href="#" data-lang="de">DE</a>
+        <a href="#" data-lang="es">ES</a>
+        <a href="#" data-lang="it">IT</a>
+        <a href="#" data-lang="ar">AR</a>
+        <a href="#" data-lang="zh">ZH</a>
+        <a href="#" data-lang="ja">JA</a>
+      </div>
+      <button class="menu-toggle" aria-label="Menu"><span></span></button>
+    </div>
+  </header>
+  <main class="app-page">
+    <div class="container">
+      <p class="status-done">Live. Coming next: settings, password recovery.</p>
+      <div id="welcome" class="dashboard-welcome"></div>
+      <div id="quickLinks" class="quick-links"></div>
+      <h2 class="section-title">Profile</h2>
+      <p><a href="profile-edit.html" class="btn btn-outline" data-i18n="editProfile">Edit profile</a> <a href="settings.html" class="btn btn-outline">Settings</a></p>
+      <div id="profile"><p class="loading-state">LoadingÔÇª</p></div>
+      <h2 class="section-title" data-i18n="balanceTitle">Balance</h2>
+      <div id="balanceBlock"><p class="loading-state">LoadingÔÇª</p></div>
+      <h2 class="section-title">My orders</h2>
+      <div id="ordersList"><p class="loading-state">LoadingÔÇª</p></div>
+      <h2 class="section-title" data-i18n="remittancesTitle">My remittances</h2>
+      <div id="remittancesList"><p class="loading-state">LoadingÔÇª</p></div>
+    </div>
+  </main>
+  <script src="config.js"></script>
+  <script src="js/professions.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/api.js"></script>
+  <script>(function(){ var P = window.OMNIXIUS_PROFESSIONS; var el = document.getElementById('navProfessionPill'); if (P && el) { var n = P.getCurrentName(); if (n) { el.textContent = n; el.style.display = ''; } } })();</script>
+  <script src="js/nav-unread.js"></script>
+  <script>
+    (function () {
+      var params = new URLSearchParams(location.search);
+      var token = params.get('token');
+      if (token) {
+        var apiUrl = params.get('api_url');
+        if (apiUrl) localStorage.setItem('omnixius_api_url', apiUrl);
+        localStorage.setItem('omnixius_token', token);
+        var name = params.get('name');
+        var email = params.get('email');
+        if (email) {
+          var user = { email: email, name: name || '' };
+          localStorage.setItem('omnixius_user', JSON.stringify(user));
+        }
+        history.replaceState(null, '', location.pathname);
+        location.reload();
+        return;
+      }
+    })();
+    if (typeof api === 'undefined' || !api.getToken || !api.getToken()) { location.href = 'login.html'; return; }
+    document.getElementById('navLogout').onclick = () => { api.auth.logout(); location.href = '../index.html'; };
+
+    (async () => {
+      const u = await api.users.me();
+      const orders = await api.users.myOrders();
+      var name = u.name || u.email || 'User';
+      document.getElementById('welcome').innerHTML = '<h1 class="welcome-title">' + (name.length > 30 ? name.slice(0, 27) + 'ÔÇª' : name) + '</h1>';
+      document.getElementById('quickLinks').innerHTML = '<div class="quick-links-grid"><a href="marketplace.html" class="quick-link"><span class="quick-link-icon">Ôùå</span><span>' + (window.i18n ? i18n.t('navTrove') : 'Trove ┬À marketplace') + '</span></a><a href="mail.html" class="quick-link"><span class="quick-link-icon">Ô£ë</span><span>' + (window.i18n ? i18n.t('navRelay') : 'Relay ┬À mail') + '</span></a><a href="orders.html" class="quick-link"><span class="quick-link-icon">Ôùç</span><span>' + (window.i18n ? i18n.t('navOrders') : 'Orders') + '</span></a><a href="vault.html" class="quick-link"><span class="quick-link-icon">Ôûú</span><span>' + (window.i18n ? i18n.t('brandCrate') : 'Crate ┬À files') + '</span></a><a href="ai.html" class="quick-link"><span class="quick-link-icon">Ôùç</span><span>' + (window.i18n ? i18n.t('navOracle') : 'Oracle ┬À AI') + '</span></a><a href="../index.html#map" class="quick-link"><span class="quick-link-icon">Ôûú</span><span>' + (window.i18n ? i18n.t('navMap') : 'Map') + '</span></a></div>';
+      var verifiedBadge = (u.verified || u.email_verified || u.phone_verified) ? ' <span class="verified-badge" title="' + (window.i18n ? i18n.t('verifiedBadgeTitle') : 'Verified profile') + '">Ô£ô ' + (window.i18n ? i18n.t('verifiedBadge') : 'Verified') + '</span>' : '';
+      document.getElementById('profile').innerHTML = '<p><img class="profile-avatar" src="' + (u.avatar_path ? (window.API_URL + '/uploads/' + u.avatar_path) : 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 80 80%22><rect fill=%22%23333%22 width=%2280%22 height=%2280%22/><text x=%2250%25%22 y=%2255%25%22 fill=%22%23888%22 text-anchor=%22middle%22 dy=%22.3em%22 font-size=%2224%22>?</text></svg>') + '" alt=""></p><p><strong>' + (u.name || 'ÔÇö') + '</strong>' + verifiedBadge + ' ┬À ' + u.email + '</p><p style="color:var(--text-muted);">Role: ' + u.role + '</p><p><a href="profile-edit.html" class="btn btn-primary" style="display:inline-block; margin-top:0.5rem;">Edit</a></p>';
+      var balanceLabel = (window.i18n && i18n.t('balanceLabel')) ? i18n.t('balanceLabel') : 'Balance';
+      var balanceCreditBtn = (window.i18n && i18n.t('balanceCreditBtn')) ? i18n.t('balanceCreditBtn') : 'Add test credit';
+      try {
+        var bal = await api.users.balance();
+        var b = (bal && typeof bal.balance === 'number') ? bal.balance : 0;
+        document.getElementById('balanceBlock').innerHTML = '<p class="balance-amount">' + (typeof b === 'number' ? b.toFixed(2) : b) + ' <span class="balance-unit">' + ((window.i18n && i18n.t('balanceUnit')) ? i18n.t('balanceUnit') : 'units') + '</span></p><p class="balance-stub"><button type="button" class="btn btn-sm" id="balanceCreditBtn">' + balanceCreditBtn + '</button> <input type="number" id="balanceCreditAmount" min="0.01" step="0.01" value="100" style="width:80px;"> <span class="text-muted">' + ((window.i18n && i18n.t('balanceStubHint')) ? i18n.t('balanceStubHint') : '(stub for testing)') + '</span></p>';
+        document.getElementById('balanceCreditBtn').onclick = async function() {
+          var amt = parseFloat(document.getElementById('balanceCreditAmount').value);
+          if (!(amt > 0)) { alert('Enter a positive amount'); return; }
+          this.disabled = true;
+          try {
+            var res = await api.users.balanceCredit(amt);
+            document.querySelector('.balance-amount').innerHTML = (res.balance != null ? Number(res.balance).toFixed(2) : b) + ' <span class="balance-unit">' + ((window.i18n && i18n.t('balanceUnit')) ? i18n.t('balanceUnit') : 'units') + '</span>';
+          } catch (e) { alert(e.data && e.data.error ? e.data.error : 'Failed'); }
+          this.disabled = false;
+        };
+      } catch (_) {
+        document.getElementById('balanceBlock').innerHTML = '<p class="text-muted">' + ((window.i18n && i18n.t('loadFailed')) ? i18n.t('loadFailed') : 'Could not load balance.') + '</p>';
+      }
+      var list = (orders.asBuyer || []).concat(orders.asSeller || []).slice(0, 20);
+      document.getElementById('ordersList').innerHTML = list.length
+        ? '<ul class="mail-list">' + list.map(function(o) { return '<li><span>' + o.title + ' ÔÇö ' + o.status + '</span><span>' + new Date(o.created_at * 1000).toLocaleDateString() + '</span></li>'; }).join('') + '</ul>'
+        : '<p style="color:var(--text-muted);">No orders yet. <a href="marketplace.html">' + (window.i18n ? i18n.t('navTrove') : 'Trove ┬À marketplace') + '</a></p>';
+      try {
+        var remittances = (api.remittances && typeof api.remittances.my === 'function') ? await api.remittances.my() : [];
+        var rList = Array.isArray(remittances) ? remittances : [];
+        var remTitle = (window.i18n && i18n.t('remittancesTitle')) ? i18n.t('remittancesTitle') : 'My remittances';
+        var remTo = (window.i18n && i18n.t('remittancesTo')) ? i18n.t('remittancesTo') : 'To';
+        var remStatus = (window.i18n && i18n.t('remittancesStatus')) ? i18n.t('remittancesStatus') : 'Status';
+        document.getElementById('remittancesList').innerHTML = rList.length
+          ? '<ul class="mail-list">' + rList.slice(0, 10).map(function(r) {
+              var date = r.created_at != null ? new Date(r.created_at * 1000).toLocaleDateString() : 'ÔÇö';
+              return '<li><span>' + (r.amount != null ? Number(r.amount).toFixed(2) : '') + ' ' + (r.currency || 'USD') + ' ÔåÆ ' + (r.to_identifier || '') + ' ┬À ' + (r.status || 'pending') + '</span><span>' + date + '</span></li>';
+            }).join('') + '</ul><p><a href="remittances.html">View all ÔåÆ Remittances</a></p>'
+          : '<p style="color:var(--text-muted);">No remittances yet. <a href="remittances.html">Create one</a>.</p>';
+      } catch (_) {
+        document.getElementById('remittancesList').innerHTML = '<p class="text-muted">Could not load remittances.</p>';
+      }
+    })().catch(function() { api.auth.logout(); location.href = 'login.html'; });
+  </script>
+  <script src="../js/main.js"></script>
+</body>
+</html>

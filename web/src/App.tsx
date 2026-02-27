@@ -25,6 +25,8 @@ import Mail from './pages/Mail';
 import Conversation from './pages/Conversation';
 import Admin from './pages/Admin';
 import Direction from './pages/Direction';
+import ProfileEdit from './pages/ProfileEdit';
+import ResetPassword from './pages/ResetPassword';
 
 export default function App() {
   return (
@@ -52,9 +54,11 @@ export default function App() {
             <Route path="conversation/:id" element={<ProtectedRoute><Conversation /></ProtectedRoute>} />
             <Route path="admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
             <Route path="direction/:name" element={<ProtectedRoute><Direction /></ProtectedRoute>} />
+            <Route path="profile-edit" element={<ProtectedRoute><ProfileEdit /></ProtectedRoute>} />
             <Route path="login" element={<Login />} />
             <Route path="register" element={<Register />} />
             <Route path="forgot-password" element={<ForgotPassword />} />
+            <Route path="reset-password" element={<ResetPassword />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>

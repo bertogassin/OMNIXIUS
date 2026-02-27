@@ -1,0 +1,133 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <title>Relay ┬À mail ÔÇö OMNIXIUS</title>
+  <link rel="stylesheet" href="../css/style.css?v=2">
+  <link rel="stylesheet" href="css/app.css?v=6">
+</head>
+<body>
+  <header class="header">
+    <div class="container header-inner">
+      <a href="../index.html" class="logo"><span class="logo-mark">O</span><span class="logo-text">MNIXIUS</span></a>
+      <div class="lang-switcher">
+        <span class="lang-switcher-label" data-i18n="langLabel">Language</span>
+        <a href="#" data-lang="en">EN</a>
+        <a href="#" data-lang="ru">RU</a>
+        <a href="#" data-lang="fr">FR</a>
+        <a href="#" data-lang="de">DE</a>
+        <a href="#" data-lang="es">ES</a>
+        <a href="#" data-lang="it">IT</a>
+        <a href="#" data-lang="ar">AR</a>
+        <a href="#" data-lang="zh">ZH</a>
+        <a href="#" data-lang="ja">JA</a>
+      </div>
+    </div>
+  </header>
+  <main class="app-page app-page-mail">
+    <div class="container">
+      <div class="mail-toolbar">
+        <a href="../index.html" class="mail-back" data-i18n="backToMail">ÔåÉ Relay</a>
+        <h1 class="mail-title">Relay ┬À mail<span class="mail-unread-badge" id="mailUnreadBadge" aria-hidden="true"></span></h1>
+        <button type="button" class="btn btn-outline btn-sm mail-refresh" id="mailRefresh" aria-label="Refresh" title="Refresh">Ôå╗</button>
+      </div>
+      <p class="mail-backend-warn" id="mailBackendWarn" style="display:none;"></p>
+      <section class="mail-inbox-section" aria-labelledby="mailInboxHeading">
+        <p class="mail-inbox-label" id="mailInboxHeading" data-i18n="mailInbox">Inbox</p>
+        <p class="mail-inbox-count" id="mailInboxCount" aria-live="polite"></p>
+        <ul class="mail-list" id="list" role="list"></ul>
+      </section>
+      <details class="mail-vision" aria-labelledby="mail-vision-title">
+        <summary id="mail-vision-title" class="mail-vision-summary" data-i18n="mailVisionTitle">Mail direction</summary>
+        <p class="mail-vision-intro" data-i18n="mailVisionIntro">Our roadmap: post-quantum security, E2EE by default, distributed nodes, semantic search, Passkeys. No ads ÔÇö freemium.</p>
+        <ul class="mail-vision-pillars">
+          <li><strong data-i18n="mailVisionSecurity">Security</strong> <span data-i18n="mailVisionSecurityDesc">Post-quantum crypto (Kyber/Dilithium), E2EE, optional Tor, Passkeys/WebAuthn.</span></li>
+          <li><strong data-i18n="mailVisionDistributed">Distributed</strong> <span data-i18n="mailVisionDistributedDesc">Global nodes, IPFS for attachments, CRDT sync. IMAP/SMTP gateway, HTTP/3 API.</span></li>
+          <li><strong data-i18n="mailVisionSmart">Intelligence</strong> <span data-i18n="mailVisionSmartDesc">Semantic search, local AI summarization, self-destruct option, real-time delivery.</span></li>
+          <li><strong data-i18n="mailVisionModel">Model</strong> <span data-i18n="mailVisionModelDesc">Freemium, no ads. Free: E2EE + base search. Pro: sovereign node, API.</span></li>
+        </ul>
+      </details>
+    </div>
+  </main>
+  <script src="config.js?v=2"></script>
+  <script src="js/i18n.js?v=6"></script>
+  <script src="js/api.js?v=2"></script>
+  <script src="js/utils.js?v=2"></script>
+  <script src="js/nav-unread.js?v=2"></script>
+  <script>
+    var listEl = document.getElementById('list');
+    var t = function (k) { return window.i18n ? i18n.t(k) : k; };
+    if (typeof api === 'undefined' || !api.getToken || !api.getToken()) {
+      listEl.innerHTML = '<div class="empty-state mail-empty-state"><p class="empty-state-title">' + (t('signInToViewInbox') || 'Sign in to view your inbox') + '</p><p class="empty-state-text">' + (t('mailNotMarketplace') || 'Messages only. To browse products, go to Trove.') + '</p><p class="empty-state-actions"><a href="login.html" class="btn btn-primary">' + t('signIn') + '</a> <a href="../index.html" class="btn btn-outline">' + (t('home') || 'Home') + '</a></p></div>';
+      var refreshBtn = document.getElementById('mailRefresh');
+      if (refreshBtn) refreshBtn.style.visibility = 'hidden';
+      var countEl = document.getElementById('mailInboxCount');
+      if (countEl) countEl.textContent = '';
+      if (window.i18n) i18n.apply();
+    } else {
+      var warnEl = document.getElementById('mailBackendWarn');
+      if (warnEl && (!window.API_URL || window.API_URL === '')) {
+        warnEl.textContent = t('mailBackendNotSet') || 'Backend not set. Set API URL on login page to load mail.';
+        warnEl.style.display = 'block';
+      }
+    (async () => {
+      listEl.innerHTML = '<p class="loading-state">' + t('loading') + '</p>';
+      try {
+        const list = await api.conversations.list();
+        if (list.length === 0) {
+          listEl.innerHTML = '<div class="empty-state mail-empty-state"><p class="empty-state-title">' + t('noConversations') + '</p><p class="empty-state-text">' + t('mailEmptyHint') + '</p><p class="empty-state-actions"><a href="marketplace.html" class="btn btn-primary">' + t('navTrove') + '</a> <a href="../index.html" class="btn btn-outline">' + (t('home') || 'Home') + '</a></p></div>';
+          var countEl = document.getElementById('mailInboxCount');
+          if (countEl) countEl.textContent = '';
+        } else {
+          var countEl = document.getElementById('mailInboxCount');
+          if (countEl) countEl.textContent = list.length === 1 ? (t('mailOneConversation') || '1 conversation') : (list.length + ' ' + (t('mailConversations') || 'conversations'));
+          var sorted = list.slice().sort(function (a, b) { var ua = a.updated_at || 0; var ub = b.updated_at || 0; return ub - ua; });
+          try {
+            var unreadRes = await api.conversations.unreadCount();
+            var unreadN = unreadRes && (unreadRes.unread != null) ? parseInt(unreadRes.unread, 10) : 0;
+            var badgeEl = document.getElementById('mailUnreadBadge');
+            if (badgeEl) {
+              if (unreadN > 0) { badgeEl.textContent = ' (' + (unreadN > 99 ? '99+' : unreadN) + ')'; badgeEl.style.display = ''; }
+              else { badgeEl.textContent = ''; badgeEl.style.display = 'none'; }
+            }
+          } catch (_) {}
+          listEl.innerHTML = sorted.map(c => {
+            const preview = (c.last_message || '').trim();
+            const short = preview.length > 60 ? preview.slice(0, 60) + 'ÔÇª' : preview;
+            const otherName = escapeHtml(c.other?.name || c.other?.email || 'User');
+            const productTitle = (c.product_title || '').trim();
+            const productPart = productTitle ? ' ┬À <span class="mail-product">' + escapeHtml(productTitle) + '</span>' : '';
+            return `<li class="mail-list-item ${c.unread ? 'unread' : ''}">
+              <span class="mail-unread-dot" aria-hidden="true"></span>
+              <a href="conversation.html?id=${c.id}" class="mail-list-link">
+                <strong>${otherName}</strong>${productPart}
+                ${short ? `<br><span class="mail-preview">${escapeHtml(short)}</span>` : ''}
+              </a>
+              <span class="mail-date">${formatDate(c.updated_at)}</span>
+            </li>`;
+          }).join('');
+        }
+      } catch (e) {
+        var msg = t('loadFailed');
+        var hint = '';
+        if (e && (e.status === 0 || (e.data && e.data.error && e.data.error.indexOf('API URL') >= 0))) {
+          hint = t('mailBackendHint') || 'Run backend: go run . in backend-go folder. Then open this page from the same computer. Or set API URL on login page.';
+        } else if (e && e.message && (e.message.indexOf('fetch') >= 0 || e.message.indexOf('Network') >= 0)) {
+          hint = t('mailBackendHint') || 'Run backend: go run . in backend-go folder. Then open this page from the same computer.';
+        }
+        listEl.innerHTML = '<div class="empty-state mail-empty-state"><p class="empty-state-title">' + msg + '</p>' + (hint ? '<p class="empty-state-text">' + hint + '</p>' : '') + '<p class="empty-state-actions"><button type="button" class="btn btn-primary" id="mailRetry">' + t('retry') + '</button></p></div>';
+        document.getElementById('mailRetry').onclick = function () { location.reload(); };
+      }
+    })();
+    function loadMail() { location.reload(); }
+    var refreshBtn = document.getElementById('mailRefresh');
+    if (refreshBtn) refreshBtn.onclick = loadMail;
+    }
+    if (window.i18n) i18n.apply();
+  </script>
+  <script src="../js/main.js"></script>
+</body>
+</html>

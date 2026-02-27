@@ -107,3 +107,16 @@
   padding: 0.1rem 0.3rem;
   border-radius: 4px;
 }
+
+.login-api-block { margin-bottom: 1.5rem; padding: 1rem; background: rgba(0,0,0,0.2); border-radius: 8px; }
+.login-api-title { margin: 0 0 0.5rem; font-size: 1rem; }
+.login-api-hint { font-size: 0.85rem; color: #8a8a8a; margin: 0 0 0.75rem; }
+.login-api-row { display: flex; gap: 0.5rem; margin-bottom: 0.5rem; }
+.login-api-row .login-input { flex: 1; margin-top: 0; }
+.login-api-row .login-btn { width: auto; margin-top: 0; }
+.login-api-result { font-size: 0.85rem; margin: 0.25rem 0 0; }
+.login-pwd-wrap { display: flex; gap: 0.25rem; margin-top: 0.35rem; }
+.login-pwd-wrap .login-input { flex: 1; margin-top: 0; }
+.login-pwd-toggle { padding: 0.5rem 0.6rem; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; color: #b0b0b0; font-size: 0.85rem; cursor: pointer; }
+.login-links { margin-top: 1rem; font-size: 0.9rem; }
+.login-links a { color: #00d4aa; }
