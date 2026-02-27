@@ -1,21 +1,25 @@
 ---
-description: OMNIXIUS tech stack — priorities: security, speed, graphics, design, scalability. Language order: Spark, Rust, Go, Swift, then the rest.
+description: OMNIXIUS tech stack — ultra-stable. Rust, Go, Spark, Swift, Kotlin, TypeScript, Python, C++, SQL, Bash. No Solidity (Rust only for blockchain). No new JS/HTML — TypeScript only for web.
 alwaysApply: true
 ---
 
 # OMNIXIUS — Stack by direction
 
-Priorities (in order): **security**, **speed**, **graphics**, **design**, **scalability**. Goal: **site, app, and project — best in the world**. Languages are chosen for that outcome.
+Priorities: **security**, **speed**, **graphics**, **design**, **scalability**. Goal: **best in the world**. Long-term stability (decades).
 
-**Language order (first to last):** Spark → Rust → Go → Swift → Kotlin → TypeScript/JS → Python → C++/C# (games) → Bash/Python/YAML (infra). Use each only where it delivers maximum for world-class result.
+**Full reference:** **STACK.md**. Solidity removed 100% — Rust is more important; blockchain = Rust only. JS/HTML to be removed/replaced by TypeScript; leave minimal HTML only where unavoidable (e.g. SPA bootstrap).
 
-When adding or changing code, use only the stack below for each direction.
+**Language order — best first:** Rust → Go → Spark → Swift → Kotlin → TypeScript → Python → C++/C → SQL → Bash/Python/YAML. Do not introduce Solidity or new JS/HTML for frontend.
 
-- **Server (logic, data, load):** Spark (analytics, recommendations), Rust (video, search, heavy compute), Go (API, microservices, chats).
-- **Website (browser):** TypeScript/JavaScript, React or Vue for UI.
+When adding or changing code, use only the stack below.
+
+- **Server:** Rust (video, search, heavy compute, **blockchain 100%**), Go (API, microservices), Spark (analytics).
+- **Website:** **TypeScript only** (React or Vue). Do not add new JavaScript or HTML; migrate existing app/ to web/ (TS+React).
 - **Mobile:** Swift (iPhone), Kotlin (Android).
-- **Games (if any):** C++ (Unreal), C# (Unity).
-- **AI / smart features:** Python (neural nets, recognition).
-- **Infrastructure:** Bash/Python scripts, YAML for server config.
+- **Games:** C++ (Unreal), C# (Unity).
+- **Blockchain:** **Rust only** (no Solidity).
+- **AI / scripts:** Python.
+- **Data:** SQL.
+- **Infrastructure:** Bash/PowerShell, Python, YAML.
 
-Existing code: `backend-go/` = Go API; `app/`, `js/` = web (migrate to TS + React/Vue when refactoring). Do not introduce new server logic in Node; use Go or Rust. See ARCHITECTURE.md §2 for full table and language order.
+Existing: `backend-go/` = Go; `web/` = main frontend (TypeScript+React). Migrate/remove `app/` and `js/` (JS/HTML) to TypeScript. No new server logic in Node; use Go or Rust.

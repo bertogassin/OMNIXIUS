@@ -39,24 +39,9 @@
         <h1>OMNIXIUS</h1>
         <p class="hero-tagline" data-i18n="heroTaglineNew">One ecosystem. Bond, Forge, Ark, IXI — Trove, Relay, Oracle. One account.</p>
         <div class="hero-actions">
-          <a href="app/login.html" class="btn btn-primary" data-i18n="signIn">Sign in</a>
+          <a href="/app/login" class="btn btn-primary" data-i18n="signIn">Sign in</a>
+          <a href="#profession" class="hero-profession-link">Choose your profession →</a>
         </div>
-        <nav class="hero-platforms" aria-label="Main platforms">
-          <a href="app/marketplace.html" data-i18n="navTrove">Trove</a>
-          <a href="app/mail.html" data-i18n="navRelay">Relay</a>
-          <a href="app/ai.html" data-i18n="navOracle">Oracle</a>
-          <a href="app/connect.html" data-i18n="brandBond">Bond</a>
-          <a href="app/trade.html" data-i18n="brandForge">Forge</a>
-          <a href="app/wallet.html">Wallet</a>
-          <a href="app/repositorium.html" data-i18n="brandArk">Ark</a>
-          <a href="app/ixi.html" data-i18n="brandIxi">IXI</a>
-          <a href="app/vault.html" data-i18n="brandCrate">Crate</a>
-          <a href="app/learning.html" data-i18n="brandAscent">Ascent</a>
-          <a href="app/startups.html" data-i18n="brandFlare">Flare</a>
-          <a href="app/media.html" data-i18n="brandLens">Lens</a>
-          <a href="app/rewards.html" data-i18n="brandBounty">Bounty</a>
-          <a href="app/admin.html">Admin</a>
-        </nav>
       </div>
     </section>
 
@@ -65,7 +50,9 @@
         <h2 class="section-title" data-i18n="professionTitle">What are you looking for?</h2>
         <p class="about-text" data-i18n="professionIntro">Choose your profession or service — you can change it anytime on this page. All main directions stay available.</p>
         <p id="professionCurrent" class="profession-current" style="display:none;"><span data-i18n="professionSelected">Selected:</span> <strong id="professionCurrentName"></strong> · <a href="#profession" id="professionChangeLink" data-i18n="professionChange">Change</a></p>
-        <div id="professionGrid" class="profession-grid"></div>
+        <div id="professionWorkspaceLink" class="profession-workspace-link" style="display:none; margin-top:1rem;"><a href="/app" class="btn btn-primary">Open workspace →</a></div>
+        <p style="margin-top:1rem;"><a href="/app/find-professional" class="link-muted">Find professional (online, by distance) →</a></p>
+        <div id="professionGrid" class="profession-grid"><span class="profession-loading">Loading…</span></div>
       </div>
     </section>
 
@@ -73,51 +60,6 @@
       <div class="container">
         <h2 data-i18n="aboutTitle">About</h2>
         <p class="about-text" data-i18n="aboutText">Self-sufficient ecosystem: communication, earning, investment, learning, asset management — in one application.</p>
-      </div>
-    </section>
-
-    <section id="map" class="section">
-      <div class="container">
-        <h2 data-i18n="mapTitle">All sections</h2>
-        <p class="about-text" style="margin-bottom:1rem;" data-i18n="mapIntro">Four platforms and other directions. Everything in its place.</p>
-
-        <h3 class="section-title" data-i18n="fourPlatforms">Four platforms</h3>
-        <div class="directions-grid">
-          <a href="app/connect.html" class="direction-card">
-            <h3 data-i18n="brandBond">Bond · social</h3>
-            <p data-i18n="cardConnectDesc">Social, experts, marketplace, chat, video. People and services.</p>
-            <span class="live" data-i18n="connectLiveLabel">Live: Trove, Relay, Profile →</span>
-          </a>
-          <a href="app/trade.html" class="direction-card">
-            <h3 data-i18n="brandForge">Forge · trade & finance</h3>
-            <p data-i18n="cardTradeDesc">Exchange, wallets, copy trading, investments.</p>
-            <span class="live">Coming next: Wallet, Trade UI →</span>
-          </a>
-          <a href="app/repositorium.html" class="direction-card">
-            <h3 data-i18n="brandArk">Ark · storage</h3>
-            <p data-i18n="cardRepositoriumDesc">Decentralized storage and compute. Data and infrastructure.</p>
-            <span class="live">Coming next: nodes, compute →</span>
-          </a>
-          <a href="app/ixi.html" class="direction-card">
-            <h3 data-i18n="brandIxi">IXI · blockchain</h3>
-            <p data-i18n="cardIxiDesc">Consensus, ZKP, tokenomics, buyback fund.</p>
-            <span class="live">Coming next: consensus, ZKP →</span>
-          </a>
-        </div>
-
-        <h3 class="section-title" style="margin-top:2.5rem;" data-i18n="otherDirections">Other directions</h3>
-        <ul class="screens-list screens-list-compact">
-          <li><a href="app/mail.html" data-i18n="brandRelay">Relay · mail</a> <span data-i18n="cardRelayDesc">— inbox, conversations with sellers</span></li>
-          <li><a href="app/wallet.html">Wallet</a> — balances, transfers</li>
-          <li><a href="app/remittances.html">Remittances</a> — cross-border transfer requests</li>
-          <li><a href="app/vault.html" data-i18n="brandCrate">Crate · files</a> <span data-i18n="cardCrateDesc">— files and folders</span></li>
-          <li><a href="app/learning.html" data-i18n="brandAscent">Ascent · learning</a> <span data-i18n="cardLearningDesc">— courses, experts</span></li>
-          <li><a href="app/startups.html" data-i18n="brandFlare">Flare · startups</a> <span data-i18n="cardStartupsDesc">— launchpad, tokens</span></li>
-          <li><a href="app/media.html" data-i18n="brandLens">Lens · media</a> <span data-i18n="cardMediaDesc">— content, subscriptions</span></li>
-          <li><a href="app/rewards.html" data-i18n="brandBounty">Bounty · rewards</a> <span data-i18n="cardRewardsDesc">— loyalty, referrals</span></li>
-          <li><a href="app/notifications.html">Notifications</a> — history, mark as read</li>
-          <li><a href="app/settings.html">Settings</a> — security, sessions, recovery, notifications</li>
-        </ul>
       </div>
     </section>
 
@@ -134,11 +76,11 @@
       <div class="footer-top">
         <span class="logo">OMNIXIUS</span>
         <nav class="footer-nav">
-          <a href="index.html#map" data-i18n="navMap">All sections</a>
+          <a href="/app/settings" data-i18n="navMap">All sections</a>
           <a href="ecosystem.html" data-i18n="navEcosystem">Ecosystem</a>
           <a href="architecture.html" data-i18n="navArchitecture">Architecture</a>
           <a href="contact.html" data-i18n="navContact">Contact</a>
-          <a href="app/login.html" data-i18n="signIn">Sign in</a>
+          <a href="/app/login" data-i18n="signIn">Sign in</a>
         </nav>
       </div>
       <div class="footer-lang">
@@ -159,8 +101,8 @@
     </div>
   </footer>
 
-  <script src="app/js/professions.js"></script>
-  <script src="app/js/i18n.js"></script>
+  <script src="js/professions.js"></script>
+  <script src="js/i18n.js"></script>
   <script src="js/main.js"></script>
   <script>
     (function() {
@@ -173,7 +115,8 @@
       function render() {
         grid.innerHTML = P.getList().map(function(p) {
           var name = P.getNameFor(p);
-          return '<button type="button" class="profession-card" data-id="' + p.id + '" data-name="' + name.replace(/"/g, '&quot;') + '">' + name + '</button>';
+          var icon = (p.icon || '').replace(/"/g, '&quot;');
+          return '<button type="button" class="profession-card" data-id="' + p.id + '" data-name="' + name.replace(/"/g, '&quot;') + '"><span class="profession-card-icon" aria-hidden="true">' + icon + '</span><span class="profession-card-name">' + name + '</span></button>';
         }).join('');
         grid.querySelectorAll('.profession-card').forEach(function(btn) {
           btn.onclick = function() {
@@ -194,6 +137,8 @@
         } else {
           currentEl.style.display = 'none';
         }
+        var workspaceEl = document.getElementById('professionWorkspaceLink');
+        if (workspaceEl) workspaceEl.style.display = (id === 'design') ? 'block' : 'none';
       }
       if (changeLink) changeLink.onclick = function() { document.getElementById('profession').scrollIntoView({ behavior: 'smooth' }); };
       var headerLink = document.getElementById('headerProfessionLink');

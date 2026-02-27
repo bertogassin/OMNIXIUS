@@ -1,4 +1,4 @@
-// OMNIXIUS API — Go backend. Stack: Go only (per project policy).
+// OMNIXIUS API — Go backend. Stack order: Rust first, then Go (see start.bat, STACK.md).
 package main
 
 import (
@@ -11,10 +11,12 @@ import (
 	"encoding/json"
 	"errors"
 	"log"
+	"math"
 	"net/http"
 	"net/url"
 	"os"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -53,6 +55,18 @@ func main() {
 	db.InitUploadDirs(cfg.UploadDir)
 	if err := initWebAuthn(); err != nil {
 		log.Printf("WebAuthn init skipped: %v (Passkeys endpoints will return 503)", err)
+	}
+
+	initWSHub()
+	// Stack order: Rust first. Ping Rust service if configured.
+	if cfg.RustServiceURL != "" {
+		client := &http.Client{Timeout: 2 * time.Second}
+		if resp, err := client.Get(cfg.RustServiceURL + "/health"); err != nil {
+			log.Printf("Rust service (%s): not available (stack 1); run start-rust.bat first", cfg.RustServiceURL)
+		} else {
+			resp.Body.Close()
+			log.Printf("Rust service (%s): ok (stack order Rust → Go)", cfg.RustServiceURL)
+		}
 	}
 
 	r := gin.New()
@@ -99,10 +113,14 @@ func main() {
 	auth.DELETE("/auth/devices/:id", handleAuthDeviceDelete)
 	auth.POST("/auth/recovery/generate", handleRecoveryGenerate)
 	auth.POST("/auth/change-password", handleChangePassword)
+	api.GET("/ws", handleWSWithQueryToken)
 	auth.GET("/users/me/orders", handleUserOrders)
 	auth.GET("/users/me/balance", handleBalanceGet)
 	auth.POST("/users/me/balance/credit", handleBalanceCredit)
 	auth.POST("/users/me/avatar", handleUserAvatar)
+	auth.POST("/users/me/heartbeat", handleUserHeartbeat)
+
+	api.GET("/professionals/search", handleProfessionalsSearch)
 
 	api.GET("/products", handleProductsList)
 	api.GET("/products/categories", handleProductsCategories)
@@ -120,6 +138,7 @@ func main() {
 	auth.GET("/subscriptions/my", handleSubscriptionsMy)
 
 	auth.GET("/orders/my", handleOrdersMy)
+	auth.GET("/orders/:id", handleOrderGet)
 	auth.POST("/orders", handleOrderCreate)
 	auth.PATCH("/orders/:id", handleOrderUpdate)
 
@@ -161,6 +180,8 @@ func main() {
 	auth.POST("/wallet/hold", handleWalletHold)
 	auth.POST("/wallet/hold/:id/release", handleWalletHoldRelease)
 	auth.POST("/wallet/hold/:id/capture", handleWalletHoldCapture)
+	auth.POST("/wallet/export", handleWalletExport)
+	auth.POST("/wallet/import", handleWalletImport)
 
 	// Notifications (§16)
 	auth.GET("/notifications/settings", handleNotificationsSettingsGet)
@@ -184,7 +205,8 @@ func main() {
 	adminGroup.POST("/users/:id/unban", handleAdminUserUnban)
 	api.POST("/reports", authRequired(), handleReportCreate)
 
-	r.NoRoute(staticSiteHandler(cfg.SiteRoot))
+	spaRoot := filepath.Join(cfg.SiteRoot, "web", "dist")
+	r.NoRoute(staticSiteHandler(cfg.SiteRoot, spaRoot))
 
 	port := ":" + cfg.Port
 	if err := r.Run(port); err != nil {
@@ -192,7 +214,7 @@ func main() {
 	}
 }
 
-func staticSiteHandler(siteRoot string) gin.HandlerFunc {
+func staticSiteHandler(siteRoot, spaRoot string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if c.Request.Method != http.MethodGet && c.Request.Method != http.MethodHead {
 			c.AbortWithStatus(http.StatusMethodNotAllowed)
@@ -202,6 +224,31 @@ func staticSiteHandler(siteRoot string) gin.HandlerFunc {
 		if strings.HasPrefix(path, "/api") || strings.HasPrefix(path, "/uploads") {
 			c.AbortWithStatus(http.StatusNotFound)
 			return
+		}
+		// SPA (TypeScript app) at /app — serve from web/dist, fallback to index.html
+		if strings.HasPrefix(path, "/app") {
+			rel := strings.TrimPrefix(path, "/app")
+			if rel == "" {
+				rel = "/"
+			}
+			rel = strings.TrimPrefix(rel, "/")
+			if rel == "" {
+				rel = "index.html"
+			}
+			cleanRel := filepath.Clean(filepath.FromSlash(rel))
+			if cleanRel == "" || cleanRel == "." || strings.HasPrefix(cleanRel, "..") {
+				cleanRel = "index.html"
+			}
+			fullPath := filepath.Join(spaRoot, cleanRel)
+			if info, err := os.Stat(fullPath); err == nil && !info.IsDir() {
+				c.File(fullPath)
+				return
+			}
+			indexPath := filepath.Join(spaRoot, "index.html")
+			if _, err := os.Stat(indexPath); err == nil {
+				c.File(indexPath)
+				return
+			}
 		}
 		if path == "/" {
 			path = "index.html"
@@ -354,8 +401,32 @@ func authRequired() gin.HandlerFunc {
 		c.Set("userRole", role)
 		c.Set("userName", name)
 		c.Set("userAvatar", avatar)
+		_, _ = db.DB.Exec("UPDATE users SET last_seen_at = unixepoch() WHERE id = ?", uid)
 		c.Next()
 	}
+}
+
+// handleWSWithQueryToken validates token from query (for WebSocket, browser cannot send Authorization header) then runs handleWS.
+func handleWSWithQueryToken(c *gin.Context) {
+	tok := strings.TrimSpace(c.Query("token"))
+	if tok == "" {
+		c.JSON(401, gin.H{"error": "token required"})
+		return
+	}
+	uid, _, sessionID, err := pqc.VerifyToken(cfg.PQCPublicKey, tok)
+	if err != nil {
+		c.JSON(401, gin.H{"error": "Invalid token"})
+		return
+	}
+	if sessionID != 0 {
+		var n int
+		if db.DB.QueryRow("SELECT 1 FROM sessions WHERE id = ? AND user_id = ? AND expires_at > ?", sessionID, uid, time.Now().Unix()).Scan(&n) != nil || n == 0 {
+			c.JSON(401, gin.H{"error": "Session invalid or expired"})
+			return
+		}
+	}
+	c.Set("userID", uid)
+	handleWS(c)
 }
 
 func adminRequired() gin.HandlerFunc {
@@ -376,6 +447,11 @@ func getUserID(c *gin.Context) int64 {
 		return id
 	}
 	return 0
+}
+
+func auditLog(userID int64, action, entityType, entityID, details string) {
+	_, _ = db.DB.Exec("INSERT INTO audit_log (user_id, action, entity_type, entity_id, details) VALUES (?, ?, ?, ?, ?)",
+		userID, action, entityType, entityID, details)
 }
 
 // getOptionalUserID returns user ID if valid Bearer token present; otherwise 0 (for optional-auth routes).
@@ -825,13 +901,166 @@ func handleUserMe(c *gin.Context) {
 }
 
 func handleUserUpdate(c *gin.Context) {
-	var body struct{ Name string `json:"name"` }
-	c.ShouldBindJSON(&body)
-	if len(body.Name) > 200 {
-		body.Name = body.Name[:200]
+	var body struct {
+		Name         *string  `json:"name"`
+		ProfessionID *string  `json:"profession_id"`
+		Lat          *float64 `json:"lat"`
+		Lng          *float64 `json:"lng"`
 	}
-	db.DB.Exec("UPDATE users SET name = ?, updated_at = unixepoch() WHERE id = ?", nullStr(body.Name), getUserID(c))
+	c.ShouldBindJSON(&body)
+	uid := getUserID(c)
+	if body.Name != nil {
+		name := strings.TrimSpace(*body.Name)
+		if len(name) > 200 {
+			name = name[:200]
+		}
+		db.DB.Exec("UPDATE users SET name = ?, updated_at = unixepoch() WHERE id = ?", name, uid)
+	}
+	if body.ProfessionID != nil {
+		p := strings.TrimSpace(*body.ProfessionID)
+		if len(p) > 64 {
+			p = p[:64]
+		}
+		db.DB.Exec("UPDATE users SET profession_id = ?, updated_at = unixepoch() WHERE id = ?", nullStr(p), uid)
+	}
+	if body.Lat != nil && body.Lng != nil {
+		db.DB.Exec("UPDATE users SET lat = ?, lng = ?, updated_at = unixepoch() WHERE id = ?", *body.Lat, *body.Lng, uid)
+	}
 	handleUserMe(c)
+}
+
+func handleUserHeartbeat(c *gin.Context) {
+	uid := getUserID(c)
+	db.DB.Exec("UPDATE users SET last_seen_at = unixepoch() WHERE id = ?", uid)
+	c.JSON(http.StatusOK, gin.H{"ok": true})
+}
+
+// haversineKm returns distance in km between two points (lat/lng in degrees).
+func haversineKm(lat1, lng1, lat2, lng2 float64) float64 {
+	const earthR = 6371 // km
+	rad := func(d float64) float64 { return d * (3.141592653589793 / 180) }
+	dLat := rad(lat2 - lat1)
+	dLng := rad(lng2 - lng1)
+	a := math.Sin(dLat/2)*math.Sin(dLat/2) + math.Cos(rad(lat1))*math.Cos(rad(lat2))*math.Sin(dLng/2)*math.Sin(dLng/2)
+	c := 2 * math.Atan2(math.Sqrt(a), math.Sqrt(1-a))
+	return earthR * c
+}
+
+func handleProfessionalsSearch(c *gin.Context) {
+	profession := strings.TrimSpace(c.Query("profession"))
+	onlineOnly := c.Query("online") == "1" || c.Query("online") == "true"
+	latQ, lngQ := c.Query("lat"), c.Query("lng")
+	var latCenter, lngCenter float64
+	useLocation := false
+	if latQ != "" && lngQ != "" {
+		if la, err := strconv.ParseFloat(latQ, 64); err == nil && la >= -90 && la <= 90 {
+			if ln, err := strconv.ParseFloat(lngQ, 64); err == nil && ln >= -180 && ln <= 180 {
+				latCenter, lngCenter = la, ln
+				useLocation = true
+			}
+		}
+	}
+	radiusKm := 0.0
+	if r := c.Query("radius_km"); r != "" {
+		if f, err := strconv.ParseFloat(r, 64); err == nil && f > 0 {
+			radiusKm = f
+		}
+	}
+	sortBy := strings.TrimSpace(c.Query("sort")) // "rating" | "distance" | ""
+	limit := 50
+	if l := c.Query("limit"); l != "" {
+		if n, err := strconv.Atoi(l); err == nil && n > 0 && n <= 100 {
+			limit = n
+		}
+	}
+	now := time.Now().Unix()
+	onlineSince := now - 900
+	sel := `SELECT id, name, avatar_path, COALESCE(profession_id,''), lat, lng, last_seen_at, COALESCE(rating_avg,0), COALESCE(rating_count,0) FROM users WHERE profession_id IS NOT NULL AND profession_id != ''`
+	args := []interface{}{}
+	if profession != "" {
+		sel += ` AND profession_id = ?`
+		args = append(args, profession)
+	}
+	if onlineOnly {
+		sel += ` AND last_seen_at > ?`
+		args = append(args, onlineSince)
+	}
+	sel += ` ORDER BY COALESCE(last_seen_at,0) DESC`
+	args = append(args, limit*3) // fetch extra for distance filter
+	sel += ` LIMIT ?`
+	rows, err := db.DB.Query(sel, args...)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"professionals": []gin.H{}})
+		return
+	}
+	defer rows.Close()
+	var list []gin.H
+	for rows.Next() {
+		var id int64
+		var name, avatarPath, professionID string
+		var lat, lng sql.NullFloat64
+		var lastSeenAt sql.NullInt64
+		var ratingAvg float64
+		var ratingCount int64
+		if rows.Scan(&id, &name, &avatarPath, &professionID, &lat, &lng, &lastSeenAt, &ratingAvg, &ratingCount) != nil {
+			continue
+		}
+		ls := lastSeenAt.Int64
+		item := gin.H{"id": id, "name": name, "avatar_path": avatarPath, "profession_id": professionID, "last_seen_at": ls, "online": ls > onlineSince, "rating_avg": ratingAvg, "rating_count": ratingCount}
+		if lat.Valid {
+			item["lat"] = lat.Float64
+		}
+		if lng.Valid {
+			item["lng"] = lng.Float64
+		}
+		if useLocation && lat.Valid && lng.Valid {
+			km := haversineKm(latCenter, lngCenter, lat.Float64, lng.Float64)
+			item["distance_km"] = math.Round(km*10) / 10
+			if radiusKm > 0 && km > radiusKm {
+				continue
+			}
+		}
+		list = append(list, item)
+	}
+	if list == nil {
+		list = []gin.H{}
+	}
+	if useLocation && sortBy == "distance" {
+		sort.Slice(list, func(i, j int) bool {
+			di, _ := list[i]["distance_km"].(float64)
+			dj, _ := list[j]["distance_km"].(float64)
+			return di < dj
+		})
+	} else if sortBy == "rating" {
+		sort.Slice(list, func(i, j int) bool {
+			ri, _ := list[i]["rating_avg"].(float64)
+			rj, _ := list[j]["rating_avg"].(float64)
+			return ri > rj
+		})
+	}
+	// Stack: Rust first. When Rust is up, use it for ranking (heavy compute path).
+	if cfg.RustServiceURL != "" && sortBy != "" && len(list) > 0 {
+		payload := map[string]interface{}{"items": list, "sort": sortBy}
+		body, _ := json.Marshal(payload)
+		req, err := http.NewRequest(http.MethodPost, cfg.RustServiceURL+"/rank", strings.NewReader(string(body)))
+		if err == nil {
+			req.Header.Set("Content-Type", "application/json")
+			client := &http.Client{Timeout: 3 * time.Second}
+			if resp, err := client.Do(req); err == nil && resp.StatusCode == http.StatusOK {
+				var out struct {
+					Items []gin.H `json:"items"`
+				}
+				if json.NewDecoder(resp.Body).Decode(&out) == nil && len(out.Items) > 0 {
+					list = out.Items
+				}
+				resp.Body.Close()
+			}
+		}
+	}
+	if len(list) > limit {
+		list = list[:limit]
+	}
+	c.JSON(http.StatusOK, gin.H{"professionals": list})
 }
 
 func handleChangePassword(c *gin.Context) {
@@ -1353,6 +1582,34 @@ func handleOrdersMy(c *gin.Context) {
 	c.JSON(200, OrdersMy(getUserID(c)))
 }
 
+func handleOrderGet(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil || id <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
+		return
+	}
+	uid := getUserID(c)
+	var oid, pid, buyerID, sellerID, createdAt int64
+	var status, title string
+	var price float64
+	var img sql.NullString
+	var urgent int
+	err = db.DB.QueryRow(
+		`SELECT o.id, o.product_id, o.buyer_id, o.seller_id, o.status, o.created_at, COALESCE(o.urgent, 0), p.title, p.price, p.image_path
+		 FROM orders o JOIN products p ON p.id = o.product_id WHERE o.id = ? AND (o.buyer_id = ? OR o.seller_id = ?)`,
+		id, uid, uid,
+	).Scan(&oid, &pid, &buyerID, &sellerID, &status, &createdAt, &urgent, &title, &price, &img)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Order not found"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"id": oid, "product_id": pid, "buyer_id": buyerID, "seller_id": sellerID,
+		"status": status, "created_at": createdAt, "urgent": urgent == 1, "title": title, "price": price, "image_path": img.String,
+	})
+}
+
 func handleOrderCreate(c *gin.Context) {
 	if getUserID(c) == 0 {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
@@ -1361,6 +1618,7 @@ func handleOrderCreate(c *gin.Context) {
 	var body struct {
 		ProductID       int64  `json:"product_id"`
 		InstallmentPlan string `json:"installment_plan"`
+		Urgent          bool   `json:"urgent"`
 	}
 	if c.ShouldBindJSON(&body) != nil || body.ProductID == 0 {
 		c.JSON(400, gin.H{"error": "product_id required"})
@@ -1370,7 +1628,8 @@ func handleOrderCreate(c *gin.Context) {
 	if body.InstallmentPlan == "requested" || body.InstallmentPlan == "installments" {
 		installmentPlan = "requested"
 	}
-	h, err := OrderCreate(getUserID(c), body.ProductID, installmentPlan)
+	uid := getUserID(c)
+	h, err := OrderCreate(uid, body.ProductID, installmentPlan, body.Urgent)
 	if err != nil {
 		switch {
 		case errors.Is(err, ErrOrderProductNotFound):
@@ -1382,18 +1641,35 @@ func handleOrderCreate(c *gin.Context) {
 		}
 		return
 	}
+	// Notify seller about new order
+	if sellerID, ok := h["seller_id"].(int64); ok && sellerID != 0 {
+		if oid, ok2 := h["id"].(int64); ok2 && oid != 0 {
+			dataJSON := `{"order_id":` + strconv.FormatInt(oid, 10) + `}`
+			title := "New order"
+			if body.Urgent {
+				title = "Urgent order"
+			}
+			_, _ = db.DB.Exec(
+				"INSERT INTO notifications_queue (user_id, type, channel, title, body, data, status) VALUES (?, 'order_new', 'in_app', ?, ?, ?, 'pending')",
+				sellerID, title, "Order #"+strconv.FormatInt(oid, 10)+" — view details and accept or decline.", dataJSON,
+			)
+			BroadcastToUser(sellerID, "notification", gin.H{"type": "order_new", "title": title, "order_id": oid})
+		}
+	}
+	auditLog(uid, "order_created", "order", strconv.FormatInt(h["id"].(int64), 10), "")
 	c.JSON(201, h)
 }
 
 func handleOrderUpdate(c *gin.Context) {
-	id := c.Param("id")
+	idStr := c.Param("id")
 	var body struct {
 		Status          string `json:"status"`
 		InstallmentPlan string `json:"installment_plan"`
 	}
 	c.ShouldBindJSON(&body)
 	var buyer, seller int64
-	if db.DB.QueryRow("SELECT buyer_id, seller_id FROM orders WHERE id = ?", id).Scan(&buyer, &seller) != nil {
+	var currentStatus string
+	if db.DB.QueryRow("SELECT buyer_id, seller_id, status FROM orders WHERE id = ?", idStr).Scan(&buyer, &seller, &currentStatus) != nil {
 		c.JSON(404, gin.H{"error": "Order not found"})
 		return
 	}
@@ -1407,12 +1683,31 @@ func handleOrderUpdate(c *gin.Context) {
 			c.JSON(400, gin.H{"error": "Invalid status"})
 			return
 		}
-		db.DB.Exec("UPDATE orders SET status = ?, updated_at = unixepoch() WHERE id = ?", body.Status, id)
+		// State machine: pending -> confirmed|cancelled; confirmed -> completed; cancelled/completed terminal
+		allowed := false
+		switch currentStatus {
+		case "pending":
+			allowed = body.Status == "confirmed" || body.Status == "cancelled"
+		case "confirmed":
+			allowed = body.Status == "completed"
+		case "cancelled", "completed":
+			allowed = false
+		default:
+			allowed = false
+		}
+		if !allowed {
+			c.JSON(400, gin.H{"error": "Cannot change status from " + currentStatus + " to " + body.Status})
+			return
+		}
+		db.DB.Exec("UPDATE orders SET status = ?, updated_at = unixepoch() WHERE id = ?", body.Status, idStr)
+		auditLog(uid, "order_status_changed", "order", idStr, currentStatus+" -> "+body.Status)
+		BroadcastToUser(buyer, "order:status", gin.H{"order_id": idStr, "status": body.Status})
+		BroadcastToUser(seller, "order:status", gin.H{"order_id": idStr, "status": body.Status})
 	}
 	if body.InstallmentPlan == "requested" || body.InstallmentPlan == "installments" {
-		db.DB.Exec("UPDATE orders SET installment_plan = 'requested', updated_at = unixepoch() WHERE id = ?", id)
+		db.DB.Exec("UPDATE orders SET installment_plan = 'requested', updated_at = unixepoch() WHERE id = ?", idStr)
 	}
-	out := gin.H{"id": id}
+	out := gin.H{"id": idStr}
 	if body.Status != "" {
 		out["status"] = body.Status
 	}
@@ -1567,6 +1862,10 @@ func handleMessageSend(c *gin.Context) {
 		}
 		c.JSON(500, gin.H{"error": "Failed"})
 		return
+	}
+	var otherID int64
+	if db.DB.QueryRow("SELECT user_id FROM conversation_participants WHERE conversation_id = ? AND user_id != ?", cid, getUserID(c)).Scan(&otherID) == nil && otherID != 0 {
+		BroadcastToUser(otherID, "relay:message", gin.H{"conversation_id": cid, "message_id": h["id"]})
 	}
 	c.JSON(201, h)
 }
@@ -1874,16 +2173,6 @@ func handleVaultDeleteFile(c *gin.Context) {
 	c.JSON(200, gin.H{"ok": true})
 }
 
-// --- §1.1 Auth: sessions, devices; §1.2 recovery; §1.9 audit ---
-func auditLog(userID int64, action, resource, resourceID, oldVal, newVal string, c *gin.Context) {
-	ip := c.ClientIP()
-	ua := c.GetHeader("User-Agent")
-	db.DB.Exec(
-		"INSERT INTO audit_log (user_id, action, resource, resource_id, old_value, new_value, ip, user_agent) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-		userID, action, resource, resourceID, nullStr(oldVal), nullStr(newVal), ip, ua,
-	)
-}
-
 func handleAuthSessionsList(c *gin.Context) {
 	uid := getUserID(c)
 	rows, err := db.DB.Query("SELECT id, device_name, created_at, expires_at FROM sessions WHERE user_id = ? AND expires_at > ? ORDER BY created_at DESC", uid, time.Now().Unix())
@@ -1921,7 +2210,7 @@ func handleAuthSessionDelete(c *gin.Context) {
 		c.JSON(404, gin.H{"error": "session not found"})
 		return
 	}
-	auditLog(uid, "session.revoked", "session", strconv.FormatInt(id, 10), "", "", c)
+	auditLog(uid, "session.revoked", "session", strconv.FormatInt(id, 10), "")
 	c.JSON(200, gin.H{"ok": true})
 }
 
@@ -1967,7 +2256,7 @@ func handleAuthDeviceDelete(c *gin.Context) {
 		c.JSON(404, gin.H{"error": "device not found"})
 		return
 	}
-	auditLog(uid, "device.removed", "device", strconv.FormatInt(id, 10), "", "", c)
+	auditLog(uid, "device.removed", "device", strconv.FormatInt(id, 10), "")
 	c.JSON(200, gin.H{"ok": true})
 }
 
@@ -1988,7 +2277,7 @@ func handleRecoveryGenerate(c *gin.Context) {
 		c.JSON(500, gin.H{"error": "failed to save recovery"})
 		return
 	}
-	auditLog(uid, "recovery.generated", "user_recovery", "", "", "", c)
+	auditLog(uid, "recovery.generated", "user_recovery", "", "")
 	c.JSON(200, gin.H{"ok": true})
 }
 
@@ -2024,7 +2313,7 @@ func handleRecoveryRestore(c *gin.Context) {
 	db.DB.Exec("DELETE FROM sessions WHERE user_id = ?", userID)
 	sessionID, exp := createSession(userID, "recovery")
 	token, _ := pqc.SignTokenWithSession(cfg.PQCPrivateKey, userID, sessionID, exp)
-	auditLog(userID, "recovery.restore", "user_recovery", "", "", "", c)
+	auditLog(userID, "recovery.restore", "user_recovery", "", "")
 	c.JSON(200, gin.H{"token": token, "user_id": userID})
 }
 

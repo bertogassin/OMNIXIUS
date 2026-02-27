@@ -17,7 +17,7 @@ export default function Marketplace() {
   useEffect(() => {
     api.products
       .list({})
-      .then((res) => setProducts(res.products ?? []))
+      .then((res) => setProducts((res.products ?? []) as Product[]))
       .catch((err: { status?: number; data?: { error?: string } }) => {
         setError(err?.data?.error ?? 'Failed to load products');
       })
@@ -59,7 +59,7 @@ export default function Marketplace() {
               {p.price != null && (
                 <span className="marketplace-item-price">{p.price} USD</span>
               )}
-              <a href={`/app/product.html?id=${p.id}`} className="marketplace-item-link">
+              <a href={`/app/marketplace?product=${p.id}`} className="marketplace-item-link">
                 View →
               </a>
             </li>

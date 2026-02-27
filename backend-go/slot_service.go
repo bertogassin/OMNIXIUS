@@ -112,7 +112,7 @@ func SlotBook(productID, slotID string, buyerID int64) (gin.H, error) {
 		return nil, ErrSlotNotFree
 	}
 	// Create order with slot_id
-	order, err := OrderCreateWithSlot(buyerID, pid, sid, "")
+	order, err := OrderCreateWithSlot(buyerID, pid, sid, "", false)
 	if err != nil {
 		return nil, err
 	}

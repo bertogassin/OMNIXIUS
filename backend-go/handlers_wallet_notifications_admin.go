@@ -535,7 +535,7 @@ func handleNotificationsHistory(c *gin.Context) {
 	uid := getUserID(c)
 	limit := 30
 	rows, err := db.DB.Query(
-		"SELECT id, type, channel, title, body, status, sent_at, created_at FROM notifications_queue WHERE user_id = ? ORDER BY created_at DESC LIMIT ?",
+		"SELECT id, type, channel, title, body, data, status, sent_at, created_at FROM notifications_queue WHERE user_id = ? ORDER BY created_at DESC LIMIT ?",
 		uid, limit,
 	)
 	if err != nil {
@@ -547,15 +547,20 @@ func handleNotificationsHistory(c *gin.Context) {
 	for rows.Next() {
 		var id int64
 		var ntype, channel, title, body, status string
+		var data sql.NullString
 		var sentAt, createdAt sql.NullInt64
-		if rows.Scan(&id, &ntype, &channel, &title, &body, &status, &sentAt, &createdAt) != nil {
+		if rows.Scan(&id, &ntype, &channel, &title, &body, &data, &status, &sentAt, &createdAt) != nil {
 			continue
 		}
-		list = append(list, gin.H{
+		item := gin.H{
 			"id": id, "type": ntype, "channel": channel,
 			"title": title, "body": body, "status": status,
 			"sent_at": sentAt.Int64, "created_at": createdAt.Int64,
-		})
+		}
+		if data.Valid && data.String != "" {
+			item["data"] = data.String
+		}
+		list = append(list, item)
 	}
 	if list == nil {
 		list = []gin.H{}

@@ -1,3 +1,15 @@
+/* Hero: link to profession block */
+.hero-profession-link {
+  display: inline-block;
+  margin-top: 0.75rem;
+  font-size: 0.95rem;
+  color: var(--accent, #00d4aa);
+  text-decoration: none;
+}
+.hero-profession-link:hover {
+  text-decoration: underline;
+}
+
 /* Header profession link (main page) */
 .header-profession-link {
   margin-right: 1rem;
@@ -10,39 +22,71 @@
 }
 
 /* Profession choice block — main page */
+.section.profession-choice {
+  padding-top: 2rem;
+  padding-bottom: 2.5rem;
+}
+.profession-choice .container {
+  max-width: 960px;
+}
 .profession-choice .section-title {
   margin-bottom: 0.5rem;
+  color: var(--text, #ecebe8);
+  font-size: 1.35rem;
 }
 .profession-choice .about-text {
   margin-bottom: 1.25rem;
+  color: var(--text-muted, #9090a0);
+}
+.profession-loading {
+  color: var(--text-muted, #9090a0);
+  font-size: 0.95rem;
 }
 .profession-current {
   margin-bottom: 1rem;
   font-size: 0.95rem;
-  color: var(--text-muted, #8a8a8a);
+  color: var(--text-muted, #9090a0);
 }
 .profession-current a {
   color: var(--accent, #00d4aa);
 }
 .profession-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 0.6rem;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 0.75rem;
+  min-height: 3rem;
+}
+@media (min-width: 640px) {
+  .profession-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 1rem; }
 }
 .profession-card {
-  padding: 0.75rem 1rem;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 8px;
-  color: inherit;
-  font-size: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 1rem 0.75rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  color: var(--text, #ecebe8);
+  font-size: 0.85rem;
   text-align: center;
   cursor: pointer;
   transition: border-color 0.2s, background 0.2s;
 }
+.profession-card-icon {
+  font-size: 1.75rem;
+  line-height: 1;
+  display: block;
+}
+.profession-card-name {
+  display: block;
+  line-height: 1.25;
+  word-break: break-word;
+}
 .profession-card:hover {
   border-color: var(--accent, #00d4aa);
-  background: rgba(0, 212, 170, 0.06);
+  background: rgba(0, 212, 170, 0.1);
 }
 
 /* App header: current profession pill */

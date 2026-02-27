@@ -16,7 +16,7 @@ export default function Dashboard() {
           <h2>Marketplace</h2>
           <p>Browse products and services (Trove).</p>
         </Link>
-        <a href="/app/dashboard.html" className="dashboard-card dashboard-card-out">
+        <a href="/app" className="dashboard-card dashboard-card-out">
           Full app (static) →
         </a>
       </div>

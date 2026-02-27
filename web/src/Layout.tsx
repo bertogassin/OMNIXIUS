@@ -21,6 +21,11 @@ export default function Layout() {
               <>
                 <Link to="/">Dashboard</Link>
                 <Link to="/marketplace">Marketplace</Link>
+                <Link to="/orders">Orders</Link>
+                <Link to="/find-professional">Find professional</Link>
+                <Link to="/notifications">Notifications</Link>
+                <Link to="/profile">Profile</Link>
+                <Link to="/settings">Settings</Link>
                 <span className="layout-user">{user?.email ?? user?.name ?? 'User'}</span>
                 <button type="button" className="layout-btn" onClick={handleLogout}>
                   Sign out

@@ -31,6 +31,8 @@ type Config struct {
 	WebAuthnRPID          string   // e.g. localhost or omnixius.com
 	WebAuthnRPDisplayName string   // e.g. OMNIXIUS
 	WebAuthnRPOrigins    []string // e.g. https://localhost:3000
+	// Stack: Rust first. Optional Rust service URL (video, search, heavy compute).
+	RustServiceURL string // e.g. http://localhost:8081; empty = do not call Rust
 }
 
 func LoadConfig() Config {
@@ -50,6 +52,7 @@ func LoadConfig() Config {
 		siteRoot = ".." // from backend-go/ run dir = project root
 	}
 	siteRoot = filepath.Clean(siteRoot)
+	rustURL := strings.TrimSuffix(os.Getenv("RUST_SERVICE_URL"), "/")
 	cfg := Config{
 		Port:             port,
 		SiteRoot:         siteRoot,
@@ -61,6 +64,7 @@ func LoadConfig() Config {
 		Argon2Time:      3,
 		Argon2Memory:    mem,
 		Argon2Threads:    2,
+		RustServiceURL:   rustURL,
 	}
 	// PQC keys from env (base64). Required for production.
 	if b, err := base64.StdEncoding.DecodeString(os.Getenv("DILITHIUM_PUBLIC_KEY")); err == nil && len(b) > 0 {
