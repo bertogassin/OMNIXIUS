@@ -1,6 +1,7 @@
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from './auth';
 import './Layout.css';
+import './pages/Pages.css';
 
 const root = typeof window !== 'undefined' ? window.location.origin : '';
 
@@ -24,6 +25,7 @@ export default function Layout() {
             <Link to="/mail">Relay · mail</Link>
             <Link to="/orders">Orders</Link>
             <Link to="/find-professional">Find professional</Link>
+            <Link to="/profession/cleaning">Cleaning</Link>
             <Link to="/notifications">Notifications</Link>
             <Link to="/profile">Profile</Link>
             <Link to="/wallet">Wallet</Link>

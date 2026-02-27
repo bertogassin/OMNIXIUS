@@ -16,17 +16,24 @@ export default function Settings() {
   };
 
   return (
-    <div>
-      <h1>Settings</h1>
-      <section>
-        <h2>Change password</h2>
-        <form onSubmit={changePassword}>
-          <input name="current" type="password" placeholder="Current password" required />
-          <input name="new" type="password" placeholder="New password" required />
-          <button type="submit" className="btn btn-primary">Update</button>
-        </form>
-      </section>
-      {msg && <p>{msg}</p>}
+    <div className="page">
+      <header className="page-header">
+        <h1>Settings</h1>
+        <p className="page-intro">Security and preferences.</p>
+      </header>
+      <div className="page-content">
+        <section className="page-section">
+          <h2>Change password</h2>
+          <form onSubmit={changePassword}>
+            <div className="page-form-row">
+              <label><input name="current" type="password" placeholder="Current password" required /></label>
+              <label><input name="new" type="password" placeholder="New password" required /></label>
+              <button type="submit" className="btn btn-primary">Update</button>
+            </div>
+          </form>
+        </section>
+        {msg && <p>{msg}</p>}
+      </div>
     </div>
   );
 }

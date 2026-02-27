@@ -13,10 +13,14 @@ export default function Direction() {
   const { name } = useParams<{ name: string }>();
   const title = (name && titles[name]) || name || 'Direction';
   return (
-    <div>
-      <h1>{title}</h1>
-      <p>Screen preserved. Content and API to be wired.</p>
-      <p><Link to="/">← Dashboard</Link></p>
+    <div className="page">
+      <header className="page-header">
+        <h1>{title}</h1>
+        <p className="page-intro">Content and API to be wired.</p>
+      </header>
+      <div className="page-content">
+        <p className="page-back"><Link to="/">← Dashboard</Link></p>
+      </div>
     </div>
   );
 }

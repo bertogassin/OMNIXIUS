@@ -29,7 +29,7 @@ export default function ResetPassword() {
 
   if (noToken) {
     return (
-      <div className="login-page">
+      <div className="page login-page">
         <div className="login-card">
           <h1>Set new password</h1>
           <p className="login-error">Invalid or expired link. Request a new reset from forgot password.</p>
@@ -41,7 +41,7 @@ export default function ResetPassword() {
 
   if (success) {
     return (
-      <div className="login-page">
+      <div className="page login-page">
         <div className="login-card">
           <h1>Set new password</h1>
           <p style={{ color: 'var(--accent, #00d4aa)' }}>Password updated. You can sign in.</p>
@@ -52,7 +52,7 @@ export default function ResetPassword() {
   }
 
   return (
-    <div className="login-page">
+    <div className="page login-page">
       <div className="login-card">
         <h1>Set new password</h1>
         {error && <p className="login-error">{error}</p>}

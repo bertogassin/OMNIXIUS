@@ -1,0 +1,113 @@
+/* Shared page layout — all screens use .page; adapt one later for responsive */
+.page {
+  min-height: 0;
+}
+
+.page-header {
+  margin-bottom: 1.5rem;
+}
+
+.page-header h1 {
+  margin: 0 0 0.5rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.page-header .page-intro {
+  margin: 0;
+  color: #8a8a8a;
+  font-size: 0.95rem;
+}
+
+.page-content {
+  margin-top: 1rem;
+}
+
+.page-loading {
+  color: #8a8a8a;
+  margin: 1rem 0;
+}
+
+.page-error {
+  color: #e57373;
+  margin: 1rem 0;
+}
+
+.page-section {
+  margin-bottom: 1.5rem;
+}
+
+.page-section h2 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 0.75rem;
+  color: #b0b0b0;
+}
+
+.page-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.page-list-item {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.page-list-item:last-child {
+  border-bottom: none;
+}
+
+.page-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.page-card h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1.05rem;
+}
+
+.page-form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: flex-end;
+  margin-bottom: 1rem;
+}
+
+.page-form-row label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.9rem;
+  color: #b0b0b0;
+}
+
+.page-form-row input,
+.page-form-row select {
+  margin-left: 0;
+}
+
+.page-back {
+  margin-bottom: 1rem;
+}
+
+.page-back a {
+  color: #8a8a8a;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.page-back a:hover {
+  color: #00d4aa;
+}

@@ -15,14 +15,19 @@ export default function Profile() {
       .catch((e: ApiError) => setErr(e.data?.error || 'Failed'));
   }, []);
 
-  if (err) return <p className="error">{err}</p>;
-  if (!me) return <p>Loading…</p>;
+  if (err) return <div className="page"><p className="page-error">{err}</p></div>;
+  if (!me) return <div className="page"><h1>Profile</h1><p className="page-loading">Loading…</p></div>;
   return (
-    <div>
-      <h1>Profile</h1>
-      <p><strong>Name:</strong> {me.name ?? '—'}</p>
-      <p><strong>Email:</strong> {me.email ?? '—'}</p>
-      <p><strong>Role:</strong> {me.role ?? '—'}</p>
+    <div className="page">
+      <header className="page-header">
+        <h1>Profile</h1>
+        <p className="page-intro">Account info.</p>
+      </header>
+      <div className="page-content">
+        <p><strong>Name:</strong> {me.name ?? '—'}</p>
+        <p><strong>Email:</strong> {me.email ?? '—'}</p>
+        <p><strong>Role:</strong> {me.role ?? '—'}</p>
+      </div>
     </div>
   );
 }

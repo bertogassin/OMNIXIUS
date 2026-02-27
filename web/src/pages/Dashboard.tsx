@@ -83,7 +83,7 @@ export default function Dashboard() {
 
   if (loading && !profile) {
     return (
-      <div className="dashboard-page">
+      <div className="page dashboard-page">
         <h1>Dashboard</h1>
         <p className="dashboard-loading">Loading…</p>
       </div>
@@ -92,7 +92,7 @@ export default function Dashboard() {
 
   if (err) {
     return (
-      <div className="dashboard-page">
+      <div className="page dashboard-page">
         <h1>Dashboard</h1>
         <p className="dashboard-error">{err}</p>
       </div>
@@ -100,7 +100,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="dashboard-page">
+    <div className="page dashboard-page">
       <p className="dashboard-status">Live. Settings, password recovery available.</p>
       <div className="dashboard-welcome">
         <h1 className="dashboard-welcome-title">{displayName.length > 30 ? displayName.slice(0, 27) + '…' : displayName}</h1>

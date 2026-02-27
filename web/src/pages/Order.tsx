@@ -16,9 +16,9 @@ export default function Order() {
       .catch((e: ApiError) => setErr(e.data?.error || 'Failed'));
   }, [id]);
 
-  if (!id) return <p>No order ID. <Link to="/orders">Orders</Link></p>;
-  if (err) return <p className="error">{err}. <Link to="/orders">Orders</Link></p>;
-  if (!order) return <p>Loading…</p>;
+  if (!id) return <div className="page"><p className="page-error">No order ID. <Link to="/orders">Orders</Link></p></div>;
+  if (err) return <div className="page"><p className="page-error">{err}. <Link to="/orders">Orders</Link></p></div>;
+  if (!order) return <div className="page"><h1>Order</h1><p className="page-loading">Loading…</p></div>;
 
   const status = (order.status as string) || '';
   const isSeller = order.seller_id === (api.user?.id ?? 0);
@@ -35,21 +35,25 @@ export default function Order() {
   };
 
   return (
-    <div>
-      <p><Link to="/orders">Back to orders</Link></p>
-      <article style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, padding: 24 }}>
+    <div className="page">
+      <p className="page-back"><Link to="/orders">← Back to orders</Link></p>
+      <header className="page-header">
         <h1>{String(order.title || 'Order')} {urgent ? <span style={{ background: '#c00', color: '#fff', fontSize: 12, padding: '2px 8px', borderRadius: 4 }}>Urgent</span> : null}</h1>
-        <p><strong>Price:</strong> {price}</p>
-        <p><strong>Status:</strong> <span className={'order-status order-status-' + status.toLowerCase()}>{status}</span></p>
-        <p className="text-muted">{date}</p>
-        {isSeller && status === 'pending' && (
-          <div style={{ marginTop: 16 }}>
-            <p>Accept or decline:</p>
-            <button type="button" className="btn btn-primary" onClick={accept}>Accept</button>
-            <button type="button" className="btn btn-outline" onClick={decline}>Decline</button>
-          </div>
-        )}
-      </article>
+      </header>
+      <div className="page-content">
+        <article className="page-card">
+          <p><strong>Price:</strong> {price}</p>
+          <p><strong>Status:</strong> <span className={'order-status order-status-' + status.toLowerCase()}>{status}</span></p>
+          <p className="page-intro">{date}</p>
+          {isSeller && status === 'pending' && (
+            <div style={{ marginTop: 16 }}>
+              <p>Accept or decline:</p>
+              <button type="button" className="btn btn-primary" onClick={accept}>Accept</button>
+              <button type="button" className="btn btn-outline" onClick={decline}>Decline</button>
+            </div>
+          )}
+        </article>
+      </div>
     </div>
   );
 }

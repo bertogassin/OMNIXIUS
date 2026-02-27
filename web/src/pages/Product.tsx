@@ -14,14 +14,18 @@ export default function Product() {
       .catch((e: ApiError) => setErr(e.data?.error || 'Failed'));
   }, [id]);
 
-  if (!id) return <p>No product. <Link to="/marketplace">Marketplace</Link></p>;
-  if (err) return <p className="error">{err}</p>;
-  if (!product) return <p>Loading…</p>;
+  if (!id) return <div className="page"><p className="page-error">No product. <Link to="/marketplace">Marketplace</Link></p></div>;
+  if (err) return <div className="page"><p className="page-error">{err}</p></div>;
+  if (!product) return <div className="page"><h1>Product</h1><p className="page-loading">Loading…</p></div>;
   return (
-    <div>
-      <h1>Product {id}</h1>
-      <pre>{JSON.stringify(product, null, 2)}</pre>
-      <p><Link to="/marketplace">← Marketplace</Link></p>
+    <div className="page">
+      <p className="page-back"><Link to="/marketplace">← Marketplace</Link></p>
+      <header className="page-header">
+        <h1>Product {id}</h1>
+      </header>
+      <div className="page-content">
+        <pre style={{ overflow: 'auto', fontSize: 0.85 }}>{JSON.stringify(product, null, 2)}</pre>
+      </div>
     </div>
   );
 }

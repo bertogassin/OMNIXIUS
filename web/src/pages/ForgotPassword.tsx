@@ -15,16 +15,23 @@ export default function ForgotPassword() {
       .catch((e: ApiError) => setErr(e.data?.error || 'Failed'));
   };
 
-  if (sent) return <p>Check your email for reset link. <Link to="/login">Sign in</Link></p>;
+  if (sent) return <div className="page"><header className="page-header"><h1>Forgot password</h1></header><p>Check your email for reset link. <Link to="/login">Sign in</Link></p></div>;
   return (
-    <div>
-      <h1>Forgot password</h1>
-      <form onSubmit={submit}>
-        <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-        <button type="submit" className="btn btn-primary">Send reset link</button>
-      </form>
-      {err && <p className="error">{err}</p>}
-      <p><Link to="/login">Sign in</Link></p>
+    <div className="page">
+      <header className="page-header">
+        <h1>Forgot password</h1>
+        <p className="page-intro">We’ll send a reset link to your email.</p>
+      </header>
+      <div className="page-content">
+        <form onSubmit={submit}>
+          <div className="page-form-row">
+            <label><input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required /></label>
+            <button type="submit" className="btn btn-primary">Send reset link</button>
+          </div>
+        </form>
+        {err && <p className="page-error">{err}</p>}
+        <p className="page-back"><Link to="/login">← Sign in</Link></p>
+      </div>
     </div>
   );
 }

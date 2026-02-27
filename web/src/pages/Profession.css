@@ -1,0 +1,239 @@
+/* Profession flow: Cleaning + Professional profile — adaptive */
+
+.profession-page {
+  --pro-gap: 1rem;
+  --pro-card-min: 260px;
+}
+
+.profession-header {
+  text-align: center;
+}
+
+.profession-header .page-back {
+  text-align: left;
+  margin-bottom: 0.75rem;
+}
+
+.profession-icon {
+  display: inline-block;
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.profession-icon-lg {
+  font-size: 3rem;
+  margin-right: 1rem;
+}
+
+.profession-filters {
+  margin-bottom: 1.5rem;
+}
+
+.profession-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pro-gap);
+  align-items: flex-end;
+}
+
+.profession-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.profession-label {
+  font-size: 0.85rem;
+  color: #8a8a8a;
+}
+
+.profession-input,
+.profession-select {
+  min-width: 100px;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.05);
+  color: #e8e6e3;
+  font-size: 0.95rem;
+}
+
+.profession-btn {
+  min-height: 40px;
+  padding: 0.5rem 1rem;
+}
+
+/* Card grid — adaptive */
+.profession-grid {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--pro-card-min), 1fr));
+  gap: var(--pro-gap);
+}
+
+.profession-card {
+  margin: 0;
+}
+
+.profession-card-link {
+  display: flex;
+  flex-direction: column;
+  padding: 1.25rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  text-decoration: none;
+  color: inherit;
+  min-height: 140px;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.profession-card-link:hover {
+  border-color: rgba(0, 212, 170, 0.4);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.profession-card-badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  color: #00d4aa;
+  margin-bottom: 0.5rem;
+}
+
+.profession-card-name {
+  margin: 0 0 0.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.profession-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: #8a8a8a;
+  margin-top: auto;
+}
+
+.profession-card-online {
+  background: rgba(0, 212, 170, 0.2);
+  color: #00d4aa;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.profession-card-rating {
+  color: #e8e6e3;
+}
+
+.profession-card-cta {
+  font-size: 0.9rem;
+  color: #00d4aa;
+  margin-top: 0.5rem;
+}
+
+.profession-empty {
+  color: #8a8a8a;
+}
+
+/* Professional detail */
+.professional-detail .profession-detail-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.profession-detail-heading {
+  flex: 1;
+  min-width: 0;
+}
+
+.profession-detail-heading h1 {
+  margin: 0.25rem 0 0.5rem;
+  font-size: 1.5rem;
+}
+
+.profession-section {
+  margin-bottom: 1.5rem;
+}
+
+.profession-section h2 {
+  font-size: 1rem;
+  color: #b0b0b0;
+  margin: 0 0 0.5rem;
+}
+
+.profession-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+/* ——— Adaptive breakpoints ——— */
+@media (max-width: 768px) {
+  .profession-page {
+    --pro-card-min: 100%;
+  }
+
+  .profession-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .profession-field {
+    width: 100%;
+  }
+
+  .profession-input,
+  .profession-select {
+    min-width: 0;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .profession-btn {
+    width: 100%;
+  }
+
+  .profession-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .profession-card-link {
+    min-height: 120px;
+    padding: 1rem;
+  }
+
+  .professional-detail .profession-detail-header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .profession-icon-lg {
+    margin-right: 0;
+  }
+
+  .profession-actions {
+    flex-direction: column;
+  }
+
+  .profession-actions .btn {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .profession-header h1 {
+    font-size: 1.35rem;
+  }
+
+  .profession-icon {
+    font-size: 1.75rem;
+  }
+}

@@ -22,16 +22,23 @@ export default function Register() {
   };
 
   return (
-    <div>
-      <h1>Create account</h1>
-      <form onSubmit={submit}>
-        <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-        <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-        <input type="text" placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} />
-        <button type="submit" className="btn btn-primary">Register</button>
-      </form>
-      {err && <p className="error">{err}</p>}
-      <p><Link to="/login">Sign in</Link></p>
+    <div className="page">
+      <header className="page-header">
+        <h1>Create account</h1>
+        <p className="page-intro">Create your OMNIXIUS account.</p>
+      </header>
+      <div className="page-content">
+        <form onSubmit={submit}>
+          <div className="page-form-row">
+            <label><input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required /></label>
+            <label><input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required /></label>
+            <label><input type="text" placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} /></label>
+            <button type="submit" className="btn btn-primary">Register</button>
+          </div>
+        </form>
+        {err && <p className="page-error">{err}</p>}
+        <p className="page-back"><Link to="/login">← Sign in</Link></p>
+      </div>
     </div>
   );
 }

@@ -11,12 +11,18 @@ export default function Admin() {
       .catch((e: ApiError) => setErr(e.data?.error || 'Admin only'));
   }, []);
 
-  if (err) return <p className="error">{err}</p>;
+  if (err) return <div className="page"><p className="page-error">{err}</p></div>;
   return (
-    <div>
-      <h1>Admin</h1>
-      <p>Stats, reports, user lookup, ban/unban. Screen preserved.</p>
-      {stats != null ? <pre>{JSON.stringify(stats, null, 2)}</pre> : null}
+    <div className="page">
+      <header className="page-header">
+        <h1>Admin</h1>
+        <p className="page-intro">Stats, reports, user lookup, ban/unban.</p>
+      </header>
+      <div className="page-content">
+        {stats == null ? <p className="page-loading">Loading…</p> : (
+          <pre style={{ overflow: 'auto', fontSize: 0.85 }}>{JSON.stringify(stats, null, 2)}</pre>
+        )}
+      </div>
     </div>
   );
 }

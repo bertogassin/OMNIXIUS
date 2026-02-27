@@ -146,6 +146,7 @@ export const api = {
   professionals: {
     search: (params: Record<string, string>) =>
       request<{ professionals?: unknown[] }>('/api/professionals/search?' + new URLSearchParams(params).toString()),
+    get: (id: string) => request<unknown>('/api/professionals/' + id),
   },
   remittances: {
     my: () => request<unknown>('/api/remittances/my'),

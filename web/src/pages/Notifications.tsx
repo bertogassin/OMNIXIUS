@@ -11,16 +11,21 @@ export default function Notifications() {
       .catch((e: ApiError) => setErr(e.data?.error || 'Failed'));
   }, []);
 
-  if (err) return <p className="error">{err}</p>;
-  if (!list) return <p>Loading…</p>;
+  if (err) return <div className="page"><p className="page-error">{err}</p></div>;
+  if (!list) return <div className="page"><h1>Notifications</h1><p className="page-loading">Loading…</p></div>;
   return (
-    <div>
-      <h1>Notifications</h1>
-      {list.length === 0 ? <p>No notifications.</p> : (
-        <ul style={{ listStyle: 'none', padding: 0 }}>{list.map((n: unknown, i: number) => (
-          <li key={i} style={{ padding: 12, borderBottom: '1px solid var(--border)' }}>{String(JSON.stringify(n))}</li>
-        ))}</ul>
-      )}
+    <div className="page">
+      <header className="page-header">
+        <h1>Notifications</h1>
+        <p className="page-intro">History and alerts.</p>
+      </header>
+      <div className="page-content">
+        {list.length === 0 ? <p>No notifications.</p> : (
+          <ul className="page-list">{list.map((n: unknown, i: number) => (
+            <li key={i} className="page-list-item">{String(JSON.stringify(n))}</li>
+          ))}</ul>
+        )}
+      </div>
     </div>
   );
 }

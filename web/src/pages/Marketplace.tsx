@@ -56,7 +56,7 @@ export default function Marketplace() {
   };
 
   return (
-    <div className="marketplace-page">
+    <div className="page marketplace-page">
       <p className="marketplace-status">Live. Filters sync to URL.</p>
       <h1>Trove · marketplace</h1>
       <form className="marketplace-filters" onSubmit={handleSubmit}>

@@ -59,9 +59,21 @@ function initProfessionGrid(): void {
 }
 
 function run(): void {
-  initI18n();
-  initNav();
-  initProfessionGrid();
+  try {
+    initI18n();
+  } catch {
+    // continue so profession grid still runs
+  }
+  try {
+    initNav();
+  } catch {
+    // continue
+  }
+  try {
+    initProfessionGrid();
+  } catch {
+    // leave static grid from HTML visible
+  }
 }
 
 if (typeof document !== 'undefined' && document.readyState === 'loading') {

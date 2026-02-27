@@ -11,12 +11,22 @@ export default function Remittances() {
       .catch((e: ApiError) => setErr(e.data?.error || 'Failed'));
   }, []);
 
-  if (err) return <p className="error">{err}</p>;
+  if (err) return <div className="page"><p className="page-error">{err}</p></div>;
   return (
-    <div>
-      <h1>Remittances</h1>
-      <p>My remittances and cross-border transfers.</p>
-      {list && <ul>{list.map((r: unknown, i: number) => <li key={i}>{JSON.stringify(r)}</li>)}</ul>}
+    <div className="page">
+      <header className="page-header">
+        <h1>Remittances</h1>
+        <p className="page-intro">My remittances and cross-border transfers.</p>
+      </header>
+      <div className="page-content">
+        {list == null ? <p className="page-loading">Loading…</p> : list.length === 0 ? (
+          <p>No remittances yet.</p>
+        ) : (
+          <ul className="page-list">{list.map((r: unknown, i: number) => (
+            <li key={i} className="page-list-item">{JSON.stringify(r)}</li>
+          ))}</ul>
+        )}
+      </div>
     </div>
   );
 }

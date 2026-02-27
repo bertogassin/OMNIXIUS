@@ -49,7 +49,7 @@ export default function ProfileEdit() {
   };
 
   return (
-    <div className="login-page" style={{ padding: '2rem' }}>
+    <div className="page login-page" style={{ padding: '2rem' }}>
       <div className="login-card" style={{ maxWidth: 500 }}>
         <p><Link to="/settings">Security, sessions → Settings</Link></p>
         <h1>Profile</h1>

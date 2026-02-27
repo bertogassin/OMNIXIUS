@@ -73,7 +73,7 @@ export default function Login() {
   };
 
   return (
-    <div className="login-page">
+    <div className="page login-page">
       <div className="login-card">
         <h1>Sign in</h1>
         {showApiBlock && (

@@ -12,6 +12,8 @@ import ProductCreate from './pages/ProductCreate';
 import Orders from './pages/Orders';
 import Order from './pages/Order';
 import FindProfessional from './pages/FindProfessional';
+import ProfessionCleaning from './pages/ProfessionCleaning';
+import Professional from './pages/Professional';
 import Notifications from './pages/Notifications';
 import Profile from './pages/Profile';
 import Settings from './pages/Settings';
@@ -41,6 +43,8 @@ export default function App() {
             <Route path="orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
             <Route path="order/:id" element={<ProtectedRoute><Order /></ProtectedRoute>} />
             <Route path="find-professional" element={<ProtectedRoute><FindProfessional /></ProtectedRoute>} />
+            <Route path="profession/cleaning" element={<ProtectedRoute><ProfessionCleaning /></ProtectedRoute>} />
+            <Route path="professional/:id" element={<ProtectedRoute><Professional /></ProtectedRoute>} />
             <Route path="notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
             <Route path="profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
